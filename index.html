@@ -8,20 +8,6 @@
 </head>
 <body>
 
-    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <linearGradient id="crystal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:rgba(10, 132, 255, 0.4)" />
-                <stop offset="50%" style="stop-color:rgba(100, 200, 255, 0.1)" />
-                <stop offset="100%" style="stop-color:rgba(10, 132, 255, 0.4)" />
-            </linearGradient>
-            <linearGradient id="crystal-edge" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#88cfff" />
-                <stop offset="100%" style="stop-color:#0a84ff" />
-            </linearGradient>
-        </defs>
-    </svg>
-
     <div class="app-container">
         <header>
             <h2 class="app-title">MultiTool</h2>
@@ -91,19 +77,31 @@
 
         <div id="d20-screen" class="screen">
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content d20-stage">
-                <div id="d20-crystal" class="d20-crystal" onclick="rollD20()">
-                    <svg class="d20-svg-face" viewBox="0 0 100 88">
-                        <polygon points="50,0 95,25 95,63 50,88 5,63 5,25" fill="url(#crystal-grad)" stroke="url(#crystal-edge)" stroke-width="1.5"/>
-                        <path d="M50,0 L95,25 L50,44 L5,25 Z" fill="rgba(255,255,255,0.15)"/> 
-                        <path d="M95,25 L95,63 L50,44 Z" fill="rgba(0,0,0,0.2)"/> 
-                        <path d="M95,63 L50,88 L50,44 Z" fill="rgba(255,255,255,0.1)"/> 
-                        <path d="M50,88 L5,63 L50,44 Z" fill="rgba(0,0,0,0.3)"/> 
-                        <path d="M5,63 L5,25 L50,44 Z" fill="rgba(255,255,255,0.2)"/> 
-                        <circle cx="50" cy="44" r="10" fill="rgba(255,255,255,0.3)" filter="blur(5px)"/>
-                    </svg>
-                    
-                    <div class="d20-number" id="d20-result">20</div>
+            <div class="tool-content d20-perspective">
+                <div class="d20-wrapper" onclick="rollD20()">
+                    <div id="d20-model" class="d20-model">
+                        <div class="d20-face face-1">1</div>
+                        <div class="d20-face face-2">2</div>
+                        <div class="d20-face face-3">3</div>
+                        <div class="d20-face face-4">4</div>
+                        <div class="d20-face face-5">5</div>
+                        <div class="d20-face face-6">6</div>
+                        <div class="d20-face face-7">7</div>
+                        <div class="d20-face face-8">8</div>
+                        <div class="d20-face face-9">9</div>
+                        <div class="d20-face face-10">10</div>
+                        <div class="d20-face face-11">11</div>
+                        <div class="d20-face face-12">12</div>
+                        <div class="d20-face face-13">13</div>
+                        <div class="d20-face face-14">14</div>
+                        <div class="d20-face face-15">15</div>
+                        <div class="d20-face face-16">16</div>
+                        <div class="d20-face face-17">17</div>
+                        <div class="d20-face face-18">18</div>
+                        <div class="d20-face face-19">19</div>
+                        <div class="d20-face face-20">20</div>
+                    </div>
+                    <div id="d20-result-overlay" class="d20-result-overlay">20</div>
                 </div>
                 <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
             </div>
