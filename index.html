@@ -77,32 +77,15 @@
 
         <div id="d20-screen" class="screen">
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content d20-perspective">
+            <div class="tool-content d20-area">
                 <div class="d20-wrapper" onclick="rollD20()">
-                    <div id="d20-3d" class="d20-3d">
-                        <div class="d20-face face-1">1</div>
-                        <div class="d20-face face-2">2</div>
-                        <div class="d20-face face-3">3</div>
-                        <div class="d20-face face-4">4</div>
-                        <div class="d20-face face-5">5</div>
-                        <div class="d20-face face-6">6</div>
-                        <div class="d20-face face-7">7</div>
-                        <div class="d20-face face-8">8</div>
-                        <div class="d20-face face-9">9</div>
-                        <div class="d20-face face-10">10</div>
-                        <div class="d20-face face-11">11</div>
-                        <div class="d20-face face-12">12</div>
-                        <div class="d20-face face-13">13</div>
-                        <div class="d20-face face-14">14</div>
-                        <div class="d20-face face-15">15</div>
-                        <div class="d20-face face-16">16</div>
-                        <div class="d20-face face-17">17</div>
-                        <div class="d20-face face-18">18</div>
-                        <div class="d20-face face-19">19</div>
-                        <div class="d20-face face-20">20</div>
+                    <div id="d20-spinner" class="d20-spinner">
+                        <div class="d20-shape front-layer"></div>
+                        <div class="d20-shape back-layer"></div>
+                        <div class="d20-inner-lines"></div>
                     </div>
+                    <div id="d20-result" class="d20-result">20</div>
                 </div>
-                <div id="d20-result-text" class="d20-result-text">20</div>
                 <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
             </div>
         </div>
