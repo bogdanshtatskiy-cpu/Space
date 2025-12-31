@@ -133,49 +133,38 @@ window.rollD6 = function() {
     }, 800);
 }
 
-// --- D20 LOGIC (NEW 3D TUMBLE) ---
+// --- D20 LOGIC (REAL 3D ROTATION) ---
 window.rollD20 = function() {
-    const crystal = document.getElementById('d20-crystal');
-    const text = document.getElementById('d20-result');
+    const d20 = document.getElementById('d20-model');
+    const overlay = document.getElementById('d20-result-overlay');
 
-    // 1. Скрываем текущий номер
-    text.style.opacity = 0.3;
-    text.style.transform = "translate(-50%, -50%) translateZ(40px) scale(0.5)";
+    // 1. Hide Overlay
+    overlay.style.opacity = 0;
+    overlay.style.transform = "translate(-50%, -50%) translateZ(100px) scale(0.5)";
+
+    // 2. Random Spins (Chaotic)
+    // We don't try to land on a specific face because 20-sided CSS collision is very hard.
+    // Instead we spin it beautifully and show the result overlay.
     
-    // 2. Генерируем хаотичные 3D вращения (несколько полных оборотов)
-    // Добавляем немного рандома к углам, чтобы он не всегда вставал ровно
-    const x = 720 + Math.random() * 360; 
-    const y = 720 + Math.random() * 360;
-    const z = 360 + Math.random() * 360; // Вращение вокруг своей оси
+    const x = Math.floor(Math.random() * 720) + 720; // At least 2 spins
+    const y = Math.floor(Math.random() * 720) + 720;
+    const z = Math.floor(Math.random() * 360);
 
-    // Применяем вращение
-    crystal.style.transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
+    d20.style.transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 
-    // 3. Анимация мелькания чисел
-    let counter = 0;
-    let interval = setInterval(() => {
-        text.innerText = Math.floor(Math.random() * 20) + 1;
-        counter++;
-        // Останавливаем мелькание ближе к концу анимации вращения
-        if (counter > 15) {
-            clearInterval(interval);
-        }
-    }, 60);
-
-    // 4. Показываем финальный результат когда анимация почти закончилась
+    // 3. Show Result
     setTimeout(() => {
-        const finalRes = Math.floor(Math.random() * 20) + 1;
-        text.innerText = finalRes;
-        text.style.opacity = 1;
-        // Возвращаем масштаб и позицию
-        text.style.transform = "translate(-50%, -50%) translateZ(40px) scale(1)";
+        const result = Math.floor(Math.random() * 20) + 1;
+        overlay.innerText = result;
         
-        // Подсветка критов
-        if (finalRes === 20) text.style.color = "#00ff00";
-        else if (finalRes === 1) text.style.color = "#ff3333";
-        else text.style.color = "#ffffff";
+        // Color logic
+        if (result === 20) overlay.style.color = "#00ff00";
+        else if (result === 1) overlay.style.color = "#ff3333";
+        else overlay.style.color = "#ffffff";
 
-    }, 1000); // Синхронизировано со временем CSS transition (1.2s)
+        overlay.style.opacity = 1;
+        overlay.style.transform = "translate(-50%, -50%) translateZ(100px) scale(1)";
+    }, 1000);
 }
 
 // --- SLOTS LOGIC ---
