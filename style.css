@@ -4,13 +4,6 @@
     --text-primary: #ffffff;
     --accent: #0a84ff;
     --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    
-    /* D20 MATH VARIABLES */
-    --face-width: 100px;
-    --face-height: 86.6px; /* width * 0.866 */
-    --d20-radius: 76px;    /* The magic number to connect faces */
-    --tilt: 52.62deg;      /* Dihedral angle */
-    --tilt-lower: 10.81deg;
 }
 
 body {
@@ -80,7 +73,7 @@ header {
 .ball-animate { animation: ballShake 0.6s ease-in-out; }
 @keyframes ballShake { 0% { transform: translate(0,0) rotate(0); } 25% { transform: translate(-5px, 0) rotate(-5deg); } 50% { transform: translate(5px, 0) rotate(5deg); } 75% { transform: translate(-5px, 0) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0); } }
 
-/* --- D6 --- */
+/* --- D6 (Reliable Cube) --- */
 .cube-container { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; cursor: pointer; }
 .cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 1s cubic-bezier(0.1, 0.9, 0.2, 1); transform: rotateX(-30deg) rotateY(-45deg); }
 .face { position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid #999; color: black; font-size: 40px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
@@ -91,113 +84,91 @@ header {
 .top { transform: rotateX(90deg) translateZ(50px); }
 .bottom { transform: rotateX(-90deg) translateZ(50px); }
 
-/* --- D20 TRUE 3D (FIXED) --- */
-.d20-perspective { 
-    perspective: 1200px; 
-    height: 300px; 
-    display: flex; 
-    align-items: center; 
+/* --- D20 (UNBREAKABLE VERSION) --- */
+.d20-area {
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
 }
 
 .d20-wrapper {
+    width: 200px;
+    height: 200px;
     position: relative;
-    width: 0;
-    height: 0;
+    cursor: pointer;
     transform-style: preserve-3d;
 }
 
-.d20-3d {
+/* Спиннер - крутит весь объект */
+.d20-spinner {
+    width: 100%;
+    height: 100%;
     position: absolute;
-    width: 0;
-    height: 0;
     transform-style: preserve-3d;
     transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    transform: rotateX(-20deg) rotateY(-10deg);
 }
 
-.d20-face {
+/* Форма D20 (через Clip Path) - это надежно */
+.d20-shape {
     position: absolute;
-    width: var(--face-width);
-    height: var(--face-height);
-    left: calc(var(--face-width) / -2);
-    top: calc(var(--face-height) / -2);
-    /* Треугольник */
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    
-    /* СТИЛЬ ГРАНЕЙ */
-    /* Плотный цвет, чтобы не видеть внутренности */
-    background: linear-gradient(135deg, rgba(10, 132, 255, 1), rgba(0, 50, 150, 1));
-    border-bottom: 2px solid rgba(255,255,255,0.4);
-    
-    /* Важно! Скрываем изнанку */
-    backface-visibility: hidden;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 30%; /* Смещаем цифру к центру треугольника */
-    box-sizing: border-box;
-    
-    color: white;
-    font-size: 28px;
-    font-weight: 800;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    transform-origin: 50% 50%; /* Вращаем от центра */
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a84ff, #003366);
+    /* Форма шестиугольника */
+    clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+    /* Фальшивые грани градиентом */
+    background-image: 
+        linear-gradient(0deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+        linear-gradient(60deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+        linear-gradient(120deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 100% 100%;
+    box-shadow: 0 0 20px rgba(10, 132, 255, 0.5);
 }
 
-/* КОНСТРУКЦИЯ D20
-  Углы подобраны так, чтобы грани смыкались без дырок.
-  translateZ выдвигает грань от центра.
-  rotateX наклоняет её.
-*/
+.front-layer {
+    transform: translateZ(25px); /* Передняя часть */
+    background: linear-gradient(135deg, rgba(10, 132, 255, 0.8), rgba(0, 50, 150, 0.9));
+    border: 1px solid rgba(255,255,255,0.3);
+}
 
-/* 1. ВЕРХНЯЯ ШАПКА (5 граней) */
-.face-1 { transform: rotateY(0deg)   translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-2 { transform: rotateY(72deg)  translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-3 { transform: rotateY(144deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-4 { transform: rotateY(216deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-5 { transform: rotateY(288deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
+.back-layer {
+    transform: translateZ(-25px) rotateY(180deg); /* Задняя часть для объема */
+    background: linear-gradient(135deg, rgba(0, 30, 90, 0.9), rgba(10, 80, 150, 0.8));
+}
 
-/* 2. НИЖНЯЯ ШАПКА (5 граней) - перевернуты */
-.face-16 { transform: rotateY(36deg)  rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-17 { transform: rotateY(108deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-18 { transform: rotateY(180deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-19 { transform: rotateY(252deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
-.face-20 { transform: rotateY(324deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--tilt)); }
+/* Внутренние линии для красоты (рисованные грани) */
+.d20-inner-lines {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    transform: translateZ(26px);
+    pointer-events: none;
+    /* Рисуем треугольник в центре */
+    background: 
+        linear-gradient(30deg, transparent 48%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 52%) no-repeat,
+        linear-gradient(-30deg, transparent 48%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 52%) no-repeat,
+        linear-gradient(90deg, transparent 48%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 52%) no-repeat;
+    background-size: 100% 100%;
+    clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+}
 
-/* 3. СРЕДНИЙ ПОЯС ВЕРХНИЙ (Смотрят вниз) */
-.face-6  { transform: rotateY(36deg)  translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)) rotateZ(180deg); }
-.face-7  { transform: rotateY(108deg) translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)) rotateZ(180deg); }
-.face-8  { transform: rotateY(180deg) translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)) rotateZ(180deg); }
-.face-9  { transform: rotateY(252deg) translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)) rotateZ(180deg); }
-.face-10 { transform: rotateY(324deg) translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)) rotateZ(180deg); }
-
-/* 4. СРЕДНИЙ ПОЯС НИЖНИЙ (Смотрят вверх) */
-.face-11 { transform: rotateY(0deg)   translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)); }
-.face-12 { transform: rotateY(72deg)  translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)); }
-.face-13 { transform: rotateY(144deg) translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)); }
-.face-14 { transform: rotateY(216deg) translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)); }
-.face-15 { transform: rotateY(288deg) translateZ(var(--d20-radius)) rotateX(var(--tilt-lower)); }
-
-
-/* Result Text (Hidden by default) */
-.d20-result-text {
+/* Результат */
+.d20-result {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, -50%) translateZ(60px);
     font-size: 80px;
     font-weight: 800;
     color: white;
-    text-shadow: 0 0 20px #0a84ff;
-    opacity: 0;
+    text-shadow: 0 0 15px #0a84ff, 0 0 5px white;
+    opacity: 1; /* Виден по умолчанию */
+    transition: opacity 0.2s;
     pointer-events: none;
-    transition: all 0.3s ease;
-    z-index: 100;
 }
 
-/* --- Standard Styles --- */
+/* --- Slots --- */
 .slot-machine { display: flex; gap: 10px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
 .reel-window { width: 70px; height: 90px; background: linear-gradient(to bottom, #111, #333, #111); border-radius: 10px; overflow: hidden; position: relative; border: 2px solid gold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
 .reel { font-size: 45px; display: flex; align-items: center; justify-content: center; height: 100%; filter: blur(0px); transition: filter 0.1s; }
