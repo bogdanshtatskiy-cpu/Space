@@ -8,6 +8,20 @@
 </head>
 <body>
 
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="crystal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:rgba(10, 132, 255, 0.4)" />
+                <stop offset="50%" style="stop-color:rgba(100, 200, 255, 0.1)" />
+                <stop offset="100%" style="stop-color:rgba(10, 132, 255, 0.4)" />
+            </linearGradient>
+            <linearGradient id="crystal-edge" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#88cfff" />
+                <stop offset="100%" style="stop-color:#0a84ff" />
+            </linearGradient>
+        </defs>
+    </svg>
+
     <div class="app-container">
         <header>
             <h2 class="app-title">MultiTool</h2>
@@ -77,16 +91,18 @@
 
         <div id="d20-screen" class="screen">
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content">
-                <div class="d20-wrapper" onclick="rollD20()">
-                    <svg class="d20-gem" viewBox="0 0 100 88" id="d20-svg">
-                        <polygon points="50,0 95,25 95,63 50,88 5,63 5,25" fill="rgba(10, 132, 255, 0.2)" stroke="#0a84ff" stroke-width="1"/>
-                        <path d="M50,0 L95,25 L50,44 L5,25 Z" fill="rgba(255,255,255,0.1)"/> 
+            <div class="tool-content d20-stage">
+                <div id="d20-crystal" class="d20-crystal" onclick="rollD20()">
+                    <svg class="d20-svg-face" viewBox="0 0 100 88">
+                        <polygon points="50,0 95,25 95,63 50,88 5,63 5,25" fill="url(#crystal-grad)" stroke="url(#crystal-edge)" stroke-width="1.5"/>
+                        <path d="M50,0 L95,25 L50,44 L5,25 Z" fill="rgba(255,255,255,0.15)"/> 
                         <path d="M95,25 L95,63 L50,44 Z" fill="rgba(0,0,0,0.2)"/> 
-                        <path d="M95,63 L50,88 L50,44 Z" fill="rgba(255,255,255,0.05)"/> 
+                        <path d="M95,63 L50,88 L50,44 Z" fill="rgba(255,255,255,0.1)"/> 
                         <path d="M50,88 L5,63 L50,44 Z" fill="rgba(0,0,0,0.3)"/> 
-                        <path d="M5,63 L5,25 L50,44 Z" fill="rgba(255,255,255,0.15)"/> 
+                        <path d="M5,63 L5,25 L50,44 Z" fill="rgba(255,255,255,0.2)"/> 
+                        <circle cx="50" cy="44" r="10" fill="rgba(255,255,255,0.3)" filter="blur(5px)"/>
                     </svg>
+                    
                     <div class="d20-number" id="d20-result">20</div>
                 </div>
                 <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
@@ -97,15 +113,9 @@
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
             <div class="tool-content">
                 <div class="slot-machine">
-                    <div class="reel-window">
-                        <div class="reel" id="reel-1">🍒</div>
-                    </div>
-                    <div class="reel-window">
-                        <div class="reel" id="reel-2">🍒</div>
-                    </div>
-                    <div class="reel-window">
-                        <div class="reel" id="reel-3">🍒</div>
-                    </div>
+                    <div class="reel-window"><div class="reel" id="reel-1">🍒</div></div>
+                    <div class="reel-window"><div class="reel" id="reel-2">🍒</div></div>
+                    <div class="reel-window"><div class="reel" id="reel-3">🍒</div></div>
                 </div>
                 <div id="slot-msg" class="slot-message"></div>
                 <button class="glass-btn-large" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button>
