@@ -79,10 +79,11 @@
     <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
     <div class="tool-content d20-area">
       <div class="d20-wrapper">
-        <div id="d20-canvas-wrap" class="d20-canvas-wrap" onclick="rollD20()"></div>
+        <div id="d20-canvas-wrap" class="d20-canvas-wrap"></div>
         <div id="d20-result" class="d20-result">20</div>
       </div>
       <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
+      <p class="hint-text" id="d20-status" style="margin-top:10px; opacity:.55; font-size:12px;"></p>
     </div>
   </div>
 
@@ -127,6 +128,10 @@
   </footer>
 </div>
 
-<script type="module" src="script.js"></script>
+<!-- 1) основной UI (не module) -->
+<script src="script.js"></script>
+
+<!-- 2) D20 WebGL (module, отдельно) -->
+<script type="module" src="d20.js"></script>
 </body>
 </html>
