@@ -3,344 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MultiTool iOS Style</title>
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            --text-color: #ffffff;
-            --accent-color: #0a84ff;
-            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-stack);
-            background: linear-gradient(135deg, #1c0e38, #4a192c, #0f2e45);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: var(--text-color);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Container with Glass Effect */
-        .app-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-            position: relative;
-        }
-
-        /* Header */
-        header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .lang-switch {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 4px;
-            display: flex;
-        }
-
-        .lang-btn {
-            background: transparent;
-            border: none;
-            color: rgba(255,255,255,0.6);
-            padding: 6px 12px;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 16px;
-            transition: 0.3s;
-        }
-
-        .lang-btn.active {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            font-weight: 600;
-        }
-
-        /* Screens */
-        .screen {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .screen.active {
-            display: flex;
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Grid Menu */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-            padding-bottom: 80px; /* Space for footer */
-        }
-
-        .menu-item {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            aspect-ratio: 1 / 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            box-shadow: var(--glass-shadow);
-            padding: 10px;
-            text-align: center;
-        }
-
-        .menu-item:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .menu-icon {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 12px;
-            fill: #fff;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-        }
-
-        .menu-label {
-            font-size: 15px;
-            font-weight: 500;
-            line-height: 1.2;
-        }
-
-        /* Back Button */
-        .back-btn {
-            align-self: flex-start;
-            background: transparent;
-            border: none;
-            color: var(--accent-color);
-            font-size: 17px;
-            font-weight: 600;
-            padding: 10px 0;
-            cursor: pointer;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .back-btn::before {
-            content: "‹";
-            font-size: 28px;
-            margin-right: 6px;
-            margin-top: -4px;
-        }
-
-        /* Tool Styles */
-        .tool-container {
-            width: 100%;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Magic 8 Ball */
-        .magic-ball {
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle at 30% 30%, #444, #000);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.8);
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        
-        .magic-ball:active { transform: scale(0.98); }
-
-        .magic-window {
-            width: 140px;
-            height: 140px;
-            background: radial-gradient(circle, #1a1a1a, #000);
-            border-radius: 50%;
-            border: 2px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .triangle {
-            width: 0;
-            height: 0;
-            border-left: 55px solid transparent;
-            border-right: 55px solid transparent;
-            border-top: 95px solid #1a5c1a; /* Dark Green */
-            position: absolute;
-            top: 25px;
-            filter: blur(0.5px);
-            transition: opacity 0.5s;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-        }
-
-        .answer-text {
-            position: absolute;
-            top: -85px; /* Adjust to center inside inverted triangle */
-            left: -45px;
-            width: 90px;
-            text-align: center;
-            color: #8aff8a;
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: bold;
-            opacity: 0;
-            text-shadow: 0 0 4px #8aff8a;
-            line-height: 1.2;
-            transition: opacity 1s ease-in;
-        }
-
-        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 0, 0) rotate(-2deg); }
-            20%, 80% { transform: translate3d(4px, 0, 0) rotate(2deg); }
-            30%, 50%, 70% { transform: translate3d(-8px, 0, 0) rotate(-4deg); }
-            40%, 60% { transform: translate3d(8px, 0, 0) rotate(4deg); }
-        }
-
-        /* Dice */
-        .dice-display {
-            width: 150px;
-            height: 150px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px);
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            font-weight: bold;
-            color: #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .dice-rotate { animation: rotateDice 0.5s linear infinite; }
-
-        @keyframes rotateDice {
-            0% { transform: rotate(0deg) scale(0.9); opacity: 0.7; }
-            50% { transform: rotate(180deg) scale(1.1); opacity: 0.9; }
-            100% { transform: rotate(360deg) scale(0.9); opacity: 0.7; }
-        }
-
-        /* Randomizer */
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .input-glass {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 18px;
-            width: 80%;
-            text-align: center;
-            outline: none;
-        }
-        
-        .action-btn {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 30px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: 0.2s;
-        }
-        
-        .action-btn:active { transform: scale(0.95); }
-
-        .result-large {
-            font-size: 80px;
-            font-weight: 200;
-            margin-top: 20px;
-            min-height: 100px;
-        }
-
-        /* Footer */
-        footer {
-            padding: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-        }
-
-        footer a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            font-weight: 600;
-        }
-    </style>
+    <title>MultiTool iOS</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="app-container">
         <header>
-            <h2 style="margin:0; font-weight: 600; font-size: 20px;">MultiTool</h2>
+            <h2 class="app-title">MultiTool</h2>
             <div class="lang-switch">
                 <button class="lang-btn active" onclick="setLang('uk')">UK</button>
                 <button class="lang-btn" onclick="setLang('ru')">RU</button>
@@ -350,31 +20,23 @@
         <div id="menu-screen" class="screen active">
             <div class="menu-grid">
                 <div class="menu-item" onclick="openTool('magicBall')">
-                    <svg class="menu-icon" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-1.1 0-2 .9-2 2h4c0-1.1-.9-2-2-2zm0 4c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                        <text x="12" y="16" font-size="8" text-anchor="middle" fill="white" font-weight="bold">8</text>
-                    </svg>
+                    <div class="icon-bg">🎱</div>
                     <span class="menu-label" data-key="ball_title">Шар Судьбы</span>
                 </div>
-
                 <div class="menu-item" onclick="openTool('d6')">
-                    <svg class="menu-icon" viewBox="0 0 24 24">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H7v-4h4v4zm0-6H7V7h4v4zm6 6h-4v-4h4v4zm0-6h-4V7h4v4z"/>
-                    </svg>
+                    <div class="icon-bg">🎲</div>
                     <span class="menu-label" data-key="d6_title">Кубик D6</span>
                 </div>
-
                 <div class="menu-item" onclick="openTool('d20')">
-                    <svg class="menu-icon" viewBox="0 0 24 24">
-                        <path d="M12 2L2 8l10 14L22 8 12 2zm0 2.8L19.2 8 12 18.5 4.8 8 12 4.8z"/>
-                    </svg>
+                    <div class="icon-bg">🐉</div>
                     <span class="menu-label" data-key="d20_title">Кубик D20</span>
                 </div>
-
+                <div class="menu-item" onclick="openTool('coin')">
+                    <div class="icon-bg">🪙</div>
+                    <span class="menu-label" data-key="coin_title">Монетка</span>
+                </div>
                 <div class="menu-item" onclick="openTool('randomizer')">
-                    <svg class="menu-icon" viewBox="0 0 24 24">
-                        <path d="M17 17h-2v-4h2v4zm-4 0h-2v-6h2v6zm-4 0H7V7h2v10zm12 0h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                    </svg>
+                    <div class="icon-bg">🔢</div>
                     <span class="menu-label" data-key="rand_title">Рандомайзер</span>
                 </div>
             </div>
@@ -382,43 +44,65 @@
 
         <div id="magicBall-screen" class="screen">
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-container">
-                <div class="magic-ball" onclick="askBall()">
-                    <div class="magic-window">
-                        <div class="triangle">
-                            <span class="answer-text" id="ball-answer"></span>
-                        </div>
+            <div class="tool-content">
+                <div class="magic-ball-outer" onclick="askBall()">
+                    <div class="magic-ball-inner">
+                        <span id="ball-text" class="ball-text">8</span>
                     </div>
                 </div>
-                <p style="margin-top: 30px; opacity: 0.6; text-align: center;" data-key="ball_hint">Нажми на шар, чтобы узнать истину</p>
+                <p class="hint-text" data-key="ball_hint">Нажми на шар</p>
             </div>
         </div>
 
         <div id="d6-screen" class="screen">
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-container">
-                <div class="dice-display" id="d6-result" onclick="rollD6()">6</div>
-                <p style="margin-top: 20px; opacity: 0.6;" data-key="tap_roll">Нажми, чтобы бросить</p>
+            <div class="tool-content" style="perspective: 1000px;">
+                <div class="cube-container" onclick="rollD6()">
+                    <div id="dice-cube" class="cube">
+                        <div class="face front">1</div>
+                        <div class="face back">6</div>
+                        <div class="face right">3</div>
+                        <div class="face left">4</div>
+                        <div class="face top">5</div>
+                        <div class="face bottom">2</div>
+                    </div>
+                </div>
+                <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
             </div>
         </div>
 
         <div id="d20-screen" class="screen">
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-container">
-                <div class="dice-display" id="d20-result" onclick="rollD20()" style="border-radius: 50%; width: 160px; height: 160px;">20</div>
-                <p style="margin-top: 20px; opacity: 0.6;" data-key="tap_roll">Нажми, чтобы бросить</p>
+            <div class="tool-content">
+                <div class="d20-container" onclick="rollD20()">
+                     <svg class="d20-svg" viewBox="0 0 100 100" id="d20-svg">
+                        <path d="M50 5 L95 30 L95 75 L50 95 L5 75 L5 30 Z" fill="none" stroke="white" stroke-width="2"/>
+                        <path d="M50 5 L50 50 L95 75 M50 50 L5 75 M50 50 L50 95" stroke="white" stroke-width="1" opacity="0.5"/>
+                        <text x="50" y="60" text-anchor="middle" fill="white" font-size="25" id="d20-result">20</text>
+                     </svg>
+                </div>
+                <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
+            </div>
+        </div>
+
+        <div id="coin-screen" class="screen">
+            <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+            <div class="tool-content" style="perspective: 1000px;">
+                <div id="coin" class="coin" onclick="flipCoin()">
+                    <div class="side-a"></div> <div class="side-b"></div> </div>
+                <p class="hint-text" data-key="tap_roll">Нажми, чтобы подбросить</p>
             </div>
         </div>
 
         <div id="randomizer-screen" class="screen">
             <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-container">
-                <div class="input-group">
-                    <label data-key="rand_limit_label">Максимум (до):</label>
-                    <input type="number" id="rand-max" class="input-glass" value="100">
+            <div class="tool-content">
+                <div class="input-area">
+                    <label data-key="rand_limit_label">Максимум:</label>
+                    <input type="number" id="rand-max" class="glass-input" value="100">
                 </div>
-                <div class="result-large" id="rand-result">0</div>
-                <button class="action-btn" onclick="generateRandom()" data-key="generate">Сгенерировать</button>
+                <div class="rand-result" id="rand-display">0</div>
+                <button class="glass-btn-large" onclick="generateRandom()" data-key="generate">Start</button>
             </div>
         </div>
 
@@ -427,153 +111,6 @@
         </footer>
     </div>
 
-    <script>
-        // --- DATA & TRANSLATIONS ---
-        const langData = {
-            uk: {
-                ball_title: "Куля Долі",
-                d6_title: "Кубик",
-                d20_title: "Кубик D20",
-                rand_title: "Рандом",
-                back: "Назад",
-                ball_hint: "Натисни на кулю, щоб дізнатися правду",
-                tap_roll: "Натисни, щоб кинути",
-                rand_limit_label: "Максимум (до):",
-                generate: "Згенерувати"
-            },
-            ru: {
-                ball_title: "Шар Судьбы",
-                d6_title: "Кубик",
-                d20_title: "Кубик D20",
-                rand_title: "Рандомайзер",
-                back: "Назад",
-                ball_hint: "Нажми на шар, чтобы узнать истину",
-                tap_roll: "Нажми, чтобы бросить",
-                rand_limit_label: "Максимум (до):",
-                generate: "Сгенерировать"
-            }
-        };
-
-        // Саркастичные ответы (можно добавлять сотни через запятую)
-        const ballAnswers = {
-            uk: [
-                "Забий", "А воно тобі треба?", "Зірки в шоці", "Навіть не думай", "Вже пізно", 
-                "Спитай у мами", "Шанс 1%", "Яка різниця?", "Тільки не сьогодні", "Ой, все", 
-                "Це фіаско", "Звісно, ні", "Мрій далі", "Інтернет каже ні", "Спробуй ще",
-                "Не ганьбися", "100%", "Так, але навіщо?", "Доля сміється", "Краще поспи"
-            ],
-            ru: [
-                "Забей", "А оно тебе надо?", "Звезды в шоке", "Даже не думай", "Уже поздно", 
-                "Спроси у мамы", "Шанс 1%", "Какая разница?", "Только не сегодня", "Ой, всё", 
-                "Это фиаско", "Конечно нет", "Мечтай дальше", "Интернет говорит нет", "Попробуй еще",
-                "Не позорься", "100%", "Да, но зачем?", "Судьба смеется", "Лучше поспи"
-            ]
-        };
-
-        let currentLang = 'uk';
-
-        // --- CORE FUNCTIONS ---
-
-        function setLang(lang) {
-            currentLang = lang;
-            
-            // Toggle buttons
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            // Update text
-            document.querySelectorAll('[data-key]').forEach(el => {
-                const key = el.getAttribute('data-key');
-                if (langData[lang][key]) {
-                    el.innerText = langData[lang][key];
-                }
-            });
-        }
-
-        function openTool(toolName) {
-            document.getElementById('menu-screen').classList.remove('active');
-            setTimeout(() => {
-                document.getElementById('menu-screen').style.display = 'none';
-                
-                const toolScreen = document.getElementById(toolName + '-screen');
-                toolScreen.style.display = 'flex';
-                setTimeout(() => toolScreen.classList.add('active'), 10);
-            }, 200); // Wait for transition
-        }
-
-        function goBack() {
-            const activeScreens = document.querySelectorAll('.screen.active');
-            activeScreens.forEach(s => s.classList.remove('active'));
-            
-            setTimeout(() => {
-                document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-                
-                const menu = document.getElementById('menu-screen');
-                menu.style.display = 'flex';
-                setTimeout(() => menu.classList.add('active'), 10);
-            }, 200);
-        }
-
-        // --- TOOL LOGIC ---
-
-        // Magic Ball
-        function askBall() {
-            const ball = document.querySelector('.magic-ball');
-            const textEl = document.getElementById('ball-answer');
-            const answers = ballAnswers[currentLang];
-            
-            // Reset
-            textEl.style.opacity = 0;
-            ball.classList.remove('shake');
-            void ball.offsetWidth; // Trigger reflow
-            
-            // Animate
-            ball.classList.add('shake');
-            
-            setTimeout(() => {
-                const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
-                textEl.innerText = randomAnswer;
-                textEl.style.opacity = 1;
-            }, 500);
-        }
-
-        // Dice Logic (Generic)
-        function rollDiceGeneric(elementId, max, duration = 600) {
-            const el = document.getElementById(elementId);
-            el.classList.add('dice-rotate');
-            
-            let interval = setInterval(() => {
-                el.innerText = Math.floor(Math.random() * max) + 1;
-            }, 50);
-
-            setTimeout(() => {
-                clearInterval(interval);
-                el.classList.remove('dice-rotate');
-                el.innerText = Math.floor(Math.random() * max) + 1;
-            }, duration);
-        }
-
-        function rollD6() { rollDiceGeneric('d6-result', 6); }
-        function rollD20() { rollDiceGeneric('d20-result', 20); }
-
-        // Randomizer
-        function generateRandom() {
-            const max = parseInt(document.getElementById('rand-max').value) || 100;
-            const resEl = document.getElementById('rand-result');
-            
-            // Animation effect
-            let step = 0;
-            let interval = setInterval(() => {
-                resEl.innerText = Math.floor(Math.random() * max) + 1;
-                step++;
-                if (step > 10) {
-                    clearInterval(interval);
-                }
-            }, 50);
-        }
-
-        // Init
-        setLang('uk'); // Default language
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
