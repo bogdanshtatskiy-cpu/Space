@@ -178,7 +178,7 @@
     .d6-f5 { transform: rotateX(90deg) translateZ(50px); }
     .d6-f2 { transform: rotateX(-90deg) translateZ(50px); }
 
-    /* --- D20 SVG (New Design) --- */
+    /* --- D20 SVG (Final Design) --- */
     .d20-wrapper {
       position: relative;
       width: 260px;
@@ -192,7 +192,6 @@
     }
     .d20-wrapper:active { transform: scale(0.96); }
 
-    /* Анимация тряски при броске */
     .d20-anim {
       animation: d20ShakeAnim 0.5s ease-in-out infinite;
     }
@@ -209,8 +208,10 @@
       width: 100%;
       height: 100%;
       fill: none;
-      stroke: #ffffff;
-      stroke-width: 3;
+      /* Цвет линий кубика */
+      stroke: #ffffff; 
+      /* Толщина линий, чтобы было как на картинке */
+      stroke-width: 4; 
       stroke-linecap: round;
       stroke-linejoin: round;
       filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
@@ -319,21 +320,21 @@
       <div class="tool-content">
         <div id="d20-wrapper" class="d20-wrapper" onclick="rollD20()">
           <svg class="d20-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="50,5 95,27 95,73 50,95 5,73 5,27" />
+            <polygon points="50,4 96,28 96,72 50,96 4,72 4,28" />
             <g>
-              <line x1="23" y1="50" x2="77" y2="50" />
-              <line x1="23" y1="50" x2="50" y2="23" />
-              <line x1="77" y1="50" x2="50" y2="23" />
-              <line x1="23" y1="50" x2="50" y2="77" />
-              <line x1="77" y1="50" x2="50" y2="77" />
+              <line x1="21" y1="50" x2="79" y2="50" />
+              <line x1="21" y1="50" x2="50" y2="21" />
+              <line x1="79" y1="50" x2="50" y2="21" />
+              <line x1="21" y1="50" x2="50" y2="79" />
+              <line x1="79" y1="50" x2="50" y2="79" />
             </g>
             <g>
-              <line x1="50" y1="23" x2="50" y2="5" />
-              <line x1="23" y1="50" x2="5" y2="27" />
-              <line x1="23" y1="50" x2="5" y2="73" />
-              <line x1="77" y1="50" x2="95" y2="27" />
-              <line x1="77" y1="50" x2="95" y2="73" />
-              <line x1="50" y1="77" x2="50" y2="95" />
+              <line x1="50" y1="21" x2="50" y2="4" />
+              <line x1="21" y1="50" x2="4" y2="28" />
+              <line x1="21" y1="50" x2="4" y2="72" />
+              <line x1="79" y1="50" x2="96" y2="28" />
+              <line x1="79" y1="50" x2="96" y2="72" />
+              <line x1="50" y1="79" x2="50" y2="96" />
             </g>
           </svg>
           <div id="d20-result" class="d20-result">20</div>
