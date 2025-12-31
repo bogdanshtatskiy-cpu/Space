@@ -5,10 +5,12 @@
     --accent: #0a84ff;
     --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     
-    /* D20 Dimensions */
-    --d20-size: 80px; /* Base size of a face width */
-    --d20-h: 69px;   /* Height of triangle ~ size * 0.866 */
-    --d20-z: 60px;   /* Distance from center */
+    /* D20 Fixed Math */
+    --d20-face-width: 100px;
+    --d20-face-height: 86px; /* sqrt(3)/2 * width */
+    --d20-radius: 78px; /* Расстояние от центра до граней (подбирается чтобы склеилось) */
+    --d20-tilt-upper: 52.6deg;
+    --d20-tilt-lower: 10.8deg;
 }
 
 body {
@@ -42,7 +44,7 @@ body {
     padding-bottom: 20px;
 }
 
-/* Header & Menu styles (Standard) */
+/* Header & Menu */
 header {
     padding: 20px;
     display: flex;
@@ -89,7 +91,7 @@ header {
 .top { transform: rotateX(90deg) translateZ(50px); }
 .bottom { transform: rotateX(-90deg) translateZ(50px); }
 
-/* --- D20 TRUE ICOSAHEDRON --- */
+/* --- D20 TRUE ICOSAHEDRON (FIXED) --- */
 .d20-perspective { perspective: 1000px; }
 
 .d20-wrapper {
@@ -103,100 +105,90 @@ header {
 
 .d20-model {
     position: relative;
-    width: 0;
+    width: 0; 
     height: 0;
     transform-style: preserve-3d;
     transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    /* Initial rotation to look cool */
     transform: rotateX(-20deg) rotateY(-10deg);
 }
 
-/* Common Face Style */
 .d20-face {
     position: absolute;
-    width: var(--d20-size);
-    height: var(--d20-h); /* Triangle Height */
-    left: calc(var(--d20-size) / -2);
-    top: calc(var(--d20-h) / -2);
+    width: var(--d20-face-width);
+    height: var(--d20-face-height);
+    /* Центрируем точку трансформации в центре экрана */
+    left: calc(var(--d20-face-width) / -2);
+    top: calc(var(--d20-face-height) / -2);
     
-    /* Triangle Shape */
+    /* Рисуем треугольник */
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background: linear-gradient(135deg, rgba(30,144,255,0.9), rgba(0,0,80,0.9));
+    border-bottom: 2px solid rgba(255,255,255,0.3); /* Легкий бордюр снизу */
     
-    /* Look */
-    background: rgba(10, 132, 255, 0.6);
-    border-bottom: 1px solid rgba(255,255,255,0.8); /* Faux border via background trick or simple line? Borders are hard with clip-path */
-    /* Use background gradient to simulate border/shine */
-    background: linear-gradient(135deg, rgba(30,144,255,0.8), rgba(0,0,50,0.8));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 30px; /* Смещаем цифру визуально в центр треугольника */
+    box-sizing: border-box;
     
     color: white;
     font-size: 24px;
     font-weight: bold;
-    display: flex;
-    align-items: flex-end; /* Text at bottom center of triangle */
-    justify-content: center;
-    padding-bottom: 5px;
-    backface-visibility: visible;
-    transform-origin: 50% 50%; /* Center of square */
+    text-shadow: 0 1px 3px black;
+    
+    /* Самое важное - точка вращения. Смещаем ее вниз, к "брюху" треугольника */
+    transform-origin: 50% 58%;
+    backface-visibility: hidden; /* Скрываем изнанку для чистоты, или visible для стекла */
+    opacity: 0.9;
 }
 
-/* Adjust text position inside triangle */
-.d20-face {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 30%; /* Push text down a bit */
-    box-sizing: border-box;
-    text-shadow: 0 0 5px black;
-}
-
-/* ICOSAHEDRON MATH 
-   Top Cap: 5 faces. Tilt ~52.62 deg.
-   Middle Up: 5 faces.
-   Middle Down: 5 faces.
-   Bottom Cap: 5 faces.
+/* СБОРКА D20
+   1. Верхняя шапка (5 шт): Наклон внутрь
+   2. Нижняя шапка (5 шт): Перевернуты и наклон внутрь
+   3. Средний пояс (10 шт): 5 смотрят вверх, 5 смотрят вниз
 */
 
-/* --- Top Cap (1-5) --- */
-.face-1 { transform: rotateY(0deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
-.face-2 { transform: rotateY(72deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
-.face-3 { transform: rotateY(144deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
-.face-4 { transform: rotateY(216deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
-.face-5 { transform: rotateY(288deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
+/* --- ВЕРХНЯЯ ШАПКА (1-5) --- */
+.face-1 { transform: rotateY(0deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-2 { transform: rotateY(72deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-3 { transform: rotateY(144deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-4 { transform: rotateY(216deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-5 { transform: rotateY(288deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
 
-/* --- Middle Top (6-10) --- 
-   Rotated Y is offset by 36deg from top cap.
-   Tilt is much less: ~10.8 deg, pointing DOWN (X rotation negative?)
+/* --- НИЖНЯЯ ШАПКА (16-20) --- 
+   Переворачиваем на 180 (rotateZ) и смещаем Y фазу на 36 градусов
 */
-.face-6  { transform: rotateY(36deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
-.face-7  { transform: rotateY(108deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
-.face-8  { transform: rotateY(180deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
-.face-9  { transform: rotateY(252deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
-.face-10 { transform: rotateY(324deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
+.face-16 { transform: rotateY(36deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-17 { transform: rotateY(108deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-18 { transform: rotateY(180deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-19 { transform: rotateY(252deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
+.face-20 { transform: rotateY(324deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
 
-/* --- Middle Bottom (11-15) --- 
-   Same Y angles as Top Cap (0, 72...), pointing UP.
+/* --- СРЕДНИЙ ПОЯС ВЕРХНИЙ (6-10) --- 
+   Смотрят вниз (rotateZ 180), наклон меньше (10.8), вклиниваются между верхними
 */
-.face-11 { transform: rotateY(0deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
-.face-12 { transform: rotateY(72deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
-.face-13 { transform: rotateY(144deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
-.face-14 { transform: rotateY(216deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
-.face-15 { transform: rotateY(288deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
+.face-6  { transform: rotateY(36deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-7  { transform: rotateY(108deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-8  { transform: rotateY(180deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-9  { transform: rotateY(252deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-10 { transform: rotateY(324deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
 
-/* --- Bottom Cap (16-20) --- 
-   Same Y angles as Middle Top (36, 108...), pointing DOWN.
+/* --- СРЕДНИЙ ПОЯС НИЖНИЙ (11-15) --- 
+   Смотрят вверх, наклон меньше (10.8), совпадают по фазе с верхними
 */
-.face-16 { transform: rotateY(36deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
-.face-17 { transform: rotateY(108deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
-.face-18 { transform: rotateY(180deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
-.face-19 { transform: rotateY(252deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
-.face-20 { transform: rotateY(324deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
+.face-11 { transform: rotateY(0deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-12 { transform: rotateY(72deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-13 { transform: rotateY(144deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-14 { transform: rotateY(216deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
+.face-15 { transform: rotateY(288deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
 
-/* Result Overlay (Floating Text) */
+
+/* Result Overlay */
 .d20-result-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) translateZ(100px);
+    transform: translate(-50%, -50%) translateZ(120px);
     font-size: 60px;
     font-weight: 800;
     color: #fff;
@@ -207,25 +199,22 @@ header {
     z-index: 10;
 }
 
-/* --- Slots --- */
+/* --- Остальные стили без изменений --- */
 .slot-machine { display: flex; gap: 10px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
 .reel-window { width: 70px; height: 90px; background: linear-gradient(to bottom, #111, #333, #111); border-radius: 10px; overflow: hidden; position: relative; border: 2px solid gold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
 .reel { font-size: 45px; display: flex; align-items: center; justify-content: center; height: 100%; filter: blur(0px); transition: filter 0.1s; }
 .reel.blur { filter: blur(4px); transform: scale(0.9); }
 .slot-message { height: 30px; margin-bottom: 15px; font-weight: bold; color: gold; text-shadow: 0 0 5px orange; }
 
-/* --- Coin --- */
 #coin { position: relative; width: 150px; height: 150px; cursor: pointer; transform-style: preserve-3d; transition: transform 3s ease-out; }
 .side-a, .side-b { position: absolute; width: 100%; height: 100%; border-radius: 50%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border: 4px solid #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
 .side-a { background: radial-gradient(circle, #ffe066, #b38f00); color: #554400; transform: rotateY(0deg); }
 .side-b { background: radial-gradient(circle, #e0e0e0, #888); color: #333; transform: rotateY(180deg); border-color: silver; }
 
-/* --- Randomizer --- */
 .input-area { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
 .glass-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 12px; font-size: 20px; text-align: center; width: 120px; outline: none; margin-top: 10px; }
 .rand-result { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; }
 
-/* Button & Footer */
 .glass-btn-large { background: white; color: black; border: none; padding: 15px 50px; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.3); transition: transform 0.1s; }
 .glass-btn-large:active { transform: scale(0.95); }
 footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; }
