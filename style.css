@@ -7,6 +7,9 @@
 
     --d20z: 78px;
     --d20tilt: 52deg;
+
+    --d20-face-w: 140px;
+    --d20-face-h: 120px;
 }
 
 body {
@@ -76,7 +79,7 @@ header {
 .ball-animate { animation: ballShake 0.6s ease-in-out; }
 @keyframes ballShake { 0% { transform: translate(0,0) rotate(0); } 25% { transform: translate(-5px, 0) rotate(-5deg); } 50% { transform: translate(5px, 0) rotate(5deg); } 75% { transform: translate(-5px, 0) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0); } }
 
-/* --- D6 (Reliable Cube) --- */
+/* --- D6 --- */
 .cube-container { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; cursor: pointer; }
 .cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 1s cubic-bezier(0.1, 0.9, 0.2, 1); transform: rotateX(-30deg) rotateY(-45deg); }
 .face { position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid #999; color: black; font-size: 40px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
@@ -87,7 +90,7 @@ header {
 .top { transform: rotateX(90deg) translateZ(50px); }
 .bottom { transform: rotateX(-90deg) translateZ(50px); }
 
-/* --- D20 (REAL 3D) --- */
+/* --- D20 (FIXED for mobile/Safari) --- */
 .d20-area {
     perspective: 1000px;
     display: flex;
@@ -101,19 +104,24 @@ header {
     height: 220px;
     position: relative;
     cursor: pointer;
+
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
 }
 
 .d20-spinner {
     width: 100%;
     height: 100%;
     position: absolute;
-    transform-style: preserve-3d; /* важно: иначе “сплющит” детей в 2D [web:33] */
+
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+
     transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
 }
 
 .d20-ico {
-    transform-style: preserve-3d;
     transform: rotateX(-20deg) rotateY(25deg);
 }
 
@@ -121,66 +129,63 @@ header {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 0;
-    height: 0;
+    width: var(--d20-face-w);
+    height: var(--d20-face-h);
+    margin-left: calc(var(--d20-face-w) / -2);
+    margin-top: calc(var(--d20-face-h) / -2);
 
-    border-left: 62px solid transparent;
-    border-right: 62px solid transparent;
-    border-bottom: 108px solid rgba(10, 132, 255, 0.85);
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    background: linear-gradient(135deg, rgba(10,132,255,0.92), rgba(0,50,150,0.85));
 
+    border: 1px solid rgba(255,255,255,0.22);
+    box-sizing: border-box;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden; /* важно для iOS [web:21] */
+
+    transform-origin: 50% 78%;
     transform-style: preserve-3d;
-    transform-origin: 50% 80%;
-    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.35));
+
+    /* микросмещение чтобы снизить z-fighting */
+    translate: 0 0;
 }
 
 .d20-face > span {
     position: absolute;
     left: 50%;
-    top: 62px;
-    transform: translateX(-50%);
+    top: 58px;
+    transform: translateX(-50%) translateZ(0.1px);
     color: #fff;
-    font-weight: 800;
+    font-weight: 900;
     font-size: 22px;
     text-shadow: 0 0 10px rgba(10,132,255,0.8);
     pointer-events: none;
 }
 
-.d20-face::after {
-    content: "";
-    position: absolute;
-    left: -62px;
-    top: 0;
-    width: 124px;
-    height: 108px;
-    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-    border: 1px solid rgba(255,255,255,0.25);
-    box-sizing: border-box;
-}
+/* Позиционирование 20 граней */
+.f1  { transform: rotateY(0deg)   rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
+.f2  { transform: rotateY(72deg)  rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
+.f3  { transform: rotateY(144deg) rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
+.f4  { transform: rotateY(216deg) rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
+.f5  { transform: rotateY(288deg) rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
 
-/* 20 граней (приближенная раскладка) */
-.f1  { transform: translate(-50%,-50%) rotateY(0deg)   rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
-.f2  { transform: translate(-50%,-50%) rotateY(72deg)  rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
-.f3  { transform: translate(-50%,-50%) rotateY(144deg) rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
-.f4  { transform: translate(-50%,-50%) rotateY(216deg) rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
-.f5  { transform: translate(-50%,-50%) rotateY(288deg) rotateX(var(--d20tilt)) translateZ(var(--d20z)); }
+.f6  { transform: rotateY(36deg)  rotateX(0deg) translateZ(var(--d20z)); }
+.f7  { transform: rotateY(108deg) rotateX(0deg) translateZ(var(--d20z)); }
+.f8  { transform: rotateY(180deg) rotateX(0deg) translateZ(var(--d20z)); }
+.f9  { transform: rotateY(252deg) rotateX(0deg) translateZ(var(--d20z)); }
+.f10 { transform: rotateY(324deg) rotateX(0deg) translateZ(var(--d20z)); }
 
-.f6  { transform: translate(-50%,-50%) rotateY(36deg)  rotateX(0deg) translateZ(var(--d20z)); }
-.f7  { transform: translate(-50%,-50%) rotateY(108deg) rotateX(0deg) translateZ(var(--d20z)); }
-.f8  { transform: translate(-50%,-50%) rotateY(180deg) rotateX(0deg) translateZ(var(--d20z)); }
-.f9  { transform: translate(-50%,-50%) rotateY(252deg) rotateX(0deg) translateZ(var(--d20z)); }
-.f10 { transform: translate(-50%,-50%) rotateY(324deg) rotateX(0deg) translateZ(var(--d20z)); }
+.f11 { transform: rotateY(0deg)   rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
+.f12 { transform: rotateY(72deg)  rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
+.f13 { transform: rotateY(144deg) rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
+.f14 { transform: rotateY(216deg) rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
+.f15 { transform: rotateY(288deg) rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
 
-.f11 { transform: translate(-50%,-50%) rotateY(0deg)   rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
-.f12 { transform: translate(-50%,-50%) rotateY(72deg)  rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
-.f13 { transform: translate(-50%,-50%) rotateY(144deg) rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
-.f14 { transform: translate(-50%,-50%) rotateY(216deg) rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
-.f15 { transform: translate(-50%,-50%) rotateY(288deg) rotateX(calc(-1 * var(--d20tilt))) translateZ(var(--d20z)) rotateZ(180deg); }
-
-.f16 { transform: translate(-50%,-50%) rotateY(36deg)  rotateX(180deg) translateZ(var(--d20z)); }
-.f17 { transform: translate(-50%,-50%) rotateY(108deg) rotateX(180deg) translateZ(var(--d20z)); }
-.f18 { transform: translate(-50%,-50%) rotateY(180deg) rotateX(180deg) translateZ(var(--d20z)); }
-.f19 { transform: translate(-50%,-50%) rotateY(252deg) rotateX(180deg) translateZ(var(--d20z)); }
-.f20 { transform: translate(-50%,-50%) rotateY(324deg) rotateX(180deg) translateZ(var(--d20z)); }
+.f16 { transform: rotateY(36deg)  rotateX(180deg) translateZ(var(--d20z)); }
+.f17 { transform: rotateY(108deg) rotateX(180deg) translateZ(var(--d20z)); }
+.f18 { transform: rotateY(180deg) rotateX(180deg) translateZ(var(--d20z)); }
+.f19 { transform: rotateY(252deg) rotateX(180deg) translateZ(var(--d20z)); }
+.f20 { transform: rotateY(324deg) rotateX(180deg) translateZ(var(--d20z)); }
 
 /* Оверлей результата */
 .d20-result {
@@ -197,7 +202,6 @@ header {
     pointer-events: none;
 }
 
-/* Подсветка критов */
 .d20-wrapper.crit #d20-result { color: #00ff66; text-shadow: 0 0 18px rgba(0,255,100,0.9), 0 0 8px rgba(255,255,255,0.9); }
 .d20-wrapper.fail #d20-result { color: #ff3344; text-shadow: 0 0 18px rgba(255,60,60,0.9), 0 0 8px rgba(255,255,255,0.9); }
 
@@ -216,7 +220,8 @@ header {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    backface-visibility: hidden; /* чтобы не светился “задник”/зеркальный текст [web:21] */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden; /* iOS [web:21] */
     display: flex;
     align-items: center;
     justify-content: center;
