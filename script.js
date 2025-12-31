@@ -133,22 +133,25 @@ window.rollD6 = function() {
     }, 800);
 }
 
-// --- D20 LOGIC (STABLE) ---
+// --- D20 LOGIC (TRUE 3D) ---
 window.rollD20 = function() {
-    const visual = document.getElementById('d20-visual');
-    const resultText = document.getElementById('d20-result');
+    const d20 = document.getElementById('d20-3d');
+    const resultText = document.getElementById('d20-result-text');
 
-    // Скрываем цифру во время вращения
+    // Hide result
     resultText.style.opacity = 0;
+    resultText.style.transform = "translate(-50%, -50%) scale(0.5)";
 
-    // Случайное 3D вращение
-    const x = Math.floor(Math.random() * 720) + 360;
-    const y = Math.floor(Math.random() * 720) + 360;
+    // Spin!
+    // Random rotation. We don't aim for a specific face because CSS icosahedron
+    // face-alignment is extremely math-heavy. We just spin it beautifully.
+    const x = Math.floor(Math.random() * 720) + 720;
+    const y = Math.floor(Math.random() * 720) + 720;
     const z = Math.floor(Math.random() * 360);
 
-    visual.style.transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
+    d20.style.transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 
-    // Показываем результат после анимации
+    // Show result after spin
     setTimeout(() => {
         const roll = Math.floor(Math.random() * 20) + 1;
         resultText.innerText = roll;
@@ -158,7 +161,8 @@ window.rollD20 = function() {
         else resultText.style.color = "#ffffff";
 
         resultText.style.opacity = 1;
-    }, 1000);
+        resultText.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 1200);
 }
 
 // --- SLOTS LOGIC ---
