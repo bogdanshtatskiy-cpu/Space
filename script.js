@@ -133,38 +133,52 @@ window.rollD6 = function() {
     }, 800);
 }
 
-// --- D20 LOGIC (UPDATED) ---
+// --- D20 LOGIC (NEW 3D TUMBLE) ---
 window.rollD20 = function() {
-    const gem = document.getElementById('d20-svg');
+    const crystal = document.getElementById('d20-crystal');
     const text = document.getElementById('d20-result');
-    const wrapper = document.querySelector('.d20-wrapper');
 
-    // Reset styles
-    gem.classList.remove('d20-shake');
+    // 1. Скрываем текущий номер
     text.style.opacity = 0.3;
-    text.style.transform = "scale(0.5)";
+    text.style.transform = "translate(-50%, -50%) translateZ(40px) scale(0.5)";
     
-    // Animate
-    void gem.offsetWidth; // Reflow
-    gem.classList.add('d20-shake');
+    // 2. Генерируем хаотичные 3D вращения (несколько полных оборотов)
+    // Добавляем немного рандома к углам, чтобы он не всегда вставал ровно
+    const x = 720 + Math.random() * 360; 
+    const y = 720 + Math.random() * 360;
+    const z = 360 + Math.random() * 360; // Вращение вокруг своей оси
 
+    // Применяем вращение
+    crystal.style.transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
+
+    // 3. Анимация мелькания чисел
     let counter = 0;
     let interval = setInterval(() => {
         text.innerText = Math.floor(Math.random() * 20) + 1;
         counter++;
-        if (counter > 10) {
+        // Останавливаем мелькание ближе к концу анимации вращения
+        if (counter > 15) {
             clearInterval(interval);
-            // Final Result
-            const finalRes = Math.floor(Math.random() * 20) + 1;
-            text.innerText = finalRes;
-            text.style.opacity = 1;
-            text.style.transform = "scale(1)";
-            text.style.color = (finalRes === 20) ? "#00ff00" : (finalRes === 1) ? "#ff3333" : "#ffffff";
         }
-    }, 50);
+    }, 60);
+
+    // 4. Показываем финальный результат когда анимация почти закончилась
+    setTimeout(() => {
+        const finalRes = Math.floor(Math.random() * 20) + 1;
+        text.innerText = finalRes;
+        text.style.opacity = 1;
+        // Возвращаем масштаб и позицию
+        text.style.transform = "translate(-50%, -50%) translateZ(40px) scale(1)";
+        
+        // Подсветка критов
+        if (finalRes === 20) text.style.color = "#00ff00";
+        else if (finalRes === 1) text.style.color = "#ff3333";
+        else text.style.color = "#ffffff";
+
+    }, 1000); // Синхронизировано со временем CSS transition (1.2s)
 }
 
-// --- SLOTS LOGIC (NEW) ---
+// --- SLOTS LOGIC ---
 window.spinSlots = function() {
     if(isSpinning) return;
     isSpinning = true;
@@ -172,39 +186,21 @@ window.spinSlots = function() {
     
     const reels = [document.getElementById('reel-1'), document.getElementById('reel-2'), document.getElementById('reel-3')];
     
-    // Add blur
     reels.forEach(r => r.classList.add('blur'));
     
-    // Spin Animation
     let intervals = reels.map(reel => {
         return setInterval(() => {
             reel.innerText = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
         }, 50);
     });
 
-    // Stop one by one
     let results = [];
-    
-    // Stop reel 1
-    setTimeout(() => {
-        clearInterval(intervals[0]);
-        reels[0].classList.remove('blur');
-        results[0] = reels[0].innerText;
-    }, 1000);
-
-    // Stop reel 2
-    setTimeout(() => {
-        clearInterval(intervals[1]);
-        reels[1].classList.remove('blur');
-        results[1] = reels[1].innerText;
-    }, 1500);
-
-    // Stop reel 3
+    setTimeout(() => { clearInterval(intervals[0]); reels[0].classList.remove('blur'); results[0] = reels[0].innerText; }, 1000);
+    setTimeout(() => { clearInterval(intervals[1]); reels[1].classList.remove('blur'); results[1] = reels[1].innerText; }, 1500);
     setTimeout(() => {
         clearInterval(intervals[2]);
         reels[2].classList.remove('blur');
         results[2] = reels[2].innerText;
-        
         checkWin(results);
         isSpinning = false;
     }, 2000);
