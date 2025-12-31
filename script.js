@@ -1,10 +1,10 @@
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 import * as CANNON from "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js";
 
 let currentLang = 'uk';
 let isSpinning = false;
 
-// --- UI TEXTS ---
+// ---- Magic phrases / UI ----
 const magicPhrases = {
   ru: ["Бесспорно","Предрешено","Никаких сомнений","Определенно да","Можешь быть уверен","Мне кажется — да","Вероятнее всего","Хорошие перспективы","Знаки говорят — да","Да","Пока не ясно","Спроси позже","Лучше не рассказывать","Сконцентрируйся и спроси","Даже не думай","Мой ответ — нет","По моим данным — нет","Перспективы не очень","Весьма сомнительно","Звезды в шоке","А оно тебе надо?","Забей","Спроси у мамы","Не сегодня","Успокойся","Рискни","Это фиаско"],
   uk: ["Безперечно","Це вирішено","Жодних сумнівів","Безумовно так","Можеш бути впевнений","Мені здається — так","Найімовірніше","Хороші перспективи","Знаки кажуть — так","Так","Поки не ясно","Спитай пізніше","Краще не розповідати","Сконцентруйся і спитай","Навіть не думай","Мій відповідь — ні","За моїми даними — ні","Перспективи не дуже","Дуже сумнівно","Зірки в шоці","А воно тобі треба?","Забий","Спитай у мами","Не сьогодні","Заспокойся","Ризикни","Це фіаско"]
@@ -17,31 +17,10 @@ const uiText = {
 
 const slotSymbols = ["🍒", "🍋", "🍇", "💎", "7️⃣", "🔔"];
 
-document.addEventListener('DOMContentLoaded', () => {
-  setLang('uk');
-  initD20();
-});
-
-// --- Language ---
-window.setLang = function(lang) {
-  currentLang = lang;
-
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  if (event && event.target) event.target.classList.add('active');
-
-  document.querySelectorAll('[data-key]').forEach(el => {
-    const key = el.getAttribute('data-key');
-    if (uiText[lang][key]) el.innerText = uiText[lang][key];
-  });
-
-  const h = document.getElementById('coin-heads');
-  const t = document.getElementById('coin-tails');
-  if (h) h.innerText = uiText[lang].heads;
-  if (t) t.innerText = uiText[lang].tails;
-}
-
-// --- Navigation ---
-window.openTool = function(toolId) {
+// ============
+// Navigation
+// ============
+function openTool(toolId) {
   const menu = document.getElementById('menu-screen');
   const tool = document.getElementById(toolId + '-screen');
   if (menu && tool) {
@@ -54,7 +33,7 @@ window.openTool = function(toolId) {
   }
 }
 
-window.goBack = function() {
+function goBack() {
   const active = document.querySelector('.screen.active');
   if(active) active.classList.remove('active');
   setTimeout(() => {
@@ -65,8 +44,30 @@ window.goBack = function() {
   }, 200);
 }
 
-// --- Magic Ball ---
-window.askBall = function() {
+// ============
+// Language
+// ============
+function setLang(lang) {
+  currentLang = lang;
+
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  if (typeof event !== "undefined" && event && event.target) event.target.classList.add('active');
+
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.getAttribute('data-key');
+    if (uiText[lang][key]) el.innerText = uiText[lang][key];
+  });
+
+  const h = document.getElementById('coin-heads');
+  const t = document.getElementById('coin-tails');
+  if (h) h.innerText = uiText[lang].heads;
+  if (t) t.innerText = uiText[lang].tails;
+}
+
+// ============
+// Magic Ball
+// ============
+function askBall() {
   const ballOuter = document.querySelector('.magic-ball-outer');
   const textEl = document.getElementById('ball-text');
   const answers = magicPhrases[currentLang];
@@ -81,8 +82,10 @@ window.askBall = function() {
   }, 600);
 }
 
-// --- D6 ---
-window.rollD6 = function() {
+// ============
+// D6
+// ============
+function rollD6() {
   const cube = document.getElementById('dice-cube');
   const result = Math.floor(Math.random() * 6) + 1;
 
@@ -109,8 +112,10 @@ window.rollD6 = function() {
   }, 800);
 }
 
-// --- Slots ---
-window.spinSlots = function() {
+// ============
+// Slots
+// ============
+function spinSlots() {
   if(isSpinning) return;
   isSpinning = true;
 
@@ -146,8 +151,10 @@ function checkWin(results) {
   }
 }
 
-// --- Coin ---
-window.flipCoin = function() {
+// ============
+// Coin
+// ============
+function flipCoin() {
   const coin = document.getElementById('coin');
   const outcome = Math.random() < 0.5 ? 0 : 1;
 
@@ -161,8 +168,10 @@ window.flipCoin = function() {
   }, 50);
 }
 
-// --- Randomizer ---
-window.generateRandom = function() {
+// ============
+// Randomizer
+// ============
+function generateRandom() {
   const maxInput = document.getElementById('rand-max');
   const max = parseInt(maxInput.value) || 100;
   const disp = document.getElementById('rand-display');
@@ -179,241 +188,138 @@ window.generateRandom = function() {
 }
 
 // ======================
-// D20: three.js + cannon
+// D20: Three.js + Cannon
 // ======================
-let d20 = null;
+let d20Inited = false;
+let d20Busy = false;
+let d20TapLockUntil = 0;
+
+let scene, camera, renderer;
+let world, diceBody, diceMesh, diceGeo;
+let wrapEl, resultEl, wrapperEl;
 
 function initD20() {
-  const wrap = document.getElementById("d20-canvas-wrap");
-  if (!wrap || d20) return;
+  wrapEl = document.getElementById("d20-canvas-wrap");
+  resultEl = document.getElementById("d20-result");
+  wrapperEl = document.querySelector(".d20-wrapper");
+  if (!wrapEl || d20Inited) return;
 
   // THREE
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
   camera.position.set(0, 4.2, 7.5);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(wrap.clientWidth, wrap.clientHeight, false);
-  wrap.appendChild(renderer.domElement);
+  renderer.setSize(wrapEl.clientWidth, wrapEl.clientHeight, false);
+  wrapEl.appendChild(renderer.domElement);
 
-  const light1 = new THREE.DirectionalLight(0xffffff, 1.1);
-  light1.position.set(4, 8, 6);
-  scene.add(light1);
+  scene.add(new THREE.AmbientLight(0x88aaff, 0.55));
+  const dir = new THREE.DirectionalLight(0xffffff, 1.1);
+  dir.position.set(4, 8, 6);
+  scene.add(dir);
 
-  const light2 = new THREE.AmbientLight(0x88aaff, 0.55);
-  scene.add(light2);
-
-  // Ground (visual)
-  const groundGeo = new THREE.CircleGeometry(4.0, 64);
-  const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a84ff, transparent: true, opacity: 0.12 });
-  const groundMesh = new THREE.Mesh(groundGeo, groundMat);
-  groundMesh.rotation.x = -Math.PI / 2;
+  // ground visual
+  const groundMesh = new THREE.Mesh(
+    new THREE.CircleGeometry(4.0, 64),
+    new THREE.MeshStandardMaterial({ color: 0x0a84ff, transparent: true, opacity: 0.12 })
+  );
+  groundMesh.rotation.x = -Math.PI/2;
   groundMesh.position.y = -1.2;
   scene.add(groundMesh);
 
-  // Dice mesh
-  const diceRadius = 1.25;
-  const diceGeo = new THREE.IcosahedronGeometry(diceRadius, 0); // d20 shape [web:83]
-
-  // Material
-  const diceMat = new THREE.MeshStandardMaterial({
-    color: 0x0a84ff,
-    metalness: 0.25,
-    roughness: 0.2
-  });
-
-  const diceMesh = new THREE.Mesh(diceGeo, diceMat);
+  // dice
+  const r = 1.25;
+  diceGeo = new THREE.IcosahedronGeometry(r, 0); // d20 форма [web:83]
+  const mat = new THREE.MeshStandardMaterial({ color: 0x0a84ff, metalness: 0.25, roughness: 0.2 });
+  diceMesh = new THREE.Mesh(diceGeo, mat);
   scene.add(diceMesh);
 
-  // (Optional) wireframe lines for "edges"
   const wire = new THREE.LineSegments(
     new THREE.WireframeGeometry(diceGeo),
     new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.22 })
   );
   diceMesh.add(wire);
 
-  // Face labels (20 sprites, one per face)
-  const labels = makeFaceLabels(diceGeo);
-  labels.forEach(s => diceMesh.add(s));
-
-  // CANNON
-  const world = new CANNON.World({
+  // physics
+  world = new CANNON.World({
     gravity: new CANNON.Vec3(0, -18, 0),
     allowSleep: true
   });
 
-  const diceBody = new CANNON.Body({
+  // Сферическая коллизия = стабильность и “как настоящий” визуально
+  diceBody = new CANNON.Body({
     mass: 1.2,
-    shape: new CANNON.Sphere(diceRadius * 0.98), // стабильнее на мобилке
+    shape: new CANNON.Sphere(r * 0.98),
     angularDamping: 0.15,
     linearDamping: 0.12
   });
-  diceBody.position.set(0, 1.8, 0);
+  diceBody.position.set(0, 2.0, 0);
   world.addBody(diceBody);
 
   const groundBody = new CANNON.Body({ mass: 0, shape: new CANNON.Plane() });
-  groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+  groundBody.quaternion.setFromEuler(-Math.PI/2, 0, 0);
   groundBody.position.set(0, -1.2, 0);
   world.addBody(groundBody);
 
-  // Walls (коробка)
+  // walls
   const wallDist = 3.2;
   const wallH = 2.8;
   const wallShape = new CANNON.Plane();
-
-  const walls = [];
   function addWall(px, py, pz, ex, ey, ez) {
     const b = new CANNON.Body({ mass: 0, shape: wallShape });
     b.position.set(px, py, pz);
     b.quaternion.setFromEuler(ex, ey, ez);
     world.addBody(b);
-    walls.push(b);
   }
-  addWall(-wallDist, -1.2 + wallH/2, 0, 0, Math.PI/2, 0);
+  addWall(-wallDist, -1.2 + wallH/2, 0, 0,  Math.PI/2, 0);
   addWall( wallDist, -1.2 + wallH/2, 0, 0, -Math.PI/2, 0);
   addWall(0, -1.2 + wallH/2, -wallDist, 0, 0, 0);
   addWall(0, -1.2 + wallH/2,  wallDist, 0, Math.PI, 0);
 
-  // state
-  const resultEl = document.getElementById("d20-result");
-  const wrapper = document.querySelector(".d20-wrapper");
-  let busy = false;
-  let tapLockUntil = 0;
+  requestAnimationFrame(loop);
+  d20Inited = true;
+}
 
-  function resizeIfNeeded() {
-    const w = wrap.clientWidth;
-    const h = wrap.clientHeight;
-    const need = (renderer.domElement.width !== Math.floor(w * renderer.getPixelRatio())) ||
-                 (renderer.domElement.height !== Math.floor(h * renderer.getPixelRatio()));
-    if (!need) return;
+function resizeD20IfNeeded() {
+  const w = wrapEl.clientWidth;
+  const h = wrapEl.clientHeight;
+  const need =
+    renderer.domElement.width !== Math.floor(w * renderer.getPixelRatio()) ||
+    renderer.domElement.height !== Math.floor(h * renderer.getPixelRatio());
+  if (!need) return;
 
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
-  }
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+}
 
-  function step() {
-    resizeIfNeeded();
+function loop() {
+  if (d20Inited) {
+    resizeD20IfNeeded();
     world.fixedStep(1/60);
 
     diceMesh.position.copy(diceBody.position);
     diceMesh.quaternion.copy(diceBody.quaternion);
 
     renderer.render(scene, camera);
-    requestAnimationFrame(step);
   }
-  requestAnimationFrame(step);
-
-  // compute result: choose face whose normal is most aligned with world up
-  function readTopFace() {
-    const up = new THREE.Vector3(0, 1, 0);
-
-    // Geometry in modern three is BufferGeometry; use normal attribute.
-    const pos = diceGeo.attributes.position;
-    const index = diceGeo.index;
-
-    let bestDot = -Infinity;
-    let bestFace = 1;
-
-    const q = diceMesh.quaternion;
-    const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
-    const ab = new THREE.Vector3(), ac = new THREE.Vector3(), n = new THREE.Vector3();
-
-    const faceCount = index ? index.count / 3 : pos.count / 3;
-    for (let f = 0; f < faceCount; f++) {
-      let ia, ib, ic;
-      if (index) {
-        ia = index.getX(f*3+0);
-        ib = index.getX(f*3+1);
-        ic = index.getX(f*3+2);
-      } else {
-        ia = f*3+0; ib = f*3+1; ic = f*3+2;
-      }
-
-      a.fromBufferAttribute(pos, ia);
-      b.fromBufferAttribute(pos, ib);
-      c.fromBufferAttribute(pos, ic);
-
-      ab.subVectors(b, a);
-      ac.subVectors(c, a);
-      n.crossVectors(ab, ac).normalize();
-      n.applyQuaternion(q); // rotate normal into world
-
-      const dot = n.dot(up);
-      if (dot > bestDot) {
-        bestDot = dot;
-        bestFace = f + 1; // face index 1..20
-      }
-    }
-
-    // Map faceIndex -> dice value 1..20.
-    // Для простоты: значение = номер грани. Если хочешь “реальную раскладку d20” (как на настоящем),
-    // сделаю точный маппинг под твою текстуру/нумерацию.
-    return bestFace;
-  }
-
-  // roll handler
-  window.rollD20 = function() {
-    const now = Date.now();
-    if (busy || now < tapLockUntil) return;
-    busy = true;
-    tapLockUntil = now + 1700;
-
-    wrapper.classList.remove("crit", "fail");
-
-    resultEl.style.opacity = 0;
-    resultEl.style.transform = "translate(-50%, -50%) scale(0.6)";
-
-    // reset
-    diceBody.velocity.set(0, 0, 0);
-    diceBody.angularVelocity.set(0, 0, 0);
-    diceBody.position.set((Math.random()*0.6-0.3), 2.2, (Math.random()*0.6-0.3));
-    diceBody.quaternion.setFromEuler(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
-
-    // impulse + spin
-    const fx = (Math.random()*2-1) * 3.5;
-    const fz = (Math.random()*2-1) * 3.5;
-    diceBody.applyImpulse(new CANNON.Vec3(fx, 6.5, fz), new CANNON.Vec3(0.2, 0, 0.15));
-
-    // wait to settle
-    setTimeout(() => {
-      // “успокоить” чуть сильнее, чтобы не крутился бесконечно
-      diceBody.angularDamping = 0.35;
-      diceBody.linearDamping = 0.25;
-    }, 700);
-
-    setTimeout(() => {
-      const value = readTopFace();
-
-      resultEl.innerText = value;
-      if (value === 20) wrapper.classList.add("crit");
-      if (value === 1) wrapper.classList.add("fail");
-
-      resultEl.style.opacity = 1;
-      resultEl.style.transform = "translate(-50%, -50%) scale(1)";
-
-      // вернуть демпферы к обычным для следующего броска
-      setTimeout(() => {
-        diceBody.angularDamping = 0.15;
-        diceBody.linearDamping = 0.12;
-        busy = false;
-      }, 200);
-    }, 1500);
-  };
-
-  d20 = { scene, camera, renderer, world, diceMesh, diceBody };
+  requestAnimationFrame(loop);
 }
 
-// Create 20 number sprites placed at each face center
-function makeFaceLabels(geo) {
-  const pos = geo.attributes.position;
-  const index = geo.index;
+function readTopFaceValue() {
+  const up = new THREE.Vector3(0, 1, 0);
+  const pos = diceGeo.attributes.position;
+  const index = diceGeo.index;
+
+  let bestDot = -Infinity;
+  let bestFace = 1;
+
+  const q = diceMesh.quaternion;
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+  const ab = new THREE.Vector3(), ac = new THREE.Vector3(), n = new THREE.Vector3();
+
   const faceCount = index ? index.count / 3 : pos.count / 3;
-
-  const labels = [];
-  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), center = new THREE.Vector3();
-
   for (let f = 0; f < faceCount; f++) {
     let ia, ib, ic;
     if (index) {
@@ -428,23 +334,81 @@ function makeFaceLabels(geo) {
     b.fromBufferAttribute(pos, ib);
     c.fromBufferAttribute(pos, ic);
 
-    center.addVectors(a, b).add(c).multiplyScalar(1/3);
+    ab.subVectors(b, a);
+    ac.subVectors(c, a);
+    n.crossVectors(ab, ac).normalize();
+    n.applyQuaternion(q);
 
-    const sprite = makeTextSprite(String(f + 1));
-    sprite.position.copy(center.clone().multiplyScalar(1.02)); // чуть наружу
-    sprite.scale.set(0.9, 0.45, 1);
-    labels.push(sprite);
+    const dot = n.dot(up);
+    if (dot > bestDot) {
+      bestDot = dot;
+      bestFace = f + 1;
+    }
   }
 
-  return labels;
+  return bestFace; // 1..20 (номер треугольной грани)
 }
 
-function makeTextSprite(text) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 128;
-  const ctx = canvas.getContext("2d");
+function rollD20() {
+  initD20(); // если экран открылся впервые
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "rgba(0,0,0,0)";
-  ctx.fill
+  const now = Date.now();
+  if (d20Busy || now < d20TapLockUntil) return;
+  d20Busy = true;
+  d20TapLockUntil = now + 1700;
+
+  wrapperEl.classList.remove("crit","fail");
+
+  resultEl.style.opacity = 0;
+  resultEl.style.transform = "translate(-50%, -50%) scale(0.6)";
+
+  diceBody.velocity.set(0, 0, 0);
+  diceBody.angularVelocity.set(0, 0, 0);
+  diceBody.position.set((Math.random()*0.6-0.3), 2.2, (Math.random()*0.6-0.3));
+  diceBody.quaternion.setFromEuler(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+
+  const fx = (Math.random()*2-1) * 3.5;
+  const fz = (Math.random()*2-1) * 3.5;
+  diceBody.applyImpulse(new CANNON.Vec3(fx, 6.5, fz), new CANNON.Vec3(0.2, 0, 0.15));
+
+  setTimeout(() => {
+    diceBody.angularDamping = 0.35;
+    diceBody.linearDamping = 0.25;
+  }, 700);
+
+  setTimeout(() => {
+    const value = readTopFaceValue();
+
+    resultEl.innerText = value;
+    if (value === 20) wrapperEl.classList.add("crit");
+    if (value === 1) wrapperEl.classList.add("fail");
+
+    resultEl.style.opacity = 1;
+    resultEl.style.transform = "translate(-50%, -50%) scale(1)";
+
+    setTimeout(() => {
+      diceBody.angularDamping = 0.15;
+      diceBody.linearDamping = 0.12;
+      d20Busy = false;
+    }, 200);
+  }, 1500);
+}
+
+// init on load (и сразу язык)
+document.addEventListener("DOMContentLoaded", () => {
+  setLang("uk");
+  initD20();
+});
+
+// IMPORTANT: вернуть функции в global scope для HTML onclick [web:97]
+Object.assign(window, {
+  setLang,
+  openTool,
+  goBack,
+  askBall,
+  rollD6,
+  rollD20,
+  spinSlots,
+  flipCoin,
+  generateRandom
+});
