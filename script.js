@@ -133,37 +133,31 @@ window.rollD6 = function() {
     }, 800);
 }
 
-// --- D20 LOGIC (REAL 3D ROTATION) ---
+// --- D20 LOGIC (STABLE) ---
 window.rollD20 = function() {
-    const d20 = document.getElementById('d20-model');
-    const overlay = document.getElementById('d20-result-overlay');
+    const visual = document.getElementById('d20-visual');
+    const resultText = document.getElementById('d20-result');
 
-    // 1. Hide Overlay
-    overlay.style.opacity = 0;
-    overlay.style.transform = "translate(-50%, -50%) translateZ(100px) scale(0.5)";
+    // Скрываем цифру во время вращения
+    resultText.style.opacity = 0;
 
-    // 2. Random Spins (Chaotic)
-    // We don't try to land on a specific face because 20-sided CSS collision is very hard.
-    // Instead we spin it beautifully and show the result overlay.
-    
-    const x = Math.floor(Math.random() * 720) + 720; // At least 2 spins
-    const y = Math.floor(Math.random() * 720) + 720;
+    // Случайное 3D вращение
+    const x = Math.floor(Math.random() * 720) + 360;
+    const y = Math.floor(Math.random() * 720) + 360;
     const z = Math.floor(Math.random() * 360);
 
-    d20.style.transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
+    visual.style.transform = `rotateX(${x}deg) rotateY(${y}deg) rotateZ(${z}deg)`;
 
-    // 3. Show Result
+    // Показываем результат после анимации
     setTimeout(() => {
-        const result = Math.floor(Math.random() * 20) + 1;
-        overlay.innerText = result;
+        const roll = Math.floor(Math.random() * 20) + 1;
+        resultText.innerText = roll;
         
-        // Color logic
-        if (result === 20) overlay.style.color = "#00ff00";
-        else if (result === 1) overlay.style.color = "#ff3333";
-        else overlay.style.color = "#ffffff";
+        if (roll === 20) resultText.style.color = "#00ff00";
+        else if (roll === 1) resultText.style.color = "#ff3333";
+        else resultText.style.color = "#ffffff";
 
-        overlay.style.opacity = 1;
-        overlay.style.transform = "translate(-50%, -50%) translateZ(100px) scale(1)";
+        resultText.style.opacity = 1;
     }, 1000);
 }
 
