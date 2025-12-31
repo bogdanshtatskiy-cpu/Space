@@ -8,147 +8,147 @@
 </head>
 <body>
 
-    <div class="app-container">
-        <header>
-            <h2 class="app-title">MultiTool</h2>
-            <div class="lang-switch">
-                <button class="lang-btn active" onclick="setLang('uk')">UK</button>
-                <button class="lang-btn" onclick="setLang('ru')">RU</button>
-            </div>
-        </header>
+<div class="app-container">
+    <header>
+        <h2 class="app-title">MultiTool</h2>
+        <div class="lang-switch">
+            <button class="lang-btn active" onclick="setLang('uk')">UK</button>
+            <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        </div>
+    </header>
 
-        <div id="menu-screen" class="screen active">
-            <div class="menu-grid">
-                <div class="menu-item" onclick="openTool('magicBall')">
-                    <div class="icon-bg">🎱</div>
-                    <span class="menu-label" data-key="ball_title">Шар Судьбы</span>
-                </div>
-                <div class="menu-item" onclick="openTool('d6')">
-                    <div class="icon-bg">🎲</div>
-                    <span class="menu-label" data-key="d6_title">Кубик D6</span>
-                </div>
-                <div class="menu-item" onclick="openTool('d20')">
-                    <div class="icon-bg">🐉</div>
-                    <span class="menu-label" data-key="d20_title">Кубик D20</span>
-                </div>
-                <div class="menu-item" onclick="openTool('slots')">
-                    <div class="icon-bg">🎰</div>
-                    <span class="menu-label" data-key="slots_title">Слоты</span>
-                </div>
-                <div class="menu-item" onclick="openTool('coin')">
-                    <div class="icon-bg">🪙</div>
-                    <span class="menu-label" data-key="coin_title">Монетка</span>
-                </div>
-                <div class="menu-item" onclick="openTool('randomizer')">
-                    <div class="icon-bg">🔢</div>
-                    <span class="menu-label" data-key="rand_title">Рандомайзер</span>
-                </div>
+    <div id="menu-screen" class="screen active">
+        <div class="menu-grid">
+            <div class="menu-item" onclick="openTool('magicBall')">
+                <div class="icon-bg">🎱</div>
+                <span class="menu-label" data-key="ball_title">Шар Судьбы</span>
+            </div>
+            <div class="menu-item" onclick="openTool('d6')">
+                <div class="icon-bg">🎲</div>
+                <span class="menu-label" data-key="d6_title">Кубик D6</span>
+            </div>
+            <div class="menu-item" onclick="openTool('d20')">
+                <div class="icon-bg">🐉</div>
+                <span class="menu-label" data-key="d20_title">Кубик D20</span>
+            </div>
+            <div class="menu-item" onclick="openTool('slots')">
+                <div class="icon-bg">🎰</div>
+                <span class="menu-label" data-key="slots_title">Слоты</span>
+            </div>
+            <div class="menu-item" onclick="openTool('coin')">
+                <div class="icon-bg">🪙</div>
+                <span class="menu-label" data-key="coin_title">Монетка</span>
+            </div>
+            <div class="menu-item" onclick="openTool('randomizer')">
+                <div class="icon-bg">🔢</div>
+                <span class="menu-label" data-key="rand_title">Рандомайзер</span>
             </div>
         </div>
-
-        <div id="magicBall-screen" class="screen">
-            <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content">
-                <div class="magic-ball-outer" onclick="askBall()">
-                    <div class="magic-ball-inner">
-                        <span id="ball-text" class="ball-text">8</span>
-                    </div>
-                </div>
-                <p class="hint-text" data-key="ball_hint">Нажми на шар</p>
-            </div>
-        </div>
-
-        <div id="d6-screen" class="screen">
-            <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content" style="perspective: 1000px;">
-                <div class="cube-container" onclick="rollD6()">
-                    <div id="dice-cube" class="cube">
-                        <div class="face front">1</div>
-                        <div class="face back">6</div>
-                        <div class="face right">3</div>
-                        <div class="face left">4</div>
-                        <div class="face top">5</div>
-                        <div class="face bottom">2</div>
-                    </div>
-                </div>
-                <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
-            </div>
-        </div>
-
-        <div id="d20-screen" class="screen">
-            <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content d20-area">
-                <div class="d20-wrapper" onclick="rollD20()">
-                    <div id="d20-spinner" class="d20-spinner d20-ico">
-                        <div class="d20-face f1"><span>1</span></div>
-                        <div class="d20-face f2"><span>2</span></div>
-                        <div class="d20-face f3"><span>3</span></div>
-                        <div class="d20-face f4"><span>4</span></div>
-                        <div class="d20-face f5"><span>5</span></div>
-                        <div class="d20-face f6"><span>6</span></div>
-                        <div class="d20-face f7"><span>7</span></div>
-                        <div class="d20-face f8"><span>8</span></div>
-                        <div class="d20-face f9"><span>9</span></div>
-                        <div class="d20-face f10"><span>10</span></div>
-                        <div class="d20-face f11"><span>11</span></div>
-                        <div class="d20-face f12"><span>12</span></div>
-                        <div class="d20-face f13"><span>13</span></div>
-                        <div class="d20-face f14"><span>14</span></div>
-                        <div class="d20-face f15"><span>15</span></div>
-                        <div class="d20-face f16"><span>16</span></div>
-                        <div class="d20-face f17"><span>17</span></div>
-                        <div class="d20-face f18"><span>18</span></div>
-                        <div class="d20-face f19"><span>19</span></div>
-                        <div class="d20-face f20"><span>20</span></div>
-                    </div>
-
-                    <div id="d20-result" class="d20-result">20</div>
-                </div>
-                <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
-            </div>
-        </div>
-
-        <div id="slots-screen" class="screen">
-            <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content">
-                <div class="slot-machine">
-                    <div class="reel-window"><div class="reel" id="reel-1">🍒</div></div>
-                    <div class="reel-window"><div class="reel" id="reel-2">🍒</div></div>
-                    <div class="reel-window"><div class="reel" id="reel-3">🍒</div></div>
-                </div>
-                <div id="slot-msg" class="slot-message"></div>
-                <button class="glass-btn-large" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button>
-            </div>
-        </div>
-
-        <div id="coin-screen" class="screen">
-            <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content" style="perspective: 1000px;">
-                <div id="coin" class="coin" onclick="flipCoin()">
-                    <div class="side-a"><span class="coin-text" id="coin-heads">ОРЕЛ</span></div>
-                    <div class="side-b"><span class="coin-text" id="coin-tails">РЕШКА</span></div>
-                </div>
-                <p class="hint-text" data-key="tap_roll">Нажми, чтобы подбросить</p>
-            </div>
-        </div>
-
-        <div id="randomizer-screen" class="screen">
-            <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-            <div class="tool-content">
-                <div class="input-area">
-                    <label data-key="rand_limit_label">Максимум:</label>
-                    <input type="number" id="rand-max" class="glass-input" value="100">
-                </div>
-                <div class="rand-result" id="rand-display">0</div>
-                <button class="glass-btn-large" onclick="generateRandom()" data-key="generate">Start</button>
-            </div>
-        </div>
-
-        <footer>
-            Developer: <a href="https://t.me/desoope" target="_blank">DesOope</a>
-        </footer>
     </div>
 
-    <script src="script.js"></script>
+    <div id="magicBall-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="tool-content">
+            <div class="magic-ball-outer" onclick="askBall()">
+                <div class="magic-ball-inner">
+                    <span id="ball-text" class="ball-text">8</span>
+                </div>
+            </div>
+            <p class="hint-text" data-key="ball_hint">Нажми на шар</p>
+        </div>
+    </div>
+
+    <div id="d6-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="tool-content" style="perspective: 1000px;">
+            <div class="cube-container" onclick="rollD6()">
+                <div id="dice-cube" class="cube">
+                    <div class="face front">1</div>
+                    <div class="face back">6</div>
+                    <div class="face right">3</div>
+                    <div class="face left">4</div>
+                    <div class="face top">5</div>
+                    <div class="face bottom">2</div>
+                </div>
+            </div>
+            <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
+        </div>
+    </div>
+
+    <div id="d20-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="tool-content d20-area">
+            <div class="d20-wrapper" onclick="rollD20()">
+                <div id="d20-spinner" class="d20-spinner d20-ico">
+                    <div class="d20-face f1"><span>1</span></div>
+                    <div class="d20-face f2"><span>2</span></div>
+                    <div class="d20-face f3"><span>3</span></div>
+                    <div class="d20-face f4"><span>4</span></div>
+                    <div class="d20-face f5"><span>5</span></div>
+                    <div class="d20-face f6"><span>6</span></div>
+                    <div class="d20-face f7"><span>7</span></div>
+                    <div class="d20-face f8"><span>8</span></div>
+                    <div class="d20-face f9"><span>9</span></div>
+                    <div class="d20-face f10"><span>10</span></div>
+                    <div class="d20-face f11"><span>11</span></div>
+                    <div class="d20-face f12"><span>12</span></div>
+                    <div class="d20-face f13"><span>13</span></div>
+                    <div class="d20-face f14"><span>14</span></div>
+                    <div class="d20-face f15"><span>15</span></div>
+                    <div class="d20-face f16"><span>16</span></div>
+                    <div class="d20-face f17"><span>17</span></div>
+                    <div class="d20-face f18"><span>18</span></div>
+                    <div class="d20-face f19"><span>19</span></div>
+                    <div class="d20-face f20"><span>20</span></div>
+                </div>
+
+                <div id="d20-result" class="d20-result">20</div>
+            </div>
+            <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
+        </div>
+    </div>
+
+    <div id="slots-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="tool-content">
+            <div class="slot-machine">
+                <div class="reel-window"><div class="reel" id="reel-1">🍒</div></div>
+                <div class="reel-window"><div class="reel" id="reel-2">🍒</div></div>
+                <div class="reel-window"><div class="reel" id="reel-3">🍒</div></div>
+            </div>
+            <div id="slot-msg" class="slot-message"></div>
+            <button class="glass-btn-large" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button>
+        </div>
+    </div>
+
+    <div id="coin-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="tool-content" style="perspective: 1000px;">
+            <div id="coin" class="coin" onclick="flipCoin()">
+                <div class="side-a"><span class="coin-text" id="coin-heads">ОРЕЛ</span></div>
+                <div class="side-b"><span class="coin-text" id="coin-tails">РЕШКА</span></div>
+            </div>
+            <p class="hint-text" data-key="tap_roll">Нажми, чтобы подбросить</p>
+        </div>
+    </div>
+
+    <div id="randomizer-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="tool-content">
+            <div class="input-area">
+                <label data-key="rand_limit_label">Максимум:</label>
+                <input type="number" id="rand-max" class="glass-input" value="100">
+            </div>
+            <div class="rand-result" id="rand-display">0</div>
+            <button class="glass-btn-large" onclick="generateRandom()" data-key="generate">Start</button>
+        </div>
+    </div>
+
+    <footer>
+        Developer: <a href="https://t.me/desoope" target="_blank">DesOope</a>
+    </footer>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
