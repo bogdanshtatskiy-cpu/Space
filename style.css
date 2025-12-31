@@ -79,7 +79,7 @@ header {
 /* Screens */
 .screen {
     flex: 1;
-    display: none; /* Hidden by default */
+    display: none;
     flex-direction: column;
     padding: 20px;
     overflow-y: auto;
@@ -95,7 +95,7 @@ header {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Main Menu Grid */
+/* Menu */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -115,24 +115,14 @@ header {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
+    transition: transform 0.2s;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-.menu-item:active {
-    transform: scale(0.96);
-    background: var(--glass-highlight);
-}
+.menu-item:active { transform: scale(0.96); }
 
-.icon-bg {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-.menu-label {
-    font-size: 14px;
-    font-weight: 500;
-}
+.icon-bg { font-size: 40px; margin-bottom: 10px; }
+.menu-label { font-size: 14px; font-weight: 500; }
 
 /* Back Button */
 .back-btn {
@@ -156,7 +146,6 @@ header {
     margin-top: -3px;
 }
 
-/* Tool Content Area */
 .tool-content {
     flex: 1;
     display: flex;
@@ -166,11 +155,7 @@ header {
     width: 100%;
 }
 
-.hint-text {
-    margin-top: 30px;
-    opacity: 0.6;
-    font-size: 14px;
-}
+.hint-text { margin-top: 30px; opacity: 0.6; font-size: 14px; }
 
 /* --- Magic Ball --- */
 .magic-ball-outer {
@@ -183,10 +168,7 @@ header {
     justify-content: center;
     box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.8);
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
 }
-
 .magic-ball-inner {
     width: 180px;
     height: 180px;
@@ -199,7 +181,6 @@ header {
     text-align: center;
     padding: 20px;
 }
-
 .ball-text {
     color: #aaffaa;
     text-shadow: 0 0 10px #aaffaa;
@@ -208,12 +189,8 @@ header {
     text-transform: uppercase;
     opacity: 1;
     transition: opacity 1s ease;
-    line-height: 1.4;
 }
-
-.ball-animate {
-    animation: ballShake 0.6s ease-in-out;
-}
+.ball-animate { animation: ballShake 0.6s ease-in-out; }
 
 @keyframes ballShake {
     0% { transform: translate(0,0) rotate(0); }
@@ -223,7 +200,7 @@ header {
     100% { transform: translate(0,0) rotate(0); }
 }
 
-/* --- D6 3D Cube --- */
+/* --- D6 --- */
 .cube-container {
     width: 100px;
     height: 100px;
@@ -231,23 +208,21 @@ header {
     transform-style: preserve-3d;
     cursor: pointer;
 }
-
 .cube {
     width: 100%;
     height: 100%;
     position: absolute;
     transform-style: preserve-3d;
-    transition: transform 1s cubic-bezier(0.1, 0.9, 0.2, 1); /* Realistic ease */
+    transition: transform 1s cubic-bezier(0.1, 0.9, 0.2, 1);
     transform: rotateX(-30deg) rotateY(-45deg);
 }
-
 .face {
     position: absolute;
     width: 100px;
     height: 100px;
-    background: rgba(255,255,255,0.9);
-    border-radius: 10px;
-    border: 2px solid #ccc;
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    border: 1px solid #999;
     color: black;
     font-size: 40px;
     font-weight: bold;
@@ -256,31 +231,95 @@ header {
     justify-content: center;
     box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
 }
-
-.front  { transform: rotateY(0deg) translateZ(50px); }
-.back   { transform: rotateY(180deg) translateZ(50px); }
-.right  { transform: rotateY(90deg) translateZ(50px); }
-.left   { transform: rotateY(-90deg) translateZ(50px); }
-.top    { transform: rotateX(90deg) translateZ(50px); }
+.front { transform: rotateY(0deg) translateZ(50px); }
+.back { transform: rotateY(180deg) translateZ(50px); }
+.right { transform: rotateY(90deg) translateZ(50px); }
+.left { transform: rotateY(-90deg) translateZ(50px); }
+.top { transform: rotateX(90deg) translateZ(50px); }
 .bottom { transform: rotateX(-90deg) translateZ(50px); }
 
-/* --- D20 SVG --- */
-.d20-container {
-    width: 200px;
-    height: 200px;
+/* --- D20 Crystal Style (NEW) --- */
+.d20-wrapper {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
 }
-.d20-svg {
+
+.d20-gem {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
-    transition: transform 0.6s ease;
+    filter: drop-shadow(0 0 15px rgba(10, 132, 255, 0.6));
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.d20-spin {
-    animation: spinD20 0.5s linear infinite;
+
+.d20-number {
+    position: absolute;
+    font-size: 50px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 20px #0a84ff;
+    z-index: 2;
 }
-@keyframes spinD20 {
-    100% { transform: rotate(360deg); }
+
+.d20-shake {
+    animation: d20Shake 0.5s linear;
+}
+
+@keyframes d20Shake {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(15deg) scale(0.9); }
+    50% { transform: rotate(-15deg) scale(1.1); }
+    75% { transform: rotate(5deg) scale(0.95); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+/* --- SLOTS (NEW) --- */
+.slot-machine {
+    display: flex;
+    gap: 10px;
+    background: rgba(0,0,0,0.4);
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+}
+
+.reel-window {
+    width: 70px;
+    height: 90px;
+    background: linear-gradient(to bottom, #111, #333, #111);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid gold;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+.reel {
+    font-size: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    filter: blur(0px);
+    transition: filter 0.1s;
+}
+
+.reel.blur {
+    filter: blur(4px);
+    transform: scale(0.9);
+}
+
+.slot-message {
+    height: 30px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: gold;
+    text-shadow: 0 0 5px orange;
 }
 
 /* --- Coin --- */
@@ -290,9 +329,8 @@ header {
     height: 150px;
     cursor: pointer;
     transform-style: preserve-3d;
-    transition: transform 3s ease-out; /* Long spin */
+    transition: transform 3s ease-out;
 }
-
 .side-a, .side-b {
     position: absolute;
     width: 100%;
@@ -307,31 +345,11 @@ header {
     border: 4px solid #ffd700;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
 }
-
-.side-a {
-    background: radial-gradient(circle, #ffe066, #b38f00);
-    color: #554400;
-    transform: rotateY(0deg);
-}
-.side-a::after { content: "HEADS"; }
-
-.side-b {
-    background: radial-gradient(circle, #e0e0e0, #888);
-    color: #333;
-    transform: rotateY(180deg);
-    border-color: #silver;
-}
-.side-b::after { content: "TAILS"; }
+.side-a { background: radial-gradient(circle, #ffe066, #b38f00); color: #554400; transform: rotateY(0deg); }
+.side-b { background: radial-gradient(circle, #e0e0e0, #888); color: #333; transform: rotateY(180deg); border-color: silver; }
 
 /* --- Randomizer --- */
-.input-area {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
+.input-area { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
 .glass-input {
     background: rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.3);
@@ -344,15 +362,9 @@ header {
     outline: none;
     margin-top: 10px;
 }
+.rand-result { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; }
 
-.rand-result {
-    font-size: 80px;
-    font-weight: 200;
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-}
-
+/* General Button */
 .glass-btn-large {
     background: white;
     color: black;
@@ -368,10 +380,5 @@ header {
 .glass-btn-large:active { transform: scale(0.95); }
 
 /* Footer */
-footer {
-    text-align: center;
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    margin-top: 10px;
-}
+footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; }
 footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
