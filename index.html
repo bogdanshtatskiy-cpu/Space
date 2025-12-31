@@ -178,57 +178,51 @@
     .d6-f5 { transform: rotateX(90deg) translateZ(50px); }
     .d6-f2 { transform: rotateX(-90deg) translateZ(50px); }
 
-    /* --- D20 SIMPLE --- */
-    .d20-icon-wrapper {
+    /* --- D20 SVG (New Design) --- */
+    .d20-wrapper {
       position: relative;
-      width: 220px;
-      height: 220px;
+      width: 260px;
+      height: 260px;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
-      -webkit-tap-highlight-color: transparent;
       transition: transform 0.1s;
     }
-    .d20-icon-wrapper:active { transform: scale(0.95); }
-    
+    .d20-wrapper:active { transform: scale(0.96); }
+
+    /* Анимация тряски при броске */
+    .d20-anim {
+      animation: d20ShakeAnim 0.5s ease-in-out infinite;
+    }
+
+    @keyframes d20ShakeAnim {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(8deg) scale(1.05); }
+      50% { transform: rotate(-8deg) scale(1.05); }
+      75% { transform: rotate(8deg) scale(1.05); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+
     .d20-svg {
       width: 100%;
       height: 100%;
-      filter: drop-shadow(0 0 15px rgba(10, 132, 255, 0.4));
-    }
-    
-    /* Стили линий SVG */
-    .d20-path {
-      fill: rgba(0,0,0,0.3);
-      stroke: #0a84ff;
-      stroke-width: 2;
-      stroke-linejoin: round;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 3;
       stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
     }
 
-    .d20-number-display {
+    .d20-result {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 60px;
-      font-weight: 900;
+      font-size: 70px;
+      font-weight: 800;
       color: #fff;
-      text-shadow: 0 0 20px rgba(10, 132, 255, 0.8);
-      z-index: 2;
-    }
-
-    .d20-rolling {
-      animation: d20Shake 0.5s ease-in-out infinite;
-    }
-    
-    @keyframes d20Shake {
-      0% { transform: rotate(0deg) scale(1); }
-      25% { transform: rotate(10deg) scale(1.05); }
-      50% { transform: rotate(-10deg) scale(1.05); }
-      75% { transform: rotate(10deg) scale(1.05); }
-      100% { transform: rotate(0deg) scale(1); }
+      text-shadow: 0 0 20px rgba(0,0,0,0.8);
+      z-index: 5;
     }
 
     /* --- Slots --- */
@@ -263,8 +257,8 @@
     <header>
       <h2 class="app-title">MultiTool</h2>
       <div class="lang-switch">
-        <button class="lang-btn active" onclick="setLang('uk')">UK</button>
-        <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        <button class="lang-btn" data-lang="uk" onclick="setLang('uk')">UK</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
       </div>
     </header>
 
@@ -323,24 +317,26 @@
     <div id="d20-screen" class="screen">
       <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
       <div class="tool-content">
-        <div id="d20-wrapper" class="d20-icon-wrapper" onclick="rollD20Simple()">
-           <svg class="d20-svg" viewBox="0 0 100 100">
-             <polygon class="d20-path" points="50,5 95,25 95,75 50,95 5,75 5,25" fill="rgba(255,255,255,0.05)"/>
-             <line class="d20-path" x1="50" y1="5" x2="50" y2="95" />
-             <line class="d20-path" x1="50" y1="5" x2="95" y2="25" />
-             <line class="d20-path" x1="50" y1="5" x2="5" y2="25" />
-             <line class="d20-path" x1="95" y1="25" x2="5" y2="25" />
-             <line class="d20-path" x1="95" y1="75" x2="5" y2="75" />
-             <line class="d20-path" x1="50" y1="95" x2="95" y2="75" />
-             <line class="d20-path" x1="50" y1="95" x2="5" y2="75" />
-             <line class="d20-path" x1="95" y1="25" x2="95" y2="75" />
-             <line class="d20-path" x1="5" y1="25" x2="5" y2="75" />
-             <line class="d20-path" x1="5" y1="25" x2="50" y2="50" />
-             <line class="d20-path" x1="95" y1="25" x2="50" y2="50" />
-             <line class="d20-path" x1="5" y1="75" x2="50" y2="50" />
-             <line class="d20-path" x1="95" y1="75" x2="50" y2="50" />
-           </svg>
-           <div id="d20-number" class="d20-number-display">20</div>
+        <div id="d20-wrapper" class="d20-wrapper" onclick="rollD20()">
+          <svg class="d20-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,5 95,27 95,73 50,95 5,73 5,27" />
+            <g>
+              <line x1="23" y1="50" x2="77" y2="50" />
+              <line x1="23" y1="50" x2="50" y2="23" />
+              <line x1="77" y1="50" x2="50" y2="23" />
+              <line x1="23" y1="50" x2="50" y2="77" />
+              <line x1="77" y1="50" x2="50" y2="77" />
+            </g>
+            <g>
+              <line x1="50" y1="23" x2="50" y2="5" />
+              <line x1="23" y1="50" x2="5" y2="27" />
+              <line x1="23" y1="50" x2="5" y2="73" />
+              <line x1="77" y1="50" x2="95" y2="27" />
+              <line x1="77" y1="50" x2="95" y2="73" />
+              <line x1="50" y1="77" x2="50" y2="95" />
+            </g>
+          </svg>
+          <div id="d20-result" class="d20-result">20</div>
         </div>
         <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
       </div>
@@ -427,17 +423,29 @@
       }, 200);
     };
 
-    // --- LANGUAGE ---
+    // --- LANGUAGE & SAVING ---
     window.setLang = function(lang) {
       currentLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      if (window.event && event.target) event.target.classList.add('active');
+      
+      // Save to memory
+      localStorage.setItem('multitool_lang', lang);
 
+      // Update button styles
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        if (btn.getAttribute('data-lang') === lang) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+      });
+
+      // Update Text Content
       document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.getAttribute('data-key');
         if (uiText[lang][key]) el.innerText = uiText[lang][key];
       });
 
+      // Update Coin Labels
       const a = document.querySelector('#coin .side-a');
       const b = document.querySelector('#coin .side-b');
       if (a) a.setAttribute('data-label', uiText[lang].heads);
@@ -483,38 +491,38 @@
       }, 800);
     };
 
-    // --- D20 Logic (SIMPLE) ---
+    // --- D20 Logic (SVG + Animation) ---
     let d20Rolling = false;
-    window.rollD20Simple = function() {
+    window.rollD20 = function() {
       if (d20Rolling) return;
       d20Rolling = true;
       
       const wrapper = document.getElementById('d20-wrapper');
-      const numDisplay = document.getElementById('d20-number');
+      const resultEl = document.getElementById('d20-result');
       
-      // Start Shake
-      wrapper.classList.add('d20-rolling');
-      numDisplay.style.opacity = 0.3;
+      // Start Shake Animation
+      wrapper.classList.add('d20-anim');
+      resultEl.style.opacity = 0.4;
       
-      // Random numbers flickering
-      let flick = setInterval(() => {
-         numDisplay.innerText = Math.floor(Math.random() * 20) + 1;
-      }, 50);
+      // Fast number shuffle
+      let shuffle = setInterval(() => {
+        resultEl.innerText = Math.floor(Math.random() * 20) + 1;
+      }, 60);
       
-      // Stop
+      // Stop after 600ms
       setTimeout(() => {
-        clearInterval(flick);
-        wrapper.classList.remove('d20-rolling');
-        numDisplay.style.opacity = 1;
+        clearInterval(shuffle);
+        wrapper.classList.remove('d20-anim');
+        resultEl.style.opacity = 1;
         
-        // Final result
+        // Final Result
         const final = Math.floor(Math.random() * 20) + 1;
-        numDisplay.innerText = final;
+        resultEl.innerText = final;
         
-        // Color effect for nat 20 or crit fail 1
-        if(final === 20) numDisplay.style.color = '#00ff00';
-        else if(final === 1) numDisplay.style.color = '#ff4444';
-        else numDisplay.style.color = '#fff';
+        // Color highlighting
+        if(final === 20) resultEl.style.color = '#00ff00'; // Green for 20
+        else if(final === 1) resultEl.style.color = '#ff3333'; // Red for 1
+        else resultEl.style.color = '#ffffff';
         
         d20Rolling = false;
       }, 600);
@@ -585,7 +593,9 @@
 
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
-      setLang('uk');
+      // Load saved language or default to 'uk'
+      const savedLang = localStorage.getItem('multitool_lang') || 'uk';
+      setLang(savedLang);
     });
   </script>
 </body>
