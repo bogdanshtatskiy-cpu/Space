@@ -4,13 +4,6 @@
     --text-primary: #ffffff;
     --accent: #0a84ff;
     --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    
-    /* D20 Fixed Math */
-    --d20-face-width: 100px;
-    --d20-face-height: 86px; /* sqrt(3)/2 * width */
-    --d20-radius: 78px; /* Расстояние от центра до граней (подбирается чтобы склеилось) */
-    --d20-tilt-upper: 52.6deg;
-    --d20-tilt-lower: 10.8deg;
 }
 
 body {
@@ -91,115 +84,63 @@ header {
 .top { transform: rotateX(90deg) translateZ(50px); }
 .bottom { transform: rotateX(-90deg) translateZ(50px); }
 
-/* --- D20 TRUE ICOSAHEDRON (FIXED) --- */
-.d20-perspective { perspective: 1000px; }
+/* --- D20 STABLE 3D CRYSTAL (NEW) --- */
+.d20-stage {
+    perspective: 1000px;
+    height: 300px; /* Больше места для вращения */
+}
 
 .d20-wrapper {
     position: relative;
-    width: 200px;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.d20-model {
-    position: relative;
-    width: 0; 
-    height: 0;
+    width: 220px;
+    height: 220px;
+    cursor: pointer;
     transform-style: preserve-3d;
-    transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    transform: rotateX(-20deg) rotateY(-10deg);
 }
 
-.d20-face {
+/* Вращающаяся часть */
+.d20-visual {
+    width: 100%;
+    height: 100%;
     position: absolute;
-    width: var(--d20-face-width);
-    height: var(--d20-face-height);
-    /* Центрируем точку трансформации в центре экрана */
-    left: calc(var(--d20-face-width) / -2);
-    top: calc(var(--d20-face-height) / -2);
-    
-    /* Рисуем треугольник */
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    background: linear-gradient(135deg, rgba(30,144,255,0.9), rgba(0,0,80,0.9));
-    border-bottom: 2px solid rgba(255,255,255,0.3); /* Легкий бордюр снизу */
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 30px; /* Смещаем цифру визуально в центр треугольника */
-    box-sizing: border-box;
-    
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-    text-shadow: 0 1px 3px black;
-    
-    /* Самое важное - точка вращения. Смещаем ее вниз, к "брюху" треугольника */
-    transform-origin: 50% 58%;
-    backface-visibility: hidden; /* Скрываем изнанку для чистоты, или visible для стекла */
-    opacity: 0.9;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* СБОРКА D20
-   1. Верхняя шапка (5 шт): Наклон внутрь
-   2. Нижняя шапка (5 шт): Перевернуты и наклон внутрь
-   3. Средний пояс (10 шт): 5 смотрят вверх, 5 смотрят вниз
-*/
+/* Визуальный стиль кристалла D20 */
+.d20-face-style {
+    width: 100%;
+    height: 100%;
+    /* Форма шестиугольника, имитирующая проекцию D20 */
+    clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+    background: linear-gradient(135deg, rgba(10, 132, 255, 0.8), rgba(60, 10, 100, 0.8));
+    box-shadow: 0 0 40px rgba(10, 132, 255, 0.5);
+    
+    /* Рисуем грани с помощью градиентов */
+    background-image: 
+        linear-gradient(to bottom, transparent 49%, rgba(255,255,255,0.4) 50%, transparent 51%),
+        linear-gradient(60deg, transparent 49%, rgba(255,255,255,0.4) 50%, transparent 51%),
+        linear-gradient(-60deg, transparent 49%, rgba(255,255,255,0.4) 50%, transparent 51%);
+        
+    /* Добавляем объем */
+    transform: translateZ(20px);
+}
 
-/* --- ВЕРХНЯЯ ШАПКА (1-5) --- */
-.face-1 { transform: rotateY(0deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-2 { transform: rotateY(72deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-3 { transform: rotateY(144deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-4 { transform: rotateY(216deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-5 { transform: rotateY(288deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-
-/* --- НИЖНЯЯ ШАПКА (16-20) --- 
-   Переворачиваем на 180 (rotateZ) и смещаем Y фазу на 36 градусов
-*/
-.face-16 { transform: rotateY(36deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-17 { transform: rotateY(108deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-18 { transform: rotateY(180deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-19 { transform: rotateY(252deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-.face-20 { transform: rotateY(324deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-upper)); }
-
-/* --- СРЕДНИЙ ПОЯС ВЕРХНИЙ (6-10) --- 
-   Смотрят вниз (rotateZ 180), наклон меньше (10.8), вклиниваются между верхними
-*/
-.face-6  { transform: rotateY(36deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-7  { transform: rotateY(108deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-8  { transform: rotateY(180deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-9  { transform: rotateY(252deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-10 { transform: rotateY(324deg) rotateZ(180deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-
-/* --- СРЕДНИЙ ПОЯС НИЖНИЙ (11-15) --- 
-   Смотрят вверх, наклон меньше (10.8), совпадают по фазе с верхними
-*/
-.face-11 { transform: rotateY(0deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-12 { transform: rotateY(72deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-13 { transform: rotateY(144deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-14 { transform: rotateY(216deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-.face-15 { transform: rotateY(288deg) translateZ(var(--d20-radius)) rotateX(var(--d20-tilt-lower)); }
-
-
-/* Result Overlay */
-.d20-result-overlay {
+/* Результат, парящий перед кубиком */
+.d20-result {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) translateZ(120px);
-    font-size: 60px;
+    transform: translate(-50%, -50%) translateZ(60px); /* Парит перед кристаллом */
+    font-size: 70px;
     font-weight: 800;
     color: #fff;
-    text-shadow: 0 0 20px #0a84ff, 0 0 10px white;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none;
-    z-index: 10;
+    text-shadow: 0 0 20px #0a84ff;
+    pointer-events: none; /* Чтобы клики проходили сквозь цифру */
+    transition: opacity 0.2s;
 }
 
-/* --- Остальные стили без изменений --- */
+/* --- Остальные стили --- */
 .slot-machine { display: flex; gap: 10px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
 .reel-window { width: 70px; height: 90px; background: linear-gradient(to bottom, #111, #333, #111); border-radius: 10px; overflow: hidden; position: relative; border: 2px solid gold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
 .reel { font-size: 45px; display: flex; align-items: center; justify-content: center; height: 100%; filter: blur(0px); transition: filter 0.1s; }
