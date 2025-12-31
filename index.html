@@ -3,17 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MultiTool iOS</title>
-
-  <!-- three.js via importmap (one-file, no build) -->
-  <script async src="https://unpkg.com/es-module-shims@1.10.0/dist/es-module-shims.js"></script>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.161.0/build/three.module.js"
-      }
-    }
-  </script>
+  <title>MultiTool iOS Style</title>
 
   <style>
     :root {
@@ -62,6 +52,7 @@
       align-items: center;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      z-index: 10;
     }
 
     .app-title { margin: 0; font-weight: 700; letter-spacing: 0.5px; }
@@ -91,7 +82,7 @@
       color: white;
     }
 
-    .screen { flex: 1; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
+    .screen { flex: 1; display: none; flex-direction: column; padding: 20px; overflow-y: auto; overflow-x: hidden; }
     .screen.active { display: flex; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -133,13 +124,14 @@
       align-items: center;
       margin-bottom: 10px;
       -webkit-tap-highlight-color: transparent;
+      z-index: 10;
     }
     .back-btn::before { content: "‹"; font-size: 24px; margin-right: 5px; margin-top: -3px; }
 
-    .tool-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
-    .hint-text { margin-top: 30px; opacity: 0.6; font-size: 14px; }
+    .tool-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; position: relative; }
+    .hint-text { margin-top: 40px; opacity: 0.6; font-size: 14px; pointer-events: none; }
 
-    /* Magic Ball */
+    /* --- Magic Ball --- */
     .magic-ball-outer {
       width: 280px; height: 280px;
       background: radial-gradient(circle at 30% 30%, #444, #000);
@@ -175,69 +167,64 @@
       100% { transform: translate(0,0) rotate(0); }
     }
 
-    /* D6 */
+    /* --- D6 Cube --- */
     .cube-container { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.1, 0.9, 0.2, 1); transform: rotateX(-30deg) rotateY(-45deg); }
-    .face { position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid #999; color: black; font-size: 40px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
-    .front { transform: rotateY(0deg) translateZ(50px); }
-    .back { transform: rotateY(180deg) translateZ(50px); }
-    .right { transform: rotateY(90deg) translateZ(50px); }
-    .left { transform: rotateY(-90deg) translateZ(50px); }
-    .top { transform: rotateX(90deg) translateZ(50px); }
-    .bottom { transform: rotateX(-90deg) translateZ(50px); }
+    .face { position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid #999; color: black; font-size: 40px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); backface-visibility: hidden; }
+    /* Manual face positioning for D6 */
+    .d6-f1 { transform: rotateY(0deg) translateZ(50px); }
+    .d6-f6 { transform: rotateY(180deg) translateZ(50px); }
+    .d6-f3 { transform: rotateY(90deg) translateZ(50px); }
+    .d6-f4 { transform: rotateY(-90deg) translateZ(50px); }
+    .d6-f5 { transform: rotateX(90deg) translateZ(50px); }
+    .d6-f2 { transform: rotateX(-90deg) translateZ(50px); }
 
-    /* D20 (WebGL container) */
-    .d20-area { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .d20-wrapper{
-      width: 260px;
-      height: 260px;
+    /* --- D20 Icosahedron --- */
+    .d20-container {
+      width: 200px; height: 200px;
       position: relative;
+      transform-style: preserve-3d;
+      display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
     }
-    #d20-canvas{
-      width: 100%;
-      height: 100%;
-      display: block;
-      border-radius: 28px;
-      background: rgba(0,0,0,0.15);
-      box-shadow: 0 20px 60px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.08);
-    }
-    #d20-result{
+    .d20-cube {
+      width: 100%; height: 100%;
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 88px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 0 0 18px rgba(10,132,255,.9), 0 0 6px rgba(255,255,255,.85);
-      pointer-events: none;
-      opacity: 1;
-      transition: opacity .2s, transform .2s, color .2s;
+      transform-style: preserve-3d;
+      transition: transform 1.5s cubic-bezier(0.15, 0.9, 0.3, 1);
     }
-    .d20-result-hide{
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(.92);
+    .d20-face {
+      position: absolute;
+      width: 100px; /* Width of the triangle base */
+      height: 86.6px; /* Height (100 * sin(60)) */
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #aaa;
+      /* Create triangle shape */
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 800; color: #333;
+      transform-origin: 50% 50%;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+      padding-top: 25px; box-sizing: border-box;
+      backface-visibility: hidden;
     }
 
-    /* Slots */
+    /* --- Slots --- */
     .slot-machine { display: flex; gap: 10px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
     .reel-window { width: 70px; height: 90px; background: linear-gradient(to bottom, #111, #333, #111); border-radius: 10px; overflow: hidden; position: relative; border: 2px solid gold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
     .reel { font-size: 45px; display: flex; align-items: center; justify-content: center; height: 100%; filter: blur(0px); transition: filter 0.1s; }
     .reel.blur { filter: blur(4px); transform: scale(0.9); }
     .slot-message { height: 30px; margin-bottom: 15px; font-weight: bold; color: gold; text-shadow: 0 0 5px orange; }
 
-    /* Coin */
+    /* --- Coin --- */
     #coin { position: relative; width: 150px; height: 150px; cursor: pointer; transform-style: preserve-3d; transition: transform 2.5s cubic-bezier(0.1, 0.9, 0.2, 1); -webkit-tap-highlight-color: transparent; }
     .side-a, .side-b { position: absolute; width: 100%; height: 100%; border-radius: 50%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; border: 4px solid #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
     .side-a { background: radial-gradient(circle, #ffe066, #b38f00); color: #3b2f00; transform: rotateY(0deg); }
     .side-b { background: radial-gradient(circle, #e0e0e0, #888); color: #222; transform: rotateY(180deg); border-color: silver; }
     .side-a::after, .side-b::after { content: attr(data-label); font-size: 18px; letter-spacing: .5px; text-shadow: 0 0 8px rgba(255,255,255,.25); }
 
-    /* Randomizer */
+    /* --- Randomizer --- */
     .input-area { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
     .glass-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 12px; font-size: 20px; text-align: center; width: 120px; outline: none; margin-top: 10px; }
     .rand-result { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; }
@@ -245,7 +232,7 @@
     .glass-btn-large { background: white; color: black; border: none; padding: 15px 50px; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.3); transition: transform 0.1s; -webkit-tap-highlight-color: transparent; }
     .glass-btn-large:active { transform: scale(0.95); }
 
-    footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; }
+    footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; padding-bottom: 10px; }
     footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
   </style>
 </head>
@@ -304,8 +291,8 @@
       <div class="tool-content" style="perspective: 1000px;">
         <div class="cube-container" onclick="rollD6()">
           <div id="dice-cube" class="cube">
-            <div class="face front">1</div><div class="face back">6</div><div class="face right">3</div>
-            <div class="face left">4</div><div class="face top">5</div><div class="face bottom">2</div>
+            <div class="face d6-f1">1</div><div class="face d6-f6">6</div><div class="face d6-f3">3</div>
+            <div class="face d6-f4">4</div><div class="face d6-f5">5</div><div class="face d6-f2">2</div>
           </div>
         </div>
         <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
@@ -314,10 +301,10 @@
 
     <div id="d20-screen" class="screen">
       <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="tool-content d20-area">
-        <div class="d20-wrapper" id="d20-wrapper">
-          <canvas id="d20-canvas"></canvas>
-          <div id="d20-result">20</div>
+      <div class="tool-content" style="perspective: 1000px;">
+        <div class="d20-container" onclick="rollD20()">
+          <div id="d20-cube" class="d20-cube">
+            </div>
         </div>
         <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
       </div>
@@ -362,11 +349,8 @@
     <footer>Developer: <a href="https://t.me/desoope" target="_blank" rel="noopener">DesOope</a></footer>
   </div>
 
-  <script type="module">
-    import * as THREE from "three";
-    // IcosahedronGeometry: это реальный икосаэдр (20 граней) [web:9][page:1]
-
-    // --- UI TEXT ---
+  <script>
+    // --- UI TEXT & CONFIG ---
     let currentLang = 'uk';
     let isSpinning = false;
 
@@ -382,7 +366,7 @@
 
     const slotSymbols = ["🍒","🍋","🍇","💎","7️⃣","🔔"];
 
-    // --- NAV ---
+    // --- NAVIGATION ---
     window.openTool = function(toolId) {
       const menu = document.getElementById('menu-screen');
       const tool = document.getElementById(toolId + '-screen');
@@ -407,7 +391,7 @@
       }, 200);
     };
 
-    // --- LANG ---
+    // --- LANGUAGE ---
     window.setLang = function(lang) {
       currentLang = lang;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
@@ -424,8 +408,6 @@
       if (b) b.setAttribute('data-label', uiText[lang].tails);
     };
 
-    document.addEventListener('DOMContentLoaded', () => setLang('uk'));
-
     // --- Magic Ball ---
     window.askBall = function() {
       const ballOuter = document.querySelector('.magic-ball-outer');
@@ -440,11 +422,12 @@
       }, 600);
     };
 
-    // --- D6 ---
+    // --- D6 Logic ---
     window.rollD6 = function() {
       const cube = document.getElementById('dice-cube');
       const result = Math.floor(Math.random() * 6) + 1;
       let x = 0, y = 0;
+      // Map result to angles
       switch(result) {
         case 1: x=0; y=0; break;
         case 6: x=0; y=180; break;
@@ -453,10 +436,13 @@
         case 3: x=0; y=-90; break;
         case 4: x=0; y=90; break;
       }
+      // Add multiple rotations for effect
       x += 360 * 3 + (Math.random() * 20 - 10);
       y += 360 * 3 + (Math.random() * 20 - 10);
-      cube.style.transition = "transform 0.8s ease-in-out";
+      
       cube.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
+      
+      // Correct to precise angle after spin
       setTimeout(() => {
         const cleanX = Math.round(x / 90) * 90;
         const cleanY = Math.round(y / 90) * 90;
@@ -464,7 +450,71 @@
       }, 800);
     };
 
-    // --- Slots ---
+    // --- D20 Logic (CSS 3D) ---
+    const d20FacesData = [];
+    
+    function initD20() {
+      const cube = document.getElementById('d20-cube');
+      cube.innerHTML = ''; 
+      d20FacesData.length = 0;
+
+      // 20 faces of Icosahedron
+      for (let i = 0; i < 20; i++) {
+        const el = document.createElement('div');
+        el.className = 'd20-face';
+        el.innerText = i + 1;
+
+        let yRot = 0, xRot = 0;
+        
+        // Arrange faces to form a sphere/icosahedron approximation
+        if (i < 5) { // Top Cap
+          yRot = i * 72;
+          xRot = 53;
+        } else if (i < 10) { // Upper Mid
+            yRot = (i - 5) * 72 + 36;
+            xRot = 11;
+        } else if (i < 15) { // Lower Mid
+            yRot = (i - 10) * 72;
+            xRot = -11;
+        } else { // Bottom Cap
+            yRot = (i - 15) * 72 + 36;
+            xRot = -53;
+        }
+
+        // Apply Position
+        // translateZ(85px) pushes faces out from center
+        el.style.transform = `rotateY(${yRot}deg) rotateX(${xRot}deg) translateZ(85px)`;
+        
+        // Store reverse angles to show this face later
+        d20FacesData.push({ 
+            el: el, 
+            targetX: -xRot, 
+            targetY: -yRot 
+        });
+        
+        cube.appendChild(el);
+      }
+    }
+
+    window.rollD20 = function() {
+      const cube = document.getElementById('d20-cube');
+      
+      // 1. Pick Result
+      const resultIndex = Math.floor(Math.random() * 20);
+      const target = d20FacesData[resultIndex];
+      
+      // 2. Calculate spin (add full 360s)
+      const extraSpinsY = 360 * (3 + Math.floor(Math.random() * 3));
+      const extraSpinsX = 360 * (2 + Math.floor(Math.random() * 2));
+      
+      const finalX = target.targetX + extraSpinsX;
+      const finalY = target.targetY + extraSpinsY;
+      
+      // 3. Animate
+      cube.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg)`;
+    };
+
+    // --- Slots Logic ---
     window.spinSlots = function() {
       if(isSpinning) return;
       isSpinning = true;
@@ -495,7 +545,7 @@
       }, 2000);
     };
 
-    // --- Coin ---
+    // --- Coin Logic ---
     window.flipCoin = function() {
       const coin = document.getElementById('coin');
       const outcome = Math.random() < 0.5 ? 0 : 1;
@@ -510,7 +560,7 @@
       });
     };
 
-    // --- Randomizer ---
+    // --- Randomizer Logic ---
     window.generateRandom = function() {
       const maxInput = document.getElementById('rand-max');
       const max = parseInt(maxInput.value) || 100;
@@ -527,116 +577,11 @@
       }, 50);
     };
 
-    // -------------------------
-    // D20 (WebGL true 3D)
-    // -------------------------
-    const canvas = document.getElementById('d20-canvas');
-    const wrapper = document.getElementById('d20-wrapper');
-    const resultEl = document.getElementById('d20-result');
-
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(0, 0.8, 5);
-
-    // lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-    const key = new THREE.DirectionalLight(0xffffff, 1.0);
-    key.position.set(4, 6, 5);
-    scene.add(key);
-    const rim = new THREE.DirectionalLight(0x66aaff, 0.7);
-    rim.position.set(-5, -1, -4);
-    scene.add(rim);
-
-    // D20 geometry: IcosahedronGeometry(radius, detail=0) [web:9][page:1]
-    const geo = new THREE.IcosahedronGeometry(1.55, 0);
-
-    // material
-    const mat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color("#1b78ff"),
-      roughness: 0.25,
-      metalness: 0.05,
-      clearcoat: 0.7,
-      clearcoatRoughness: 0.25
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+      setLang('uk');
+      initD20(); // Build the D20 geometry
     });
-
-    const d20 = new THREE.Mesh(geo, mat);
-    d20.rotation.set(0.6, 0.8, 0.1);
-    scene.add(d20);
-
-    // subtle wireframe overlay
-    const wf = new THREE.LineSegments(
-      new THREE.WireframeGeometry(geo),
-      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.22 })
-    );
-    d20.add(wf);
-
-    function resizeD20() {
-      const w = wrapper.clientWidth;
-      const h = wrapper.clientHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-    window.addEventListener('resize', resizeD20);
-    resizeD20();
-
-    // animation loop
-    let spinVel = new THREE.Vector3(0,0,0);
-    let rolling = false;
-
-    function tick() {
-      // inertial spin
-      d20.rotation.x += spinVel.x;
-      d20.rotation.y += spinVel.y;
-      d20.rotation.z += spinVel.z;
-
-      // friction
-      spinVel.multiplyScalar(rolling ? 0.985 : 0.95);
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(tick);
-    }
-    tick();
-
-    function rand(min, max){ return min + Math.random() * (max - min); }
-
-    function setResultColor(n){
-      if (n === 20) resultEl.style.color = "#00ff00";
-      else if (n === 1) resultEl.style.color = "#ff3333";
-      else resultEl.style.color = "#ffffff";
-    }
-
-    function rollD20WebGL() {
-      if (rolling) return;
-      rolling = true;
-
-      // hide text while rolling
-      resultEl.classList.add('d20-result-hide');
-
-      // kick spin
-      spinVel.set(rand(0.18, 0.28), rand(0.18, 0.28), rand(0.14, 0.22));
-
-      // after ~1.3s slow down and show result
-      setTimeout(() => {
-        const n = Math.floor(Math.random() * 20) + 1;
-
-        // stop almost completely (looks like settle)
-        spinVel.multiplyScalar(0.08);
-
-        resultEl.textContent = String(n);
-        setResultColor(n);
-        resultEl.classList.remove('d20-result-hide');
-
-        // unlock after a short delay
-        setTimeout(() => { rolling = false; }, 250);
-      }, 1300);
-    }
-
-    // click/tap
-    wrapper.addEventListener('click', rollD20WebGL, { passive: true });
   </script>
 </body>
 </html>
