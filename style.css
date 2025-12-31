@@ -1,10 +1,14 @@
 :root {
     --glass-bg: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
-    --glass-highlight: rgba(255, 255, 255, 0.05);
     --text-primary: #ffffff;
     --accent: #0a84ff;
     --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+    /* D20 Dimensions */
+    --d20-size: 80px; /* Base size of a face width */
+    --d20-h: 69px;   /* Height of triangle ~ size * 0.866 */
+    --d20-z: 60px;   /* Distance from center */
 }
 
 body {
@@ -38,7 +42,7 @@ body {
     padding-bottom: 20px;
 }
 
-/* Header */
+/* Header & Menu styles (Standard) */
 header {
     padding: 20px;
     display: flex;
@@ -46,191 +50,38 @@ header {
     align-items: center;
     backdrop-filter: blur(10px);
 }
+.app-title { margin: 0; font-weight: 700; letter-spacing: 0.5px; }
+.lang-switch { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 4px; display: flex; }
+.lang-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 6px 12px; cursor: pointer; border-radius: 16px; transition: 0.3s; font-weight: 600; }
+.lang-btn.active { background: rgba(255,255,255,0.2); color: white; }
 
-.app-title {
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
+.screen { flex: 1; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
+.screen.active { display: flex; animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.lang-switch {
-    background: rgba(0,0,0,0.3);
-    border-radius: 20px;
-    padding: 4px;
-    display: flex;
-}
-
-.lang-btn {
-    background: transparent;
-    border: none;
-    color: rgba(255,255,255,0.5);
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 16px;
-    transition: 0.3s;
-    font-weight: 600;
-}
-
-.lang-btn.active {
-    background: rgba(255,255,255,0.2);
-    color: white;
-}
-
-/* Screens */
-.screen {
-    flex: 1;
-    display: none;
-    flex-direction: column;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.screen.active {
-    display: flex;
-    animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Menu */
-.menu-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    padding: 10px;
-}
-
-.menu-item {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.2s;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
+.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
+.menu-item { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
 .menu-item:active { transform: scale(0.96); }
-
 .icon-bg { font-size: 40px; margin-bottom: 10px; }
 .menu-label { font-size: 14px; font-weight: 500; }
 
-/* Back Button */
-.back-btn {
-    background: transparent;
-    border: none;
-    color: var(--accent);
-    font-size: 17px;
-    font-weight: 600;
-    padding: 10px 0;
-    cursor: pointer;
-    align-self: flex-start;
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
+.back-btn { background: transparent; border: none; color: var(--accent); font-size: 17px; font-weight: 600; padding: 10px 0; cursor: pointer; align-self: flex-start; display: flex; align-items: center; margin-bottom: 10px; }
+.back-btn::before { content: "‹"; font-size: 24px; margin-right: 5px; margin-top: -3px; }
 
-.back-btn::before {
-    content: "‹";
-    font-size: 24px;
-    margin-right: 5px;
-    margin-top: -3px;
-}
-
-.tool-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
+.tool-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
 .hint-text { margin-top: 30px; opacity: 0.6; font-size: 14px; }
 
 /* --- Magic Ball --- */
-.magic-ball-outer {
-    width: 280px;
-    height: 280px;
-    background: radial-gradient(circle at 30% 30%, #444, #000);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.8);
-    cursor: pointer;
-}
-.magic-ball-inner {
-    width: 180px;
-    height: 180px;
-    background: radial-gradient(circle, #111, #000);
-    border-radius: 50%;
-    border: 1px solid #222;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-}
-.ball-text {
-    color: #aaffaa;
-    text-shadow: 0 0 10px #aaffaa;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    opacity: 1;
-    transition: opacity 1s ease;
-}
+.magic-ball-outer { width: 280px; height: 280px; background: radial-gradient(circle at 30% 30%, #444, #000); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.8); cursor: pointer; }
+.magic-ball-inner { width: 180px; height: 180px; background: radial-gradient(circle, #111, #000); border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+.ball-text { color: #aaffaa; text-shadow: 0 0 10px #aaffaa; font-size: 16px; font-weight: bold; text-transform: uppercase; opacity: 1; transition: opacity 1s ease; }
 .ball-animate { animation: ballShake 0.6s ease-in-out; }
-
-@keyframes ballShake {
-    0% { transform: translate(0,0) rotate(0); }
-    25% { transform: translate(-5px, 0) rotate(-5deg); }
-    50% { transform: translate(5px, 0) rotate(5deg); }
-    75% { transform: translate(-5px, 0) rotate(-5deg); }
-    100% { transform: translate(0,0) rotate(0); }
-}
+@keyframes ballShake { 0% { transform: translate(0,0) rotate(0); } 25% { transform: translate(-5px, 0) rotate(-5deg); } 50% { transform: translate(5px, 0) rotate(5deg); } 75% { transform: translate(-5px, 0) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0); } }
 
 /* --- D6 --- */
-.cube-container {
-    width: 100px;
-    height: 100px;
-    position: relative;
-    transform-style: preserve-3d;
-    cursor: pointer;
-}
-.cube {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    transform-style: preserve-3d;
-    transition: transform 1s cubic-bezier(0.1, 0.9, 0.2, 1);
-    transform: rotateX(-30deg) rotateY(-45deg);
-}
-.face {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: rgba(255,255,255,0.95);
-    border-radius: 12px;
-    border: 1px solid #999;
-    color: black;
-    font-size: 40px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-}
+.cube-container { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; cursor: pointer; }
+.cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 1s cubic-bezier(0.1, 0.9, 0.2, 1); transform: rotateX(-30deg) rotateY(-45deg); }
+.face { position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid #999; color: black; font-size: 40px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
 .front { transform: rotateY(0deg) translateZ(50px); }
 .back { transform: rotateY(180deg) translateZ(50px); }
 .right { transform: rotateY(90deg) translateZ(50px); }
@@ -238,148 +89,144 @@ header {
 .top { transform: rotateX(90deg) translateZ(50px); }
 .bottom { transform: rotateX(-90deg) translateZ(50px); }
 
-/* --- D20 3D CRYSTAL (NEW) --- */
-.d20-stage {
-    perspective: 1200px; /* Глубина 3D сцены */
-}
+/* --- D20 TRUE ICOSAHEDRON --- */
+.d20-perspective { perspective: 1000px; }
 
-.d20-crystal {
+.d20-wrapper {
     position: relative;
-    width: 220px;
-    height: 220px;
-    transform-style: preserve-3d; /* Важно для 3D */
-    transition: transform 1.2s cubic-bezier(0.1, 0.8, 0.2, 1); /* Плавное замедление */
-    cursor: pointer;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Сам SVG кристалл */
-.d20-svg-face {
-    width: 100%;
-    height: 100%;
-    /* Легкое свечение и тень */
-    filter: drop-shadow(0 0 20px rgba(10, 132, 255, 0.5)) drop-shadow(0 10px 20px rgba(0,0,0,0.4));
-    /* Немного выдвигаем вперед в 3D */
-    transform: translateZ(10px);
+.d20-model {
+    position: relative;
+    width: 0;
+    height: 0;
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Initial rotation to look cool */
+    transform: rotateX(-20deg) rotateY(-10deg);
 }
 
-/* Номер */
-.d20-number {
+/* Common Face Style */
+.d20-face {
+    position: absolute;
+    width: var(--d20-size);
+    height: var(--d20-h); /* Triangle Height */
+    left: calc(var(--d20-size) / -2);
+    top: calc(var(--d20-h) / -2);
+    
+    /* Triangle Shape */
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    
+    /* Look */
+    background: rgba(10, 132, 255, 0.6);
+    border-bottom: 1px solid rgba(255,255,255,0.8); /* Faux border via background trick or simple line? Borders are hard with clip-path */
+    /* Use background gradient to simulate border/shine */
+    background: linear-gradient(135deg, rgba(30,144,255,0.8), rgba(0,0,50,0.8));
+    
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: flex-end; /* Text at bottom center of triangle */
+    justify-content: center;
+    padding-bottom: 5px;
+    backface-visibility: visible;
+    transform-origin: 50% 50%; /* Center of square */
+}
+
+/* Adjust text position inside triangle */
+.d20-face {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 30%; /* Push text down a bit */
+    box-sizing: border-box;
+    text-shadow: 0 0 5px black;
+}
+
+/* ICOSAHEDRON MATH 
+   Top Cap: 5 faces. Tilt ~52.62 deg.
+   Middle Up: 5 faces.
+   Middle Down: 5 faces.
+   Bottom Cap: 5 faces.
+*/
+
+/* --- Top Cap (1-5) --- */
+.face-1 { transform: rotateY(0deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
+.face-2 { transform: rotateY(72deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
+.face-3 { transform: rotateY(144deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
+.face-4 { transform: rotateY(216deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
+.face-5 { transform: rotateY(288deg) translateZ(var(--d20-z)) rotateX(52.6deg); }
+
+/* --- Middle Top (6-10) --- 
+   Rotated Y is offset by 36deg from top cap.
+   Tilt is much less: ~10.8 deg, pointing DOWN (X rotation negative?)
+*/
+.face-6  { transform: rotateY(36deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
+.face-7  { transform: rotateY(108deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
+.face-8  { transform: rotateY(180deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
+.face-9  { transform: rotateY(252deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
+.face-10 { transform: rotateY(324deg) translateZ(var(--d20-z)) rotateX(-10.8deg) rotateZ(180deg); }
+
+/* --- Middle Bottom (11-15) --- 
+   Same Y angles as Top Cap (0, 72...), pointing UP.
+*/
+.face-11 { transform: rotateY(0deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
+.face-12 { transform: rotateY(72deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
+.face-13 { transform: rotateY(144deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
+.face-14 { transform: rotateY(216deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
+.face-15 { transform: rotateY(288deg) translateZ(var(--d20-z)) rotateX(-10.8deg); }
+
+/* --- Bottom Cap (16-20) --- 
+   Same Y angles as Middle Top (36, 108...), pointing DOWN.
+*/
+.face-16 { transform: rotateY(36deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
+.face-17 { transform: rotateY(108deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
+.face-18 { transform: rotateY(180deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
+.face-19 { transform: rotateY(252deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
+.face-20 { transform: rotateY(324deg) translateZ(var(--d20-z)) rotateX(52.6deg) rotateZ(180deg); }
+
+/* Result Overlay (Floating Text) */
+.d20-result-overlay {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* Центрируем и выдвигаем еще сильнее вперед, чтобы парил над кристаллом */
-    transform: translate(-50%, -50%) translateZ(40px);
-    font-size: 55px;
+    transform: translate(-50%, -50%) translateZ(100px);
+    font-size: 60px;
     font-weight: 800;
     color: #fff;
-    text-shadow: 0 0 25px #0a84ff, 0 0 5px white;
-    z-index: 2;
-    backface-visibility: hidden; /* Не показывать, если перевернут задом */
+    text-shadow: 0 0 20px #0a84ff, 0 0 10px white;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 10;
 }
 
-
-/* --- SLOTS --- */
-.slot-machine {
-    display: flex;
-    gap: 10px;
-    background: rgba(0,0,0,0.4);
-    padding: 15px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 20px;
-}
-
-.reel-window {
-    width: 70px;
-    height: 90px;
-    background: linear-gradient(to bottom, #111, #333, #111);
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    border: 2px solid gold;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
-}
-
-.reel {
-    font-size: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    filter: blur(0px);
-    transition: filter 0.1s;
-}
-
-.reel.blur {
-    filter: blur(4px);
-    transform: scale(0.9);
-}
-
-.slot-message {
-    height: 30px;
-    margin-bottom: 15px;
-    font-weight: bold;
-    color: gold;
-    text-shadow: 0 0 5px orange;
-}
+/* --- Slots --- */
+.slot-machine { display: flex; gap: 10px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+.reel-window { width: 70px; height: 90px; background: linear-gradient(to bottom, #111, #333, #111); border-radius: 10px; overflow: hidden; position: relative; border: 2px solid gold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+.reel { font-size: 45px; display: flex; align-items: center; justify-content: center; height: 100%; filter: blur(0px); transition: filter 0.1s; }
+.reel.blur { filter: blur(4px); transform: scale(0.9); }
+.slot-message { height: 30px; margin-bottom: 15px; font-weight: bold; color: gold; text-shadow: 0 0 5px orange; }
 
 /* --- Coin --- */
-#coin {
-    position: relative;
-    width: 150px;
-    height: 150px;
-    cursor: pointer;
-    transform-style: preserve-3d;
-    transition: transform 3s ease-out;
-}
-.side-a, .side-b {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    backface-visibility: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: bold;
-    border: 4px solid #ffd700;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-}
+#coin { position: relative; width: 150px; height: 150px; cursor: pointer; transform-style: preserve-3d; transition: transform 3s ease-out; }
+.side-a, .side-b { position: absolute; width: 100%; height: 100%; border-radius: 50%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border: 4px solid #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
 .side-a { background: radial-gradient(circle, #ffe066, #b38f00); color: #554400; transform: rotateY(0deg); }
 .side-b { background: radial-gradient(circle, #e0e0e0, #888); color: #333; transform: rotateY(180deg); border-color: silver; }
 
 /* --- Randomizer --- */
 .input-area { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
-.glass-input {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    padding: 12px;
-    border-radius: 12px;
-    font-size: 20px;
-    text-align: center;
-    width: 120px;
-    outline: none;
-    margin-top: 10px;
-}
+.glass-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 12px; font-size: 20px; text-align: center; width: 120px; outline: none; margin-top: 10px; }
 .rand-result { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; }
 
-/* General Button */
-.glass-btn-large {
-    background: white;
-    color: black;
-    border: none;
-    padding: 15px 50px;
-    border-radius: 30px;
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    transition: transform 0.1s;
-}
+/* Button & Footer */
+.glass-btn-large { background: white; color: black; border: none; padding: 15px 50px; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.3); transition: transform 0.1s; }
 .glass-btn-large:active { transform: scale(0.95); }
-
-/* Footer */
 footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; }
 footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
