@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MultiTool iOS Style</title>
+  <title>MultiTool iOS</title>
 
   <style>
     :root {
@@ -171,7 +171,6 @@
     .cube-container { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.1, 0.9, 0.2, 1); transform: rotateX(-30deg) rotateY(-45deg); }
     .face { position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid #999; color: black; font-size: 40px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); backface-visibility: hidden; }
-    /* Manual face positioning for D6 */
     .d6-f1 { transform: rotateY(0deg) translateZ(50px); }
     .d6-f6 { transform: rotateY(180deg) translateZ(50px); }
     .d6-f3 { transform: rotateY(90deg) translateZ(50px); }
@@ -179,35 +178,57 @@
     .d6-f5 { transform: rotateX(90deg) translateZ(50px); }
     .d6-f2 { transform: rotateX(-90deg) translateZ(50px); }
 
-    /* --- D20 Icosahedron --- */
-    .d20-container {
-      width: 200px; height: 200px;
+    /* --- D20 SIMPLE --- */
+    .d20-icon-wrapper {
       position: relative;
-      transform-style: preserve-3d;
-      display: flex; align-items: center; justify-content: center;
+      width: 220px;
+      height: 220px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s;
     }
-    .d20-cube {
-      width: 100%; height: 100%;
-      position: absolute;
-      transform-style: preserve-3d;
-      transition: transform 1.5s cubic-bezier(0.15, 0.9, 0.3, 1);
+    .d20-icon-wrapper:active { transform: scale(0.95); }
+    
+    .d20-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 15px rgba(10, 132, 255, 0.4));
     }
-    .d20-face {
+    
+    /* Стили линий SVG */
+    .d20-path {
+      fill: rgba(0,0,0,0.3);
+      stroke: #0a84ff;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+
+    .d20-number-display {
       position: absolute;
-      width: 100px; /* Width of the triangle base */
-      height: 86.6px; /* Height (100 * sin(60)) */
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid #aaa;
-      /* Create triangle shape */
-      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 32px; font-weight: 800; color: #333;
-      transform-origin: 50% 50%;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
-      padding-top: 25px; box-sizing: border-box;
-      backface-visibility: hidden;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 60px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(10, 132, 255, 0.8);
+      z-index: 2;
+    }
+
+    .d20-rolling {
+      animation: d20Shake 0.5s ease-in-out infinite;
+    }
+    
+    @keyframes d20Shake {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(10deg) scale(1.05); }
+      50% { transform: rotate(-10deg) scale(1.05); }
+      75% { transform: rotate(10deg) scale(1.05); }
+      100% { transform: rotate(0deg) scale(1); }
     }
 
     /* --- Slots --- */
@@ -301,10 +322,25 @@
 
     <div id="d20-screen" class="screen">
       <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="tool-content" style="perspective: 1000px;">
-        <div class="d20-container" onclick="rollD20()">
-          <div id="d20-cube" class="d20-cube">
-            </div>
+      <div class="tool-content">
+        <div id="d20-wrapper" class="d20-icon-wrapper" onclick="rollD20Simple()">
+           <svg class="d20-svg" viewBox="0 0 100 100">
+             <polygon class="d20-path" points="50,5 95,25 95,75 50,95 5,75 5,25" fill="rgba(255,255,255,0.05)"/>
+             <line class="d20-path" x1="50" y1="5" x2="50" y2="95" />
+             <line class="d20-path" x1="50" y1="5" x2="95" y2="25" />
+             <line class="d20-path" x1="50" y1="5" x2="5" y2="25" />
+             <line class="d20-path" x1="95" y1="25" x2="5" y2="25" />
+             <line class="d20-path" x1="95" y1="75" x2="5" y2="75" />
+             <line class="d20-path" x1="50" y1="95" x2="95" y2="75" />
+             <line class="d20-path" x1="50" y1="95" x2="5" y2="75" />
+             <line class="d20-path" x1="95" y1="25" x2="95" y2="75" />
+             <line class="d20-path" x1="5" y1="25" x2="5" y2="75" />
+             <line class="d20-path" x1="5" y1="25" x2="50" y2="50" />
+             <line class="d20-path" x1="95" y1="25" x2="50" y2="50" />
+             <line class="d20-path" x1="5" y1="75" x2="50" y2="50" />
+             <line class="d20-path" x1="95" y1="75" x2="50" y2="50" />
+           </svg>
+           <div id="d20-number" class="d20-number-display">20</div>
         </div>
         <p class="hint-text" data-key="tap_roll">Нажми, чтобы бросить</p>
       </div>
@@ -427,7 +463,6 @@
       const cube = document.getElementById('dice-cube');
       const result = Math.floor(Math.random() * 6) + 1;
       let x = 0, y = 0;
-      // Map result to angles
       switch(result) {
         case 1: x=0; y=0; break;
         case 6: x=0; y=180; break;
@@ -436,13 +471,11 @@
         case 3: x=0; y=-90; break;
         case 4: x=0; y=90; break;
       }
-      // Add multiple rotations for effect
       x += 360 * 3 + (Math.random() * 20 - 10);
       y += 360 * 3 + (Math.random() * 20 - 10);
       
       cube.style.transform = `rotateX(${x}deg) rotateY(${y}deg)`;
       
-      // Correct to precise angle after spin
       setTimeout(() => {
         const cleanX = Math.round(x / 90) * 90;
         const cleanY = Math.round(y / 90) * 90;
@@ -450,68 +483,41 @@
       }, 800);
     };
 
-    // --- D20 Logic (CSS 3D) ---
-    const d20FacesData = [];
-    
-    function initD20() {
-      const cube = document.getElementById('d20-cube');
-      cube.innerHTML = ''; 
-      d20FacesData.length = 0;
-
-      // 20 faces of Icosahedron
-      for (let i = 0; i < 20; i++) {
-        const el = document.createElement('div');
-        el.className = 'd20-face';
-        el.innerText = i + 1;
-
-        let yRot = 0, xRot = 0;
+    // --- D20 Logic (SIMPLE) ---
+    let d20Rolling = false;
+    window.rollD20Simple = function() {
+      if (d20Rolling) return;
+      d20Rolling = true;
+      
+      const wrapper = document.getElementById('d20-wrapper');
+      const numDisplay = document.getElementById('d20-number');
+      
+      // Start Shake
+      wrapper.classList.add('d20-rolling');
+      numDisplay.style.opacity = 0.3;
+      
+      // Random numbers flickering
+      let flick = setInterval(() => {
+         numDisplay.innerText = Math.floor(Math.random() * 20) + 1;
+      }, 50);
+      
+      // Stop
+      setTimeout(() => {
+        clearInterval(flick);
+        wrapper.classList.remove('d20-rolling');
+        numDisplay.style.opacity = 1;
         
-        // Arrange faces to form a sphere/icosahedron approximation
-        if (i < 5) { // Top Cap
-          yRot = i * 72;
-          xRot = 53;
-        } else if (i < 10) { // Upper Mid
-            yRot = (i - 5) * 72 + 36;
-            xRot = 11;
-        } else if (i < 15) { // Lower Mid
-            yRot = (i - 10) * 72;
-            xRot = -11;
-        } else { // Bottom Cap
-            yRot = (i - 15) * 72 + 36;
-            xRot = -53;
-        }
-
-        // Apply Position
-        // translateZ(85px) pushes faces out from center
-        el.style.transform = `rotateY(${yRot}deg) rotateX(${xRot}deg) translateZ(85px)`;
+        // Final result
+        const final = Math.floor(Math.random() * 20) + 1;
+        numDisplay.innerText = final;
         
-        // Store reverse angles to show this face later
-        d20FacesData.push({ 
-            el: el, 
-            targetX: -xRot, 
-            targetY: -yRot 
-        });
+        // Color effect for nat 20 or crit fail 1
+        if(final === 20) numDisplay.style.color = '#00ff00';
+        else if(final === 1) numDisplay.style.color = '#ff4444';
+        else numDisplay.style.color = '#fff';
         
-        cube.appendChild(el);
-      }
-    }
-
-    window.rollD20 = function() {
-      const cube = document.getElementById('d20-cube');
-      
-      // 1. Pick Result
-      const resultIndex = Math.floor(Math.random() * 20);
-      const target = d20FacesData[resultIndex];
-      
-      // 2. Calculate spin (add full 360s)
-      const extraSpinsY = 360 * (3 + Math.floor(Math.random() * 3));
-      const extraSpinsX = 360 * (2 + Math.floor(Math.random() * 2));
-      
-      const finalX = target.targetX + extraSpinsX;
-      const finalY = target.targetY + extraSpinsY;
-      
-      // 3. Animate
-      cube.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg)`;
+        d20Rolling = false;
+      }, 600);
     };
 
     // --- Slots Logic ---
@@ -580,7 +586,6 @@
     // --- INIT ---
     document.addEventListener('DOMContentLoaded', () => {
       setLang('uk');
-      initD20(); // Build the D20 geometry
     });
   </script>
 </body>
