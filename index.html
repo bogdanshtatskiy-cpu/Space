@@ -95,12 +95,13 @@
 
     <div id="coin-screen" class="screen">
       <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="coin-container" onclick="flipCoin()">
-        <div class="coin">
+      <div class="coin-wrapper">
+        <div class="coin" onclick="flipCoin()">
           <div class="coin-face side-a" data-key="heads">ОРЕЛ</div>
           <div class="coin-face coin-back side-b" data-key="tails">РЕШКА</div>
         </div>
       </div>
+      <p class="hint-text" data-key="tap">Нажми</p>
     </div>
 
     <div id="slots-screen" class="screen">
@@ -110,6 +111,7 @@
         <div class="reel-window"><div class="reel" id="reel-2">🍒</div></div>
         <div class="reel-window"><div class="reel" id="reel-3">🍒</div></div>
       </div>
+      <div id="slot-msg" style="text-align:center; height:30px; font-weight:bold; margin-top:10px;"></div>
       <button class="glass-btn" style="margin-top:20px; width:100%" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button>
     </div>
 
