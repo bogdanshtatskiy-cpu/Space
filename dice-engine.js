@@ -4,13 +4,15 @@ export class DiceEngine {
     constructor(containerId, diceType) {
         this.container = document.getElementById(containerId);
         this.type = diceType; 
-        // Единый цвет: матовый серо-голубой лед
+        
+        // Цвет: Матовое серо-голубое стекло (спокойный)
         this.color = 0x8899aa; 
         
-        // Размеры
-        this.size = (diceType === 'd6') ? 7 : (diceType === 'd10' ? 6.5 : (diceType === 'd12' ? 7 : 8));
+        // Размеры кубиков
+        this.size = (diceType === 'd6') ? 6.5 : (diceType === 'd10' ? 6.5 : (diceType === 'd12' ? 7 : 8));
         
-        this.faceNormals = [];
+        this.textMeshes = {}; // Хранилище ссылок на меши цифр для ориентации
+        this.resultValues = []; // Доступные значения
         this.isRolling = false;
         
         this.init();
@@ -19,6 +21,7 @@ export class DiceEngine {
 
     init() {
         this.scene = new THREE.Scene();
+        
         this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 1, 1000);
         this.camera.position.z = 35;
 
@@ -28,6 +31,7 @@ export class DiceEngine {
         this.renderer.physicallyCorrectLights = true;
         this.container.appendChild(this.renderer.domElement);
 
+        // Освещение
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         this.scene.add(ambientLight);
         
@@ -55,32 +59,22 @@ export class DiceEngine {
 
     createD10Geometry(radius) {
         // Пентагональный трапецоэдр (D10)
-        // Геометрически это 2 "шапки", соединенные зигзагом
         const vertices = [];
         const indices = [];
-        
-        // Магия пропорций для красивого D10
-        const h = radius * 1.3; // Высота полюсов
-        const r = radius * 1.0; // Ширина экватора
-        const k = radius * 0.2; // Сдвиг экватора (зигзаг)
+        const h = radius * 1.3; 
+        const r = radius * 1.0; 
+        const k = radius * 0.2; 
 
-        vertices.push(0, h, 0); // 0: Верхний полюс
-        vertices.push(0, -h, 0); // 1: Нижний полюс
+        vertices.push(0, h, 0); // 0: Top
+        vertices.push(0, -h, 0); // 1: Bottom
 
-        // Генерация точек экватора (10 точек)
         for (let i = 0; i < 5; i++) {
             const angle = (i * 72) * (Math.PI / 180);
             const angleOffset = ((i * 72) + 36) * (Math.PI / 180);
-            
-            // Верхнее кольцо экватора (четные)
-            vertices.push(r * Math.cos(angle), k, r * Math.sin(angle));
-            // Нижнее кольцо экватора (нечетные)
-            vertices.push(r * Math.cos(angleOffset), -k, r * Math.sin(angleOffset));
+            vertices.push(r * Math.cos(angle), k, r * Math.sin(angle)); // Upper
+            vertices.push(r * Math.cos(angleOffset), -k, r * Math.sin(angleOffset)); // Lower
         }
 
-        // Индексы.
-        // Верхние точки: 2, 4, 6, 8, 10
-        // Нижние точки: 3, 5, 7, 9, 11
         const upper = [2, 4, 6, 8, 10];
         const lower = [3, 5, 7, 9, 11];
 
@@ -88,29 +82,9 @@ export class DiceEngine {
             const u = upper[i];
             const nextU = upper[(i + 1) % 5];
             const l = lower[i];
-            const nextL = lower[(i + 1) % 5];
-
-            // Каждая грань D10 - это "kite" (дельтоид).
-            // В 3D мы строим его из 2 треугольников.
-            // ВАЖНО: Треугольники должны быть в одной плоскости, чтобы это выглядело как одна грань.
-
-            // Верхние грани (5 штук)
-            // Состоят из: Top, Upper[i], Lower[i] + Top, Lower[i], Upper[next]
-            // Но в D10 грань соединяет: Top, Upper[i], Lower[i], Upper[next] - это не плоско!
-            // Правильная грань D10 соединяет: Top, Lower[i], Upper[next], Lower[next] ??? Нет.
-            
-            // Простая модель:
-            // Грань 1: Top, Upper[i], Lower[i] -- это треугольник? Нет.
-            // Грань D10 соединяет Полюс и 3 точки экватора зигзагом.
-            
-            // Давайте используем простую проверенную триангуляцию:
-            // Верхняя грань i: (Top, Upper[i], Lower[i]) + (Top, Lower[i], Upper[next])
-            // Чтобы убрать шов, мы используем EdgesGeometry с большим порогом угла.
             
             indices.push(0, u, l);
             indices.push(0, l, nextU);
-
-            // Нижняя грань i
             indices.push(1, l, nextU);
             indices.push(1, nextU, lower[(i+1)%5]);
         }
@@ -146,17 +120,13 @@ export class DiceEngine {
         const mesh = new THREE.Mesh(geometry, material);
         this.diceGroup.add(mesh);
 
-        // --- УДАЛЕНИЕ ЛИШНИХ ЛИНИЙ ---
-        // Для D10 угол между треугольниками одной грани = 0 (или очень мал).
-        // Угол между разными гранями большой.
-        // Ставим thresholdAngle = 30 градусов. Все ребра, где угол меньше 30, не будут рисоваться.
-        // Это скроет диагональ на гранях D10.
-        const threshold = (this.type === 'd10') ? 30 : 1; 
+        // Линии (скрываем внутренние швы для D10)
+        const threshold = (this.type === 'd10') ? 30 : 1;
         const edges = new THREE.EdgesGeometry(geometry, threshold);
         const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 }));
         this.diceGroup.add(line);
 
-        // --- ЦИФРЫ ---
+        // --- РАССТАНОВКА ЦИФР ---
         if (this.type === 'd6') {
              const data = [
                 {pos: [1, 0, 0], rot: [0, Math.PI/2, 0], num: 1},
@@ -169,20 +139,16 @@ export class DiceEngine {
             const offset = this.size * 1.6 / 2 + 0.1;
             data.forEach(d => {
                 const vec = new THREE.Vector3(...d.pos);
-                this.faceNormals.push({ normal: vec.clone(), value: d.num });
-                const txt = this.createTextLabel(d.num.toString());
-                txt.position.copy(vec.multiplyScalar(offset));
-                txt.rotation.set(...d.rot);
-                this.diceGroup.add(txt);
+                this.addText(d.num, vec.multiplyScalar(offset), (mesh) => {
+                    mesh.rotation.set(...d.rot);
+                });
             });
 
         } else if (this.type === 'd10') {
-            // D10: 10 граней (0-9).
             const posAttr = geometry.getAttribute('position');
             const indexAttr = geometry.getIndex();
             
             for (let face = 0; face < 10; face++) {
-                // У нас 10 граней. В индексе они идут по 2 треугольника (6 вершин)
                 const iStart = face * 6; 
                 const uniqueIndices = new Set();
                 for(let k=0; k<6; k++) uniqueIndices.add(indexAttr.getX(iStart + k));
@@ -194,58 +160,52 @@ export class DiceEngine {
                 center.divideScalar(uniqueIndices.size);
                 
                 let num = face; // 0-9
-                let displayNum = num.toString();
-                const normal = center.clone().normalize();
-                this.faceNormals.push({ normal: normal.clone(), value: num });
-
-                const txt = this.createTextLabel(displayNum);
-                // Чуть дальше от центра, чтобы не тонуло
-                txt.position.copy(center.multiplyScalar(1.08));
-                txt.lookAt(center.multiplyScalar(2));
-                
-                // Переворачиваем нижние цифры, чтобы они смотрели "наружу" от полюса
-                if (face >= 5) txt.rotation.z = Math.PI; 
-                this.diceGroup.add(txt);
+                this.addText(num, center.multiplyScalar(1.08), (mesh) => {
+                    mesh.lookAt(center.multiplyScalar(2));
+                    // D10 специфика: нижние цифры переворачиваем, чтобы читались от полюса
+                    if (face >= 5) mesh.rotation.z = Math.PI;
+                });
             }
 
         } else {
             // D4, D8, D12, D20
             const posAttr = geometry.attributes.position;
-            // D12 (Dodecahedron): в Three.js геометрия строится не тривиально
-            // Каждая грань (пентагон) состоит из 3 треугольников (9 вершин)
-            // Но в 'position' буфере они могут быть дублированы для flat shading
-            
-            // Определяем сколько вершин на грань
             const vertsPerFace = (this.type === 'd12') ? 9 : 3;
             const totalFaces = posAttr.count / vertsPerFace;
 
             for (let i = 0; i < totalFaces; i++) {
                 let num = i + 1;
-                
-                // Находим центр грани
                 const center = new THREE.Vector3();
                 for (let k = 0; k < vertsPerFace; k++) {
-                    const v = new THREE.Vector3().fromBufferAttribute(posAttr, i * vertsPerFace + k);
-                    center.add(v);
+                    center.add(new THREE.Vector3().fromBufferAttribute(posAttr, i * vertsPerFace + k));
                 }
                 center.divideScalar(vertsPerFace);
                 
-                const normal = center.clone().normalize();
-                this.faceNormals.push({ normal: normal.clone(), value: num });
-                
-                const txt = this.createTextLabel(num.toString());
-                txt.position.copy(center.multiplyScalar(1.05));
-                txt.lookAt(center.multiplyScalar(2));
-                
-                if (this.type === 'd4') txt.rotation.z += Math.PI / 3;
-                
-                this.diceGroup.add(txt);
+                this.addText(num, center.multiplyScalar(1.05), (mesh) => {
+                    mesh.lookAt(center.multiplyScalar(2));
+                    if (this.type === 'd4') mesh.rotation.z += Math.PI / 3;
+                });
             }
         }
     }
 
+    addText(num, pos, orientCallback) {
+        let displayNum = num.toString();
+        // Для D10 цифра 10 обычно это 0
+        if (this.type === 'd10' && num === 10) displayNum = "0"; // Если логика 1-10
+        
+        const txt = this.createTextLabel(displayNum);
+        txt.position.copy(pos);
+        orientCallback(txt);
+        
+        this.diceGroup.add(txt);
+        
+        // Сохраняем ссылку на меш текста для этого числа
+        this.textMeshes[num] = txt;
+        this.resultValues.push(num);
+    }
+
     createTextLabel(text) {
-        // Высокое разрешение для четкости
         const size = 512; 
         const canvas = document.createElement('canvas');
         canvas.width = size; canvas.height = size;
@@ -258,10 +218,14 @@ export class DiceEngine {
         ctx.textAlign = 'center'; 
         ctx.textBaseline = 'middle';
         
-        let txt = text;
-        if (txt === '6' || txt === '9') txt += '.';
+        // Рисуем текст по центру
+        ctx.fillText(text, size / 2, size / 2);
         
-        ctx.fillText(txt, size / 2, size / 2);
+        // Точка для 6 и 9 (внизу справа)
+        if (text === '6' || text === '9' || text === '06' || text === '09') {
+             ctx.font = 'bold 200px Arial';
+             ctx.fillText('.', size / 2 + 80, size / 2 + 80);
+        }
         
         const tex = new THREE.CanvasTexture(canvas);
         tex.minFilter = THREE.LinearFilter;
@@ -272,53 +236,65 @@ export class DiceEngine {
         return new THREE.Mesh(geo, mat);
     }
 
-    // --- НОВАЯ АНИМАЦИЯ БРОСКА ---
+    // --- ПЛАВНАЯ АНИМАЦИЯ С ПРАВИЛЬНОЙ ОРИЕНТАЦИЕЙ ---
     roll() {
         if (this.isRolling) return;
         this.isRolling = true;
 
-        const idx = Math.floor(Math.random() * this.faceNormals.length);
-        const target = this.faceNormals[idx];
+        // 1. Выбираем случайное число из доступных
+        const resultVal = this.resultValues[Math.floor(Math.random() * this.resultValues.length)];
         
-        // Целевая ориентация (грань смотрит в камеру Z+)
-        const targetQ = new THREE.Quaternion().setFromUnitVectors(target.normal, new THREE.Vector3(0,0,1));
+        // 2. Получаем меш текста для этого числа
+        const targetMesh = this.textMeshes[resultVal];
+
+        // 3. Вычисляем целевой поворот (Target Quaternion)
+        // Идея: Мы хотим, чтобы targetMesh оказался повернут лицом к камере (identity rotation в мире, если камера смотрит по Z)
+        // Но targetMesh имеет локальный поворот относительно diceGroup.
+        // DiceGroup.quaternion * targetMesh.quaternion = WorldRotation
+        // Мы хотим WorldRotation = Identity (или FacingCamera)
+        // Значит: TargetDiceGroupQ = (targetMesh.quaternion)^-1
         
-        const duration = 2000; // 2 секунды всего
+        // Тонкость: Камера смотрит в -Z, а текст мы создавали глядя на нормали.
+        // Обычно lookAt ориентирует +Z объекта на цель.
+        // Чтобы текст смотрел в камеру, его +Z должен смотреть на +Z камеры (которая на позиции z=35).
+        
+        const targetQ = targetMesh.quaternion.clone().invert();
+
+        // 4. Параметры анимации
+        const duration = 2000; // 2 секунды
         const startTime = performance.now();
         
-        // Текущая скорость вращения (Эйлеровы углы)
-        let rotSpeed = { x: 0.4, y: 0.4 };
+        // Менее агрессивное начальное вращение
+        let rotSpeed = { x: 0.15 + Math.random()*0.1, y: 0.15 + Math.random()*0.1 };
 
         const animateRoll = (time) => {
             const elapsed = time - startTime;
-            const progress = Math.min(elapsed / duration, 1); // 0 -> 1
+            const progress = Math.min(elapsed / duration, 1);
 
             if (progress < 1) {
-                // ФАЗА 1: Активное вращение (0% - 75% времени)
-                if (progress < 0.75) {
-                    // Просто вращаем объект быстро
+                // ФАЗА 1: Свободное вращение (0% - 60%)
+                if (progress < 0.6) {
                     this.diceGroup.rotation.x += rotSpeed.x;
                     this.diceGroup.rotation.y += rotSpeed.y;
                     
-                    // Постепенно готовимся к перехвату управления
-                    // (сохраняем текущую позицию как стартовую для интерполяции)
+                    // Сохраняем текущее положение для плавного перехода
                     this.midQ = this.diceGroup.quaternion.clone();
                 } 
-                // ФАЗА 2: Плавная доводка (75% - 100% времени)
+                // ФАЗА 2: Плавная доводка до идеального угла (60% - 100%)
                 else {
                     // Нормализуем прогресс для этой фазы (0 -> 1)
-                    const p2 = (progress - 0.75) * 4; 
+                    const p2 = (progress - 0.6) * 2.5; 
                     
-                    // Easing (SmoothStep)
-                    const ease = p2 * p2 * (3 - 2 * p2);
+                    // Ease Out Cubic (плавное замедление)
+                    const ease = 1 - Math.pow(1 - p2, 3);
 
-                    // Сферическая интерполяция от того места, где были в 0.75, к цели
+                    // Интерполяция от "где мы были" к "куда надо"
                     this.diceGroup.quaternion.slerpQuaternions(this.midQ, targetQ, ease);
                 }
                 
                 requestAnimationFrame(animateRoll);
             } else {
-                // Финиш
+                // Финиш: жестко ставим идеальный угол
                 this.diceGroup.quaternion.copy(targetQ);
                 this.isRolling = false;
             }
@@ -329,6 +305,7 @@ export class DiceEngine {
     animate() {
         requestAnimationFrame(() => this.animate());
         if (!this.isRolling) {
+            // Легкое покачивание (дыхание)
             this.diceGroup.rotation.y += 0.001;
         }
         this.renderer.render(this.scene, this.camera);
