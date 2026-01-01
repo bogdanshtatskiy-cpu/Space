@@ -1,14 +1,10 @@
 import { DiceEngine } from './dice-engine.js';
+import { predictions } from './predictions.js';
 
 // --- ДАННЫЕ ---
-const predictions = {
-    ru: ["Бесспорно","Предрешено","Никаких сомнений","Определенно да","Можешь быть уверен","Мне кажется — да","Вероятнее всего","Хорошие перспективы","Знаки говорят — да","Да","Пока не ясно","Спроси позже","Лучше не рассказывать","Сконцентрируйся","Даже не думай","Мой ответ — нет","По моим данным — нет","Перспективы не очень","Весьма сомнительно","Звезды говорят нет","Абсолютно точно","Не надейся","Удача на твоей стороне","Слушай сердце","Рискни","Забудь","Время покажет"],
-    uk: ["Безперечно","Це вирішено","Жодних сумнівів","Безумовно так","Можеш бути впевнений","Мені здається — так","Найімовірніше","Хороші перспективи","Знаки кажуть — так","Так","Поки не ясно","Спитай пізніше","Краще не розповідати","Сконцентруйся","Навіть не думай","Мій відповідь — ні","За моїми даними — ні","Перспективи не дуже","Дуже сумнівно","Зірки кажуть ні","Абсолютно точно","Не сподівайся","Удача з тобою","Слухай серце","Ризикни","Забудь","Час покаже"]
-};
-
 const translations = {
-    ru: { ball:"Шар Судьбы", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоты", coin:"Монетка", rand:"Рандом", back:"Назад", tap:"Нажми, чтобы бросить", heads:"ОРЕЛ", tails:"РЕШКА", win:"ПОБЕДА!", lose_phrases:["Эх, мимо...", "Попробуй еще!", "Не сегодня", "Упс...", "Пусто", "Почти..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", rand_limit_label:"Максимум:", settings:"Настройки" },
-    uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", rand_limit_label:"Максимум:", settings:"Налаштування" }
+    ru: { ball:"Шар Судьбы", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоты", coin:"Монетка", rand:"Рандом", trump:"Козырь", back:"Назад", tap:"Нажми, чтобы бросить", heads:"ОРЕЛ", tails:"РЕШКА", win:"ПОБЕДА!", lose_phrases:["Эх, мимо...", "Попробуй еще!", "Не сегодня", "Упс...", "Пусто", "Почти..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", reset:"СБРОС", rand_limit_label:"Максимум:", settings:"Настройки" },
+    uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", trump:"Козир", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТИ", generate:"СТАРТ", reset:"СКИДАННЯ", rand_limit_label:"Максимум:", settings:"Налаштування" }
 };
 
 let state = {
@@ -17,8 +13,6 @@ let state = {
 };
 
 const engines = {}; 
-
-// --- ПЕРЕМЕННЫЕ ДЛЯ МОНЕТКИ ---
 let isFlippingCoin = false;
 let currentCoinRotation = 0;
 
@@ -62,60 +56,56 @@ window.askBall = () => {
     }, 500);
 };
 
-// --- ИСПРАВЛЕННАЯ АНИМАЦИЯ МОНЕТКИ ---
 window.flipCoin = () => {
     if(isFlippingCoin) return;
     isFlippingCoin = true;
-
     const coin = document.querySelector('.coin');
-    
-    // Результат: 0 (Орел) или 180 (Решка) + немного случайности для реализма
     const outcome = Math.random() > 0.5 ? 0 : 180;
-    
-    // Цель: Текущий угол + 5 полных оборотов (1800) + результат
-    // Добавляем к текущему, чтобы монетка всегда крутилась вперед
     const targetRotation = currentCoinRotation + 1800 + outcome;
-
     const startTime = performance.now();
-    const duration = 2500; // 2.5 секунды полета
+    const duration = 2500; 
 
     function animate(time) {
         const elapsed = time - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing: easeOutCubic (быстро взлетает, медленно падает)
         const ease = 1 - Math.pow(1 - progress, 3);
-        
-        // Вращение
         const currentRot = currentCoinRotation + (targetRotation - currentCoinRotation) * ease;
-        
-        // Подбрасывание (Scale + Translate) - синусоида
-        // Пик в середине (progress = 0.5)
-        let scale = 1;
-        let translateY = 0;
-        
-        // Пока анимация идет, меняем масштаб и позицию
+        let scale = 1; let translateY = 0;
         if (progress < 1) {
-            const jumpProgress = Math.sin(progress * Math.PI); // 0 -> 1 -> 0
-            scale = 1 + jumpProgress * 0.5; // Увеличение до 1.5x
-            translateY = jumpProgress * -100; // Взлет вверх на 100px
+            const jumpProgress = Math.sin(progress * Math.PI); 
+            scale = 1 + jumpProgress * 0.5; 
+            translateY = jumpProgress * -100;
         }
-
-        // Применяем стили
         coin.style.transform = `translateY(${translateY}px) scale(${scale}) rotateY(${currentRot}deg)`;
-
         if (progress < 1) {
             requestAnimationFrame(animate);
         } else {
-            // Финиш
-            currentCoinRotation = targetRotation; // Сохраняем новый угол
-            // Убираем смещение и масштаб, оставляем только поворот
+            currentCoinRotation = targetRotation; 
             coin.style.transform = `rotateY(${targetRotation}deg)`; 
             isFlippingCoin = false;
         }
     }
-
     requestAnimationFrame(animate);
+};
+
+window.flipTrumpCard = (card) => {
+    if (card.classList.contains('flipped')) return;
+    const suits = ['♠️', '♥️', '♦️', '♣️'];
+    const randomSuit = suits[Math.floor(Math.random() * suits.length)];
+    const frontFace = card.querySelector('.card-front-side');
+    frontFace.textContent = randomSuit;
+    frontFace.classList.remove('suit-red', 'suit-black');
+    if (randomSuit === '♥️' || randomSuit === '♦️') frontFace.classList.add('suit-red');
+    else frontFace.classList.add('suit-black');
+    card.classList.add('flipped');
+};
+
+window.resetTrumpCards = () => {
+    const cards = document.querySelectorAll('.playing-card');
+    cards.forEach(card => {
+        card.classList.remove('flipped');
+        setTimeout(() => { card.querySelector('.card-front-side').textContent = ''; }, 300);
+    });
 };
 
 window.spinSlots = () => {
@@ -150,7 +140,6 @@ window.generateRandom = () => {
     }, 50);
 };
 
-// ВНУТРЕННИЕ ФУНКЦИИ
 function checkWin(res, msgEl) {
     if(res[0] === res[1] && res[1] === res[2]) {
         msgEl.textContent = translations[state.lang].win;
@@ -179,7 +168,6 @@ function setupNavigation() {
             applyLang();
         };
     });
-
     const themeBtn = document.getElementById('theme-toggle');
     if (themeBtn) {
         themeBtn.onclick = () => {
@@ -198,9 +186,7 @@ function applyTheme() {
 }
 
 function applyLang() {
-    document.querySelectorAll('.lang-btn').forEach(b => 
-        b.classList.toggle('active', b.dataset.lang === state.lang));
-    
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === state.lang));
     document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.dataset.key;
         if(translations[state.lang][key]) el.textContent = translations[state.lang][key];
