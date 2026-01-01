@@ -21,18 +21,51 @@
 
     <div id="menu-screen" class="screen active">
       <div class="menu-grid">
-        <div class="menu-item" onclick="openScreen('d4-screen')"><div class="icon-bg">⚠️</div><span class="menu-label" data-key="d4">D4</span></div>
-        <div class="menu-item" onclick="openScreen('d6-screen')"><div class="icon-bg">🎲</div><span class="menu-label" data-key="d6">D6</span></div>
-        <div class="menu-item" onclick="openScreen('d8-screen')"><div class="icon-bg">💎</div><span class="menu-label" data-key="d8">D8</span></div>
-        <div class="menu-item" onclick="openScreen('d10-screen')"><div class="icon-bg">💠</div><span class="menu-label" data-key="d10">D10</span></div>
-        <div class="menu-item" onclick="openScreen('d12-screen')"><div class="icon-bg">⚽</div><span class="menu-label" data-key="d12">D12</span></div>
-        <div class="menu-item" onclick="openScreen('d20-screen')"><div class="icon-bg">🐉</div><span class="menu-label" data-key="d20">D20</span></div>
+        <div class="menu-item" onclick="openScreen('d4-screen')">
+            <img src="d4.png" class="menu-icon" alt="D4">
+            <span class="menu-label" data-key="d4">D4</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d6-screen')">
+            <img src="d6.png" class="menu-icon" alt="D6">
+            <span class="menu-label" data-key="d6">D6</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d8-screen')">
+            <img src="d8.png" class="menu-icon" alt="D8">
+            <span class="menu-label" data-key="d8">D8</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d10-screen')">
+            <img src="d10.png" class="menu-icon" alt="D10">
+            <span class="menu-label" data-key="d10">D10</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d12-screen')">
+            <img src="d12.png" class="menu-icon" alt="D12">
+            <span class="menu-label" data-key="d12">D12</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d20-screen')">
+            <img src="d20.png" class="menu-icon" alt="D20">
+            <span class="menu-label" data-key="d20">D20</span>
+        </div>
         
-        <div class="menu-item" onclick="openScreen('trump-screen')"><div class="icon-bg">🃏</div><span class="menu-label" data-key="trump">Козырь</span></div>
-        <div class="menu-item" onclick="openScreen('ball-screen')"><div class="icon-bg">🎱</div><span class="menu-label" data-key="ball">Ball</span></div>
-        <div class="menu-item" onclick="openScreen('coin-screen')"><div class="icon-bg">🪙</div><span class="menu-label" data-key="coin">Coin</span></div>
-        <div class="menu-item" onclick="openScreen('slots-screen')"><div class="icon-bg">🎰</div><span class="menu-label" data-key="slots">Slots</span></div>
-        <div class="menu-item" onclick="openScreen('rand-screen')"><div class="icon-bg">🔢</div><span class="menu-label" data-key="rand">Rand</span></div>
+        <div class="menu-item" onclick="openScreen('trump-screen')">
+            <img src="kar.png" class="menu-icon" alt="Trump">
+            <span class="menu-label" data-key="trump">Козырь</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('ball-screen')">
+            <img src="sh.png" class="menu-icon" alt="Ball">
+            <span class="menu-label" data-key="ball">Ball</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('coin-screen')">
+            <img src="mon.png" class="menu-icon" alt="Coin">
+            <span class="menu-label" data-key="coin">Coin</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('slots-screen')">
+            <img src="slot.png" class="menu-icon" alt="Slots">
+            <span class="menu-label" data-key="slots">Slots</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('rand-screen')">
+            <img src="ran.png" class="menu-icon" alt="Random">
+            <span class="menu-label" data-key="rand">Rand</span>
+        </div>
       </div>
     </div>
 
@@ -46,10 +79,10 @@
     <div id="trump-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
         <div class="trump-table">
-            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
-            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
-            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
-            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+            <div class="playing-card" onclick="flipTrumpCard(this, 0)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+            <div class="playing-card" onclick="flipTrumpCard(this, 1)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+            <div class="playing-card" onclick="flipTrumpCard(this, 2)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+            <div class="playing-card" onclick="flipTrumpCard(this, 3)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
         </div>
         <button class="glass-btn" style="margin-top: 30px" onclick="resetTrumpCards()" data-key="reset">СБРОС</button>
     </div>
