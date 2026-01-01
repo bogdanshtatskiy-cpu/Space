@@ -1,6 +1,6 @@
 import { DiceEngine } from './dice-engine.js';
 
-// Данные
+// --- ДАННЫЕ ---
 const predictions = {
     ru: ["Бесспорно","Предрешено","Никаких сомнений","Определенно да","Можешь быть уверен","Мне кажется — да","Вероятнее всего","Хорошие перспективы","Знаки говорят — да","Да","Пока не ясно","Спроси позже","Лучше не рассказывать","Сконцентрируйся","Даже не думай","Мой ответ — нет","По моим данным — нет","Перспективы не очень","Весьма сомнительно","Звезды говорят нет","Абсолютно точно","Не надейся","Удача на твоей стороне","Слушай сердце","Рискни","Забудь","Время покажет"],
     uk: ["Безперечно","Це вирішено","Жодних сумнівів","Безумовно так","Можеш бути впевнений","Мені здається — так","Найімовірніше","Хороші перспективи","Знаки кажуть — так","Так","Поки не ясно","Спитай пізніше","Краще не розповідати","Сконцентруйся","Навіть не думай","Мій відповідь — ні","За моїми даними — ні","Перспективи не дуже","Дуже сумнівно","Зірки кажуть ні","Абсолютно точно","Не сподівайся","Удача з тобою","Слухай серце","Ризикни","Забудь","Час покаже"]
@@ -8,7 +8,7 @@ const predictions = {
 
 const translations = {
     ru: { ball:"Шар Судьбы", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоты", coin:"Монетка", rand:"Рандом", back:"Назад", tap:"Нажми, чтобы бросить", heads:"ОРЕЛ", tails:"РЕШКА", win:"ПОБЕДА!", lose_phrases:["Эх, мимо...", "Попробуй еще!", "Не сегодня", "Упс...", "Пусто", "Почти..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", rand_limit_label:"Максимум:", settings:"Настройки" },
-    uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТИ", generate:"СТАРТ", rand_limit_label:"Максимум:", settings:"Налаштування" }
+    uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", rand_limit_label:"Максимум:", settings:"Налаштування" }
 };
 
 let state = {
@@ -16,9 +16,10 @@ let state = {
     theme: localStorage.getItem('mt_theme') || 'dark'
 };
 
+let coinTotalRotation = 0;
 const engines = {}; 
 
-// Глобальные функции
+// ГЛОБАЛЬНЫЕ ФУНКЦИИ
 window.openScreen = (id) => {
     const menu = document.getElementById('menu-screen');
     menu.classList.remove('active');
@@ -28,10 +29,7 @@ window.openScreen = (id) => {
         target.style.display = 'flex';
         void target.offsetWidth; 
         target.classList.add('active');
-        
-        if(id.startsWith('d') && id.includes('-screen')) {
-            setTimeout(() => initDice3D(id), 50);
-        }
+        if(id.startsWith('d') && id.includes('-screen')) setTimeout(() => initDice3D(id), 50);
     }, 200);
 };
 
@@ -61,70 +59,21 @@ window.askBall = () => {
     }, 500);
 };
 
-// --- НОВАЯ JS АНИМАЦИЯ МОНЕТКИ (60 FPS) ---
-let isFlippingCoin = false;
-let currentCoinRotation = 0; // Храним текущий угол
-
 window.flipCoin = () => {
-    if(isFlippingCoin) return;
-    isFlippingCoin = true;
-
     const coin = document.querySelector('.coin');
-    const outcome = Math.random() > 0.5 ? 0 : 180; // 0 или 180 (Орел или Решка)
-    
-    // Целевой угол: текущий + минимум 5 оборотов (1800) + результат
-    // Важно добавлять к текущему, чтобы не крутило назад
-    // Мы нормализуем текущий угол к 0 или 180 перед стартом для простоты, 
-    // но визуально лучше просто добавлять.
-    
-    // Чтобы всегда докручивать в одну сторону:
-    // Находим ближайшее кратное 360, чтобы старт был "чистым"
-    const baseRotation = Math.ceil(currentCoinRotation / 360) * 360;
-    const targetRotation = baseRotation + 1800 + outcome; 
-
-    const startTime = performance.now();
-    const duration = 2500; // 2.5 секунды
-
-    const animateCoin = (time) => {
-        const elapsed = time - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing: easeOutCubic
-        const ease = 1 - Math.pow(1 - progress, 3);
-        
-        // Вращение
-        const currentRot = currentCoinRotation + (targetRotation - currentCoinRotation) * ease;
-        
-        // Подбрасывание (Scale + Translate) - синусоида
-        // Пик в середине (progress = 0.5)
-        let scale = 1;
-        let translateY = 0;
-        
-        if (progress < 1) {
-            const jumpProgress = Math.sin(progress * Math.PI); // 0 -> 1 -> 0
-            scale = 1 + jumpProgress * 0.5; // Увеличение до 1.5
-            translateY = jumpProgress * -50; // Вверх на 50px
-        }
-
-        coin.style.transform = `translateY(${translateY}px) scale(${scale}) rotateY(${currentRot}deg)`;
-
-        if (progress < 1) {
-            requestAnimationFrame(animateCoin);
-        } else {
-            // Финиш
-            currentCoinRotation = targetRotation; // Сохраняем угол
-            coin.style.transform = `rotateY(${targetRotation}deg)`; // Сбрасываем scale/translate
-            isFlippingCoin = false;
-        }
-    };
-    requestAnimationFrame(animateCoin);
+    const wrapper = document.querySelector('.coin-wrapper');
+    const outcome = Math.random() > 0.5 ? 0 : 180;
+    coinTotalRotation += (1800 + outcome); 
+    wrapper.classList.remove('coin-toss');
+    void wrapper.offsetWidth; 
+    wrapper.classList.add('coin-toss');
+    coin.style.transform = `rotateY(${coinTotalRotation}deg)`;
 };
 
 window.spinSlots = () => {
     const syms = ["🍒","🍋","7️⃣","💎", "🔔", "🍇"];
     const msg = document.getElementById('slot-msg');
     msg.textContent = "";
-    
     let results = [];
     [1,2,3].forEach((i) => {
         const el = document.getElementById(`reel-${i}`);
@@ -153,6 +102,7 @@ window.generateRandom = () => {
     }, 50);
 };
 
+// ВНУТРЕННИЕ ФУНКЦИИ
 function checkWin(res, msgEl) {
     if(res[0] === res[1] && res[1] === res[2]) {
         msgEl.textContent = translations[state.lang].win;
@@ -173,14 +123,38 @@ function initDice3D(screenId) {
     }
 }
 
+function setupNavigation() {
+    // Обработчик качельки языков
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.onclick = () => {
+            state.lang = btn.dataset.lang;
+            localStorage.setItem('mt_lang', state.lang);
+            applyLang();
+        };
+    });
+
+    // Обработчик темы (убеждаемся что кнопка находится)
+    const themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+        themeBtn.onclick = () => {
+            state.theme = state.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('mt_theme', state.theme);
+            applyTheme();
+        };
+    }
+}
+
 function applyTheme() {
     if (state.theme === 'light') document.body.classList.add('light-theme');
     else document.body.classList.remove('light-theme');
-    document.getElementById('theme-icon').textContent = state.theme === 'light' ? '☀️' : '🌙';
+    const icon = document.getElementById('theme-icon');
+    if(icon) icon.textContent = state.theme === 'light' ? '☀️' : '🌙';
 }
 
 function applyLang() {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === state.lang));
+    document.querySelectorAll('.lang-btn').forEach(b => 
+        b.classList.toggle('active', b.dataset.lang === state.lang));
+    
     document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.dataset.key;
         if(translations[state.lang][key]) el.textContent = translations[state.lang][key];
@@ -190,4 +164,5 @@ function applyLang() {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     applyLang();
+    setupNavigation();
 });
