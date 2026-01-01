@@ -89,7 +89,17 @@ body.light-theme .lang-btn { color: rgba(0, 0, 0, 0.5); }
     transition: transform 0.2s; box-shadow: 0 4px 30px rgba(0,0,0,0.1); text-align: center;
 }
 .menu-item:active { transform: scale(0.96); }
-.icon-bg { font-size: 36px; margin-bottom: 10px; }
+
+/* NEW IMAGE STYLES */
+.menu-icon {
+    width: 60px; height: 60px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); /* Красивая тень для картинок */
+    transition: transform 0.2s;
+}
+.menu-item:hover .menu-icon { transform: scale(1.1); }
+
 .menu-label { font-size: 14px; font-weight: 500; }
 
 .canvas-wrapper { flex: 1; width: 100%; position: relative; border-radius: 30px; overflow: hidden; }
