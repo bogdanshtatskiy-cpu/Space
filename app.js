@@ -16,8 +16,11 @@ let state = {
     theme: localStorage.getItem('mt_theme') || 'dark'
 };
 
-let coinTotalRotation = 0;
 const engines = {}; 
+
+// --- ПЕРЕМЕННЫЕ ДЛЯ МОНЕТКИ ---
+let isFlippingCoin = false;
+let currentCoinRotation = 0;
 
 // ГЛОБАЛЬНЫЕ ФУНКЦИИ
 window.openScreen = (id) => {
@@ -59,15 +62,60 @@ window.askBall = () => {
     }, 500);
 };
 
+// --- ИСПРАВЛЕННАЯ АНИМАЦИЯ МОНЕТКИ ---
 window.flipCoin = () => {
+    if(isFlippingCoin) return;
+    isFlippingCoin = true;
+
     const coin = document.querySelector('.coin');
-    const wrapper = document.querySelector('.coin-wrapper');
+    
+    // Результат: 0 (Орел) или 180 (Решка) + немного случайности для реализма
     const outcome = Math.random() > 0.5 ? 0 : 180;
-    coinTotalRotation += (1800 + outcome); 
-    wrapper.classList.remove('coin-toss');
-    void wrapper.offsetWidth; 
-    wrapper.classList.add('coin-toss');
-    coin.style.transform = `rotateY(${coinTotalRotation}deg)`;
+    
+    // Цель: Текущий угол + 5 полных оборотов (1800) + результат
+    // Добавляем к текущему, чтобы монетка всегда крутилась вперед
+    const targetRotation = currentCoinRotation + 1800 + outcome;
+
+    const startTime = performance.now();
+    const duration = 2500; // 2.5 секунды полета
+
+    function animate(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing: easeOutCubic (быстро взлетает, медленно падает)
+        const ease = 1 - Math.pow(1 - progress, 3);
+        
+        // Вращение
+        const currentRot = currentCoinRotation + (targetRotation - currentCoinRotation) * ease;
+        
+        // Подбрасывание (Scale + Translate) - синусоида
+        // Пик в середине (progress = 0.5)
+        let scale = 1;
+        let translateY = 0;
+        
+        // Пока анимация идет, меняем масштаб и позицию
+        if (progress < 1) {
+            const jumpProgress = Math.sin(progress * Math.PI); // 0 -> 1 -> 0
+            scale = 1 + jumpProgress * 0.5; // Увеличение до 1.5x
+            translateY = jumpProgress * -100; // Взлет вверх на 100px
+        }
+
+        // Применяем стили
+        coin.style.transform = `translateY(${translateY}px) scale(${scale}) rotateY(${currentRot}deg)`;
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            // Финиш
+            currentCoinRotation = targetRotation; // Сохраняем новый угол
+            // Убираем смещение и масштаб, оставляем только поворот
+            coin.style.transform = `rotateY(${targetRotation}deg)`; 
+            isFlippingCoin = false;
+        }
+    }
+
+    requestAnimationFrame(animate);
 };
 
 window.spinSlots = () => {
@@ -124,7 +172,6 @@ function initDice3D(screenId) {
 }
 
 function setupNavigation() {
-    // Обработчик качельки языков
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.onclick = () => {
             state.lang = btn.dataset.lang;
@@ -133,7 +180,6 @@ function setupNavigation() {
         };
     });
 
-    // Обработчик темы (убеждаемся что кнопка находится)
     const themeBtn = document.getElementById('theme-toggle');
     if (themeBtn) {
         themeBtn.onclick = () => {
