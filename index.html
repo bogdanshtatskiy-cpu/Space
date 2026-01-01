@@ -13,6 +13,10 @@
       <div class="controls">
         <button class="icon-btn" id="theme-toggle"><span id="theme-icon">🌙</span></button>
       </div>
+      
+      <div id="status-bar" class="status-bar">
+        </div>
+
       <div class="ios-toggle">
         <button class="lang-btn" data-lang="uk">UK</button>
         <button class="lang-btn" data-lang="ru">RU</button>
@@ -21,51 +25,25 @@
 
     <div id="menu-screen" class="screen active">
       <div class="menu-grid">
-        <div class="menu-item" onclick="openScreen('d4-screen')">
-            <img src="d4.png" class="menu-icon" alt="D4">
-            <span class="menu-label" data-key="d4">D4</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('d6-screen')">
-            <img src="d6.png" class="menu-icon" alt="D6">
-            <span class="menu-label" data-key="d6">D6</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('d8-screen')">
-            <img src="d8.png" class="menu-icon" alt="D8">
-            <span class="menu-label" data-key="d8">D8</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('d10-screen')">
-            <img src="d10.png" class="menu-icon" alt="D10">
-            <span class="menu-label" data-key="d10">D10</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('d12-screen')">
-            <img src="d12.png" class="menu-icon" alt="D12">
-            <span class="menu-label" data-key="d12">D12</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('d20-screen')">
-            <img src="d20.png" class="menu-icon" alt="D20">
-            <span class="menu-label" data-key="d20">D20</span>
-        </div>
+        <div class="menu-item" onclick="openScreen('d4-screen')"><img src="d4.png" class="menu-icon"><span class="menu-label" data-key="d4">D4</span></div>
+        <div class="menu-item" onclick="openScreen('d6-screen')"><img src="d6.png" class="menu-icon"><span class="menu-label" data-key="d6">D6</span></div>
+        <div class="menu-item" onclick="openScreen('d8-screen')"><img src="d8.png" class="menu-icon"><span class="menu-label" data-key="d8">D8</span></div>
+        <div class="menu-item" onclick="openScreen('d10-screen')"><img src="d10.png" class="menu-icon"><span class="menu-label" data-key="d10">D10</span></div>
+        <div class="menu-item" onclick="openScreen('d12-screen')"><img src="d12.png" class="menu-icon"><span class="menu-label" data-key="d12">D12</span></div>
+        <div class="menu-item" onclick="openScreen('d20-screen')"><img src="d20.png" class="menu-icon"><span class="menu-label" data-key="d20">D20</span></div>
         
-        <div class="menu-item" onclick="openScreen('trump-screen')">
-            <img src="kar.png" class="menu-icon" alt="Trump">
-            <span class="menu-label" data-key="trump">Козырь</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('ball-screen')">
-            <img src="sh.png" class="menu-icon" alt="Ball">
-            <span class="menu-label" data-key="ball">Ball</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('coin-screen')">
-            <img src="mon.png" class="menu-icon" alt="Coin">
-            <span class="menu-label" data-key="coin">Coin</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('slots-screen')">
-            <img src="slot.png" class="menu-icon" alt="Slots">
-            <span class="menu-label" data-key="slots">Slots</span>
-        </div>
-        <div class="menu-item" onclick="openScreen('rand-screen')">
-            <img src="ran.png" class="menu-icon" alt="Random">
-            <span class="menu-label" data-key="rand">Rand</span>
-        </div>
+        <div class="menu-item" onclick="openScreen('trump-screen')"><img src="kar.png" class="menu-icon"><span class="menu-label" data-key="trump">Козырь</span></div>
+        <div class="menu-item" onclick="openScreen('ball-screen')"><img src="sh.png" class="menu-icon"><span class="menu-label" data-key="ball">Ball</span></div>
+        <div class="menu-item" onclick="openScreen('coin-screen')"><img src="mon.png" class="menu-icon"><span class="menu-label" data-key="coin">Coin</span></div>
+        <div class="menu-item" onclick="openScreen('slots-screen')"><img src="slot.png" class="menu-icon"><span class="menu-label" data-key="slots">Slots</span></div>
+        <div class="menu-item" onclick="openScreen('rand-screen')"><img src="ran.png" class="menu-icon"><span class="menu-label" data-key="rand">Rand</span></div>
+
+        <div class="menu-item" onclick="openScreen('timer-screen')"><img src="time.png" class="menu-icon"><span class="menu-label" data-key="timer">Таймер</span></div>
+        <div class="menu-item" onclick="openScreen('hp-screen')"><img src="hp.png" class="menu-icon"><span class="menu-label" data-key="hp">HP</span></div>
+        <div class="menu-item" onclick="openScreen('score-screen')"><img src="score.png" class="menu-icon"><span class="menu-label" data-key="score">Счет</span></div>
+        <div class="menu-item" onclick="openScreen('name-screen')"><img src="name.png" class="menu-icon"><span class="menu-label" data-key="names">Имена</span></div>
+        <div class="menu-item" onclick="openScreen('wheel-screen')"><img src="wheel.png" class="menu-icon"><span class="menu-label" data-key="wheel">Колесо</span></div>
+        <div class="menu-item" onclick="openScreen('rps-screen')"><img src="rps.png" class="menu-icon"><span class="menu-label" data-key="rps">К-Н-Б</span></div>
       </div>
     </div>
 
@@ -87,43 +65,79 @@
         <button class="glass-btn" style="margin-top: 30px" onclick="resetTrumpCards()" data-key="reset">СБРОС</button>
     </div>
 
-    <div id="ball-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="magic-ball-outer" onclick="askBall()">
-        <div class="magic-ball-inner"><span id="ball-text" class="ball-text">8</span></div>
-      </div>
-    </div>
+    <div id="ball-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="magic-ball-outer" onclick="askBall()"><div class="magic-ball-inner"><span id="ball-text" class="ball-text">8</span></div></div></div>
+    <div id="coin-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="coin-wrapper"><div class="coin" onclick="flipCoin()"><div class="coin-face side-a" data-key="heads">ОРЕЛ</div><div class="coin-face coin-back side-b" data-key="tails">РЕШКА</div></div></div><p class="hint-text" data-key="tap">Нажми</p></div>
+    <div id="slots-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="slot-machine"><div class="reel-window"><div class="reel" id="reel-1">🍒</div></div><div class="reel-window"><div class="reel" id="reel-2">🍒</div></div><div class="reel-window"><div class="reel" id="reel-3">🍒</div></div></div><div id="slot-msg" style="text-align:center; height:30px; font-weight:bold; margin-top:10px;"></div><button class="glass-btn" style="margin-top:20px; width:100%" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button></div>
+    <div id="rand-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="input-group"><label data-key="rand_limit_label">Max:</label><input type="number" id="rand-max" class="glass-input" value="100"><div id="rand-display" class="big-number">0</div><button class="glass-btn" onclick="generateRandom()" data-key="generate">СТАРТ</button></div></div>
 
-    <div id="coin-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="coin-wrapper">
-        <div class="coin" onclick="flipCoin()">
-          <div class="coin-face side-a" data-key="heads">ОРЕЛ</div>
-          <div class="coin-face coin-back side-b" data-key="tails">РЕШКА</div>
+    <div id="timer-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="canvas-wrapper" id="timer-scene"></div>
+        <div class="input-group">
+            <input type="number" id="timer-input" class="glass-input" value="60" style="width:80px">
+            <div class="timer-controls">
+                <button class="glass-btn small" onclick="startTimer()" data-key="generate">СТАРТ</button>
+                <button class="glass-btn small" onclick="resetTimer()" data-key="reset">СБРОС</button>
+            </div>
         </div>
-      </div>
-      <p class="hint-text" data-key="tap">Нажми</p>
     </div>
 
-    <div id="slots-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="slot-machine">
-        <div class="reel-window"><div class="reel" id="reel-1">🍒</div></div>
-        <div class="reel-window"><div class="reel" id="reel-2">🍒</div></div>
-        <div class="reel-window"><div class="reel" id="reel-3">🍒</div></div>
-      </div>
-      <div id="slot-msg" style="text-align:center; height:30px; font-weight:bold; margin-top:10px;"></div>
-      <button class="glass-btn" style="margin-top:20px; width:100%" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button>
+    <div id="hp-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="mode-switch">
+            <button class="mode-btn active" onclick="setPlayers('hp', 1)">1P</button>
+            <button class="mode-btn" onclick="setPlayers('hp', 2)">2P</button>
+        </div>
+        <div id="hp-container" class="counter-container">
+            </div>
+        <button class="glass-btn reset-tool-btn" onclick="resetCounter('hp')" data-key="reset">СБРОС</button>
     </div>
 
-    <div id="rand-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="input-group">
-        <label data-key="rand_limit_label">Max:</label>
-        <input type="number" id="rand-max" class="glass-input" value="100">
-        <div id="rand-display" class="big-number">0</div>
-        <button class="glass-btn" onclick="generateRandom()" data-key="generate">СТАРТ</button>
-      </div>
+    <div id="score-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="mode-switch">
+            <button class="mode-btn active" onclick="setPlayers('score', 1)">1P</button>
+            <button class="mode-btn" onclick="setPlayers('score', 2)">2P</button>
+        </div>
+        <div id="score-container" class="counter-container">
+            </div>
+        <button class="glass-btn reset-tool-btn" onclick="resetCounter('score')" data-key="reset">СБРОС</button>
+    </div>
+
+    <div id="name-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="name-display" id="generated-name">...</div>
+        <div class="name-controls">
+            <button class="glass-btn" onclick="generateName()" data-key="generate">ГЕНЕРАЦИЯ</button>
+            <button class="glass-btn small" onclick="resetName()" data-key="reset">СБРОС</button>
+        </div>
+    </div>
+
+    <div id="wheel-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="wheel-wrapper">
+            <canvas id="wheel-canvas" width="300" height="300"></canvas>
+            <div class="wheel-pointer">▼</div>
+        </div>
+        <button class="glass-btn" onclick="spinWheel()" data-key="spin_btn">КРУТИТЬ</button>
+        <div class="wheel-inputs">
+            <input type="text" id="wheel-add-input" class="glass-input" placeholder="+">
+            <button class="icon-btn" onclick="addWheelSegment()">+</button>
+            <button class="icon-btn" onclick="resetWheel()">↻</button>
+        </div>
+    </div>
+
+    <div id="rps-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="rps-arena">
+            <div id="rps-top" class="rps-side inverted">
+                <span class="rps-icon">🤖</span>
+            </div>
+            <div id="rps-bottom" class="rps-side">
+                <span class="rps-icon">👤</span>
+            </div>
+            <button class="glass-btn round-start" onclick="playRPS()">GO</button>
+        </div>
     </div>
 
   </div>
