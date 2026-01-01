@@ -1,3 +1,4 @@
+/* ... (ВСЕ ПРЕДЫДУЩИЕ СТИЛИ ДО SECTION HEADER) ... */
 :root {
     --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
     --text-primary: #ffffff;
@@ -14,6 +15,8 @@
     --win-green: rgba(40, 167, 69, 0.6);
     --lose-red: rgba(220, 53, 69, 0.6);
     --dnd-color: #ff3b30;
+    --crit-success: #4cd964;
+    --crit-fail: #ff3b30;
 }
 
 body.light-theme {
@@ -54,147 +57,79 @@ button, a, input, textarea, .menu-item, .playing-card {
     touch-action: manipulation;
 }
 
-/* --- HEADER (FIXED LAYOUT) --- */
+/* HEADER */
 header {
     padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start; /* Элементы начинаются сверху */
-    position: relative;
-    z-index: 100; flex-shrink: 0;
-    min-height: 80px; /* Зарезервируем место под статус бар */
+    display: flex; justify-content: space-between; align-items: flex-start;
+    position: relative; z-index: 100; flex-shrink: 0; min-height: 80px;
 }
-
-/* Боковые колонки (для вертикального списка: Кнопка -> Инфо) */
-.header-col {
-    display: flex; 
-    flex-direction: column; 
-    gap: 12px; /* Отступ между кнопкой темы и именем */
-    z-index: 2; /* Чтобы быть выше DND кнопки если наедет */
-}
-
+.header-col { display: flex; flex-direction: column; gap: 12px; z-index: 2; }
 .header-col.left { align-items: flex-start; }
 .header-col.right { align-items: flex-end; }
 
-/* DND BUTTON (ABSOLUTE CENTER) */
-/* Она теперь игнорирует содержимое боковых колонок */
 .dnd-toggle-btn {
-    position: absolute;
-    left: 50%;
-    top: 15px; /* Совпадает с padding-top хедера */
-    transform: translateX(-50%);
-    
-    /* Стили как у качелек (.ios-toggle) */
-    background: rgba(0, 0, 0, 0.25);
-    border: none;
-    padding: 6px 16px; /* Внутренние отступы как у кнопок внутри качельки */
-    border-radius: 20px;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px; font-weight: 600;
-    cursor: pointer; transition: all 0.3s;
-    backdrop-filter: blur(10px);
-    
-    /* Высота как у качельки */
-    height: 32px; 
-    display: flex; align-items: center; justify-content: center;
-    white-space: nowrap;
-    z-index: 1;
+    position: absolute; left: 50%; top: 15px; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.25); border: none; padding: 6px 16px; border-radius: 20px;
+    color: rgba(255, 255, 255, 0.6); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.3s; backdrop-filter: blur(10px);
+    height: 32px; display: flex; align-items: center; justify-content: center;
+    white-space: nowrap; z-index: 1;
 }
+body.light-theme .dnd-toggle-btn { background: rgba(0, 0, 0, 0.1); color: rgba(0, 0, 0, 0.5); }
+.dnd-toggle-btn.active { background: var(--dnd-color); color: white; box-shadow: 0 2px 10px rgba(255, 59, 48, 0.4); }
 
-body.light-theme .dnd-toggle-btn { 
-    background: rgba(0, 0, 0, 0.1); 
-    color: rgba(0, 0, 0, 0.5); 
-}
-
-.dnd-toggle-btn.active {
-    background: var(--dnd-color);
-    color: white;
-    box-shadow: 0 2px 10px rgba(255, 59, 48, 0.4);
-}
-
-/* TOGGLES (SEESAW) */
-.ios-toggle {
-    display: flex; background: rgba(0, 0, 0, 0.25); padding: 3px;
-    border-radius: 20px; backdrop-filter: blur(10px);
-    height: 26px; /* Общая высота контейнера (32px с паддингами) */
-    box-sizing: content-box;
-}
+.ios-toggle { display: flex; background: rgba(0, 0, 0, 0.25); padding: 3px; border-radius: 20px; backdrop-filter: blur(10px); height: 26px; box-sizing: content-box; }
 body.light-theme .ios-toggle { background: rgba(0, 0, 0, 0.1); }
-
-.theme-btn, .lang-btn {
-    border: none; background: transparent; color: rgba(255, 255, 255, 0.6);
-    padding: 0 12px; /* Горизонтальный паддинг */
-    border-radius: 18px; cursor: pointer;
-    font-size: 14px; font-weight: 600; transition: all 0.3s;
-    height: 100%; /* На всю высоту контейнера */
-    display: flex; align-items: center;
-}
+.theme-btn, .lang-btn { border: none; background: transparent; color: rgba(255, 255, 255, 0.6); padding: 0 12px; border-radius: 18px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; height: 100%; display: flex; align-items: center; }
 body.light-theme .theme-btn, body.light-theme .lang-btn { color: rgba(0, 0, 0, 0.5); }
+.theme-btn.active, .lang-btn.active { background: #ffffff; color: #000000; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
-.theme-btn.active, .lang-btn.active {
-    background: #ffffff; color: #000000; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
+.status-area { display: flex; flex-direction: column; gap: 5px; font-size: 11px; font-weight: 600; opacity: 0.95; }
+.status-item { background: var(--btn-bg); padding: 4px 10px; border-radius: 12px; backdrop-filter: blur(5px); white-space: nowrap; }
 
-/* STATUS AREA (Name & Stats) */
-.status-area {
-    display: flex; flex-direction: column; gap: 5px;
-    font-size: 11px; font-weight: 600; opacity: 0.95;
+/* --- CRIT MESSAGE --- */
+.crit-overlay {
+    position: fixed; top: 15%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 32px; font-weight: 900; text-align: center;
+    text-transform: uppercase; letter-spacing: 2px;
+    padding: 20px 40px; border-radius: 20px;
+    backdrop-filter: blur(10px); opacity: 0; pointer-events: none;
+    transition: 0.3s; z-index: 200; white-space: nowrap;
+    text-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    will-change: transform, opacity;
 }
-.status-item { 
-    background: var(--btn-bg); padding: 4px 10px; 
-    border-radius: 12px; backdrop-filter: blur(5px); 
-    white-space: nowrap;
+.crit-success {
+    color: #fff; background: rgba(76, 217, 100, 0.8);
+    box-shadow: 0 0 30px var(--crit-success);
+    animation: popIn 0.3s forwards;
 }
+.crit-fail {
+    color: #fff; background: rgba(255, 59, 48, 0.8);
+    box-shadow: 0 0 30px var(--crit-fail);
+    animation: popIn 0.3s forwards;
+}
+@keyframes popIn { 0%{transform:translate(-50%,-50%) scale(0.5);opacity:0;} 70%{transform:translate(-50%,-50%) scale(1.1);opacity:1;} 100%{transform:translate(-50%,-50%) scale(1);opacity:1;} }
 
 /* --- SCREENS --- */
-.screen {
-    flex: 1; display: none; flex-direction: column;
-    padding: 20px; 
-    padding-top: 10px; /* Меньше отступ, так как хедер сам задает пространство */
-    overflow-y: auto; overflow-x: hidden;
-}
+.screen { flex: 1; display: none; flex-direction: column; padding: 20px; padding-top: 10px; overflow-y: auto; overflow-x: hidden; }
 .screen.active { display: flex; animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
 .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 40px; }
 .hidden-tile { display: none !important; }
-
-.menu-item {
-    background: var(--glass-bg); backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
-    border-radius: 24px; aspect-ratio: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; cursor: pointer;
-    transition: transform 0.2s; box-shadow: 0 4px 30px rgba(0,0,0,0.1); text-align: center;
-}
+.menu-item { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 30px rgba(0,0,0,0.1); text-align: center; }
 .menu-item:active { transform: scale(0.96); }
 .menu-icon { width: 85px; height: 85px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); transition: transform 0.2s; }
 .menu-item:hover .menu-icon { transform: scale(1.1); }
 .emoji-icon { font-size: 65px; display: flex; align-items: center; justify-content: center; text-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 .menu-label { font-size: 12px; font-weight: 500; opacity: 0.8; }
-
-.back-btn {
-    background: var(--glass-bg); border: 1px solid var(--glass-border);
-    color: var(--accent); padding: 10px 20px; border-radius: 20px;
-    cursor: pointer; font-weight: 600; margin-bottom: 10px;
-    align-self: flex-start; backdrop-filter: blur(10px); z-index: 50;
-}
-
+.back-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--accent); padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; margin-bottom: 10px; align-self: flex-start; backdrop-filter: blur(10px); z-index: 50; }
 .canvas-wrapper { flex: 1; width: 100%; position: relative; border-radius: 30px; overflow: hidden; }
 .hint-text { text-align: center; color: var(--hint-color); padding: 15px; font-size: 14px; pointer-events: none; }
-
-/* NOTES */
 .notes-container { flex: 1; display: flex; flex-direction: column; }
-.glass-textarea {
-    flex: 1; width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border);
-    border-radius: 20px; padding: 20px; color: var(--text-primary); font-size: 16px;
-    resize: none; outline: none; box-sizing: border-box; font-family: inherit;
-}
-
-/* FOOTER */
+.glass-textarea { flex: 1; width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; color: var(--text-primary); font-size: 16px; resize: none; outline: none; box-sizing: border-box; font-family: inherit; }
 footer { text-align: center; padding: 15px; font-size: 12px; color: var(--hint-color); width: 100%; box-sizing: border-box; }
 footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
-
-/* TOOLS (No Changes) */
+/* ... (REST OF OLD STYLES: MagicBall, Coin, etc. - Keep them) ... */
 .magic-ball-outer { width: 260px; height: 260px; background: radial-gradient(circle at 30% 30%, #444, #000); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto; cursor: pointer; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.2s; }
 .magic-ball-inner { width: 140px; height: 140px; background: radial-gradient(circle, #111, #000); border-radius: 50%; border: 1px solid #333; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; }
 .ball-text { color: #aaffaa; text-shadow: 0 0 10px #aaffaa; font-weight: bold; opacity: 0; transition: 1s; }
