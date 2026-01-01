@@ -1,34 +1,34 @@
 import { DiceEngine } from './dice-engine.js';
 import { predictions } from './predictions.js';
 
-// --- DATA ---
+// --- ДАННЫЕ ---
 const translations = {
     ru: { ball:"Шар Судьбы", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоты", coin:"Монетка", rand:"Рандом", trump:"Козырь", back:"Назад", tap:"Нажми, чтобы бросить", heads:"ОРЕЛ", tails:"РЕШКА", win:"ПОБЕДА!", lose_phrases:["Эх, мимо...", "Попробуй еще!", "Не сегодня", "Упс...", "Пусто", "Почти..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", reset:"СБРОС", rand_limit_label:"Максимум:", settings:"Настройки",
-    timer:"Таймер", hp:"HP", score:"Счет", names:"Имена", wheel:"Колесо", rps:"К-Н-Б" },
+    hp:"HP", score:"Счет", names:"Имена", wheel:"Колесо", rps:"К-Н-Б" },
     uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", trump:"Козир", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТИ", generate:"СТАРТ", reset:"СКИДАННЯ", rand_limit_label:"Максимум:", settings:"Налаштування",
-    timer:"Таймер", hp:"HP", score:"Рахунок", names:"Імена", wheel:"Колесо", rps:"К-Н-Б" }
+    hp:"HP", score:"Рахунок", names:"Імена", wheel:"Колесо", rps:"К-Н-Б" }
 };
 
-// Генератор имен (Креативные списки)
+// --- D&D СПИСКИ ---
 const nameAdjectives = {
-    ru: ["Внезапный", "Слегка пьяный", "Гламурный", "Депрессивный", "Бородатый", "Легендарный", "Бомжеватый", "Святой", "Проклятый", "Подозрительный", "Неадекватный", "Великолепный", "Уставший", "Бешеный"],
-    uk: ["Раптовий", "Трохи п'яний", "Гламурний", "Депресивний", "Бородатий", "Легендарний", "Безхатько", "Святий", "Проклятий", "Підозрілий", "Неадекватний", "Чудовий", "Втомлений", "Скажений"]
+    ru: ["Внезапный", "Пьяный", "Святой", "Проклятый", "Трусливый", "Безумный", "Жадный", "Героический", "Лысый", "Бородатый", "Сонный", "Грязный", "Золотой", "Мертвый", "Дикий", "Древний", "Юный", "Злобный", "Добрый", "Хитрый", "Тупой", "Ловкий", "Невидимый", "Горящий", "Ледяной", "Мокрый", "Громкий", "Тихий", "Слепой", "Одноглазый", "Хромой", "Везучий", "Неудачливый", "Богатый", "Нищий", "Влюбленный", "Одинокий", "Жестокий", "Милый", "Страшный", "Вонючий", "Душистый", "Быстрый", "Медленный", "Кровавый", "Теневой", "Звездный", "Лунный", "Солнечный", "Забытый"],
+    uk: ["Раптовий", "П'яний", "Святий", "Проклятий", "Боягузливий", "Божевільний", "Жадібний", "Героїчний", "Лисий", "Бородатий", "Сонний", "Брудний", "Золотий", "Мертвий", "Дикий", "Стародавній", "Юний", "Злісний", "Добрий", "Хитрий", "Тупий", "Спритний", "Невидимий", "Палаючий", "Крижаний", "Мокрий", "Гучний", "Тихий", "Сліпий", "Одноокий", "Кульгавий", "Везучий", "Невдачливий", "Багатий", "Жебрак", "Закоханий", "Самотній", "Жорстокий", "Милий", "Страшний", "Смердючий", "Запашний", "Швидкий", "Повільний", "Кривавий", "Тіньовий", "Зоряний", "Місячний", "Сонячний", "Забутий"]
 };
 const nameClasses = {
-    ru: ["Гоблин", "Табуретка", "Бард", "Некромант", "Паладин", "Хомяк", "Император", "Бомж", "Капибара", "Маг", "Рыцарь", "Орк", "Эльф 80 lvl"],
-    uk: ["Гоблін", "Табуретка", "Бард", "Некромант", "Паладин", "Хом'як", "Імператор", "Безхатько", "Капібара", "Маг", "Лицар", "Орк", "Ельф 80 lvl"]
+    ru: ["Стражник", "Орк", "Эльф", "Темный Эльф", "Бард", "Паладин", "Маг", "Лучник", "Разбойник", "Некромант", "Воин", "Варвар", "Жрец", "Друид", "Монах", "Следопыт", "Чародей", "Колдун", "Изобретатель", "Гном", "Полурослик", "Драконорожденный", "Тифлинг", "Гоблин", "Вампир", "Оборотень"],
+    uk: ["Стражник", "Орк", "Ельф", "Темний Ельф", "Бард", "Паладин", "Маг", "Лучник", "Розбійник", "Некромант", "Воїн", "Варвар", "Жрець", "Друїд", "Монах", "Слідопит", "Чародій", "Чаклун", "Винахідник", "Гном", "Напіврослик", "Дракононароджений", "Тіфлінг", "Гоблін", "Вампір", "Перевертень"]
 };
 
 let state = {
     lang: localStorage.getItem('mt_lang') || 'uk',
     theme: localStorage.getItem('mt_theme') || 'dark',
-    // Saved Data
     hp_p1: parseInt(localStorage.getItem('mt_hp_p1')) || 20,
     hp_p2: parseInt(localStorage.getItem('mt_hp_p2')) || 20,
     score_p1: parseInt(localStorage.getItem('mt_score_p1')) || 0,
     score_p2: parseInt(localStorage.getItem('mt_score_p2')) || 0,
     saved_name: localStorage.getItem('mt_name') || null,
-    wheel_segments: JSON.parse(localStorage.getItem('mt_wheel')) || ["Да", "Нет", "Может быть", "Перекрути"]
+    // КОЛЕСО ТЕПЕРЬ ПУСТОЕ ПО УМОЛЧАНИЮ
+    wheel_segments: JSON.parse(localStorage.getItem('mt_wheel')) || [] 
 };
 
 const engines = {}; 
@@ -37,31 +37,33 @@ let currentCoinRotation = 0;
 let currentDeck = ['♠️', '♥️', '♦️', '♣️'];
 let wheelAngle = 0;
 
-// Утилита вибрации
 function vibrate(ms = 50) {
     if (navigator.vibrate) navigator.vibrate(ms);
 }
 
-// --- HEADER STATUS UPDATE ---
+// --- HEADER STATUS UPDATE (Имя на новой строке) ---
 function updateHeaderStatus() {
-    const bar = document.getElementById('status-bar');
-    bar.innerHTML = ''; // Clear
+    const statsRow = document.getElementById('status-stats');
+    const nameRow = document.getElementById('status-name');
     
-    if (state.saved_name) {
-        bar.innerHTML += `<div class="status-item">👤 ${state.saved_name}</div>`;
-    }
-    // Если HP изменен от дефолта
+    statsRow.innerHTML = '';
+    nameRow.innerHTML = '';
+    
+    // Статы (HP/Score)
     if (state.hp_p1 !== 20 || state.hp_p2 !== 20) {
-        bar.innerHTML += `<div class="status-item">❤️ ${state.hp_p1}</div>`;
+        statsRow.innerHTML += `<div class="status-item">❤️ ${state.hp_p1}</div>`;
     }
-    // Если Счет изменен
     if (state.score_p1 !== 0 || state.score_p2 !== 0) {
-        bar.innerHTML += `<div class="status-item">🏆 ${state.score_p1}</div>`;
+        statsRow.innerHTML += `<div class="status-item">🏆 ${state.score_p1}</div>`;
+    }
+    
+    // Имя (отдельной строкой ниже)
+    if (state.saved_name) {
+        nameRow.innerHTML = `<div class="status-item">👤 ${state.saved_name}</div>`;
     }
 }
 
 // --- GLOBAL FUNCTIONS ---
-
 window.openScreen = (id) => {
     const menu = document.getElementById('menu-screen');
     menu.classList.remove('active');
@@ -71,10 +73,8 @@ window.openScreen = (id) => {
         target.style.display = 'flex';
         void target.offsetWidth; target.classList.add('active');
         
-        // Init logic for specific screens
         if(id.startsWith('d') && id.includes('-screen')) setTimeout(() => initDice3D(id), 50);
         if(id === 'trump-screen') shuffleDeck();
-        if(id === 'timer-screen') setTimeout(() => initDice3D('timer-scene', true), 50); // Special flag for hourglass
         if(id === 'hp-screen') renderCounter('hp', 1);
         if(id === 'score-screen') renderCounter('score', 1);
         if(id === 'wheel-screen') drawWheel();
@@ -94,18 +94,6 @@ window.goBack = () => {
         }, 300);
     }
 };
-
-// --- DICE & 3D ---
-function initDice3D(screenId, isTimer = false) {
-    const diceType = screenId.replace('-screen', '').replace('-scene', ''); 
-    if (engines[diceType]) return; 
-    const containerId = isTimer ? screenId : `${diceType}-scene`;
-    
-    if (document.getElementById(containerId)) {
-        // Если это таймер, передаем спец тип
-        engines[diceType] = new DiceEngine(containerId, isTimer ? 'hourglass' : diceType);
-    }
-}
 
 // --- MAGIC BALL ---
 window.askBall = () => {
@@ -202,17 +190,6 @@ window.generateRandom = () => {
     }, 50);
 };
 
-// --- TIMER (3D) ---
-window.startTimer = () => {
-    vibrate();
-    const time = document.getElementById('timer-input').value;
-    if(engines['timer-scene']) engines['timer-scene'].startHourglass(time);
-};
-window.resetTimer = () => {
-    vibrate();
-    if(engines['timer-scene']) engines['timer-scene'].resetHourglass();
-};
-
 // --- COUNTERS (HP / SCORE) ---
 window.setPlayers = (type, num) => {
     vibrate();
@@ -224,13 +201,13 @@ function renderCounter(type, players) {
     const container = document.getElementById(`${type}-container`);
     container.innerHTML = '';
     
-    // Helper to create box
     const createBox = (pIndex, inverted) => {
         const key = `${type}_p${pIndex}`;
         const val = state[key];
+        // Используем input вместо div для ручного ввода
         return `
         <div class="counter-box ${inverted ? 'inverted-player' : ''}">
-            <div class="counter-val" id="${key}-val">${val}</div>
+            <input type="number" class="counter-val-input" id="${key}-val" value="${val}" onchange="manualCounterUpdate('${type}', ${pIndex}, this.value)">
             <div class="counter-btns">
                 <button class="counter-btn" onclick="updateCounter('${type}', ${pIndex}, -1)">-</button>
                 <button class="counter-btn" onclick="updateCounter('${type}', ${pIndex}, 1)">+</button>
@@ -239,18 +216,25 @@ function renderCounter(type, players) {
     };
 
     if (players === 2) {
-        container.innerHTML += createBox(2, true); // Top player (inverted)
-        container.innerHTML += createBox(1, false); // Bottom player
+        container.innerHTML += createBox(2, true);
+        container.innerHTML += createBox(1, false);
     } else {
         container.innerHTML += createBox(1, false);
     }
 }
 
+window.manualCounterUpdate = (type, pIndex, newVal) => {
+    const key = `${type}_p${pIndex}`;
+    state[key] = parseInt(newVal) || 0;
+    localStorage.setItem(`mt_${key}`, state[key]);
+    updateHeaderStatus();
+};
+
 window.updateCounter = (type, pIndex, delta) => {
     vibrate(30);
     const key = `${type}_p${pIndex}`;
     state[key] += delta;
-    document.getElementById(`${key}-val`).textContent = state[key];
+    document.getElementById(`${key}-val`).value = state[key];
     localStorage.setItem(`mt_${key}`, state[key]);
     updateHeaderStatus();
 };
@@ -261,7 +245,6 @@ window.resetCounter = (type) => {
     state[`${type}_p1`] = def; state[`${type}_p2`] = def;
     localStorage.setItem(`mt_${type}_p1`, def);
     localStorage.setItem(`mt_${type}_p2`, def);
-    // Re-render current view
     const isTwo = document.querySelectorAll(`#${type}-screen .mode-btn`)[1].classList.contains('active');
     renderCounter(type, isTwo ? 2 : 1);
     updateHeaderStatus();
@@ -297,7 +280,7 @@ window.addWheelSegment = () => {
     }
 };
 window.resetWheel = () => {
-    state.wheel_segments = ["Да", "Нет", "Может быть", "Перекрути"];
+    state.wheel_segments = []; // Empty start
     localStorage.setItem('mt_wheel', JSON.stringify(state.wheel_segments));
     drawWheel();
 };
@@ -305,10 +288,21 @@ function drawWheel() {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
     const segments = state.wheel_segments;
+    
+    ctx.clearRect(0,0,300,300);
+    
+    // Если пусто
+    if (segments.length === 0) {
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        ctx.beginPath(); ctx.arc(150, 150, 140, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = "white"; ctx.font = "14px Arial"; ctx.textAlign = "center";
+        ctx.fillText("Добавьте варианты", 150, 150);
+        return;
+    }
+
     const arc = Math.PI * 2 / segments.length;
     const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
     
-    ctx.clearRect(0,0,300,300);
     ctx.translate(150, 150);
     ctx.rotate(wheelAngle);
     
@@ -332,6 +326,7 @@ function drawWheel() {
 }
 
 window.spinWheel = () => {
+    if (state.wheel_segments.length === 0) return;
     vibrate();
     const duration = 3000;
     const start = performance.now();
@@ -350,11 +345,10 @@ window.spinWheel = () => {
 // --- RPS (Rock Paper Scissors) ---
 window.playRPS = () => {
     vibrate();
-    const opts = ['🪨', '✂️', '📄']; // Rock, Scissors, Paper (Standard emoji order)
+    const opts = ['🪨', '✂️', '📄']; 
     const topEl = document.getElementById('rps-top');
     const botEl = document.getElementById('rps-bottom');
     
-    // Shuffle anim
     let c = 0;
     const int = setInterval(() => {
         topEl.querySelector('span').textContent = opts[c % 3];
@@ -362,7 +356,6 @@ window.playRPS = () => {
         c++;
         if(c > 20) {
             clearInterval(int);
-            // Result
             const r1 = Math.floor(Math.random()*3); // 0=R, 1=S, 2=P
             const r2 = Math.floor(Math.random()*3);
             
@@ -372,16 +365,11 @@ window.playRPS = () => {
             topEl.className = 'rps-side inverted';
             botEl.className = 'rps-side';
             
-            // Logic: 0 beats 1, 1 beats 2, 2 beats 0
             if(r1 === r2) { /* Tie */ }
             else if((r2 === 0 && r1 === 1) || (r2 === 1 && r1 === 2) || (r2 === 2 && r1 === 0)) {
-                // Bottom wins
-                botEl.classList.add('win'); topEl.classList.add('lose');
-                vibrate([50,50,50]);
+                botEl.classList.add('win'); topEl.classList.add('lose'); vibrate([50,50,50]);
             } else {
-                // Top wins
-                topEl.classList.add('win'); botEl.classList.add('lose');
-                vibrate([50,50,50]);
+                topEl.classList.add('win'); botEl.classList.add('lose'); vibrate([50,50,50]);
             }
         }
     }, 50);
@@ -407,4 +395,13 @@ function applyLang() {
         const key = el.dataset.key;
         if(translations[state.lang][key]) el.textContent = translations[state.lang][key];
     });
+}
+
+function initDice3D(screenId) {
+    const diceType = screenId.replace('-screen', ''); 
+    if (engines[diceType]) return; 
+    const containerId = `${diceType}-scene`;
+    if (document.getElementById(containerId)) {
+        engines[diceType] = new DiceEngine(containerId, diceType);
+    }
 }
