@@ -10,20 +10,20 @@
 
   <div class="app-container">
     <header>
-      <div class="controls">
-        <button class="icon-btn" id="theme-toggle"><span id="theme-icon">🌙</span></button>
-      </div>
+      <button class="icon-btn" id="theme-toggle"><span id="theme-icon">🌙</span></button>
       
-      <div id="status-bar" class="status-bar">
-        <div class="status-row" id="status-stats"></div>
-        <div class="status-row" id="status-name"></div>
-      </div>
+      <button class="dnd-toggle-btn" id="dnd-btn" onclick="toggleDNDMode()">DND MODE</button>
 
       <div class="ios-toggle">
         <button class="lang-btn" data-lang="uk">UK</button>
         <button class="lang-btn" data-lang="ru">RU</button>
       </div>
     </header>
+
+    <div id="status-bar" class="status-bar">
+      <div class="status-row" id="status-stats"></div>
+      <div class="status-row" id="status-name"></div>
+    </div>
 
     <div id="menu-screen" class="screen active">
       <div class="menu-grid">
@@ -34,17 +34,19 @@
         <div class="menu-item" onclick="openScreen('d12-screen')"><img src="d12.png" class="menu-icon"><span class="menu-label" data-key="d12">D12</span></div>
         <div class="menu-item" onclick="openScreen('d20-screen')"><img src="d20.png" class="menu-icon"><span class="menu-label" data-key="d20">D20</span></div>
         
-        <div class="menu-item" onclick="openScreen('trump-screen')"><img src="kar.png" class="menu-icon"><span class="menu-label" data-key="trump">Козырь</span></div>
-        <div class="menu-item" onclick="openScreen('ball-screen')"><img src="sh.png" class="menu-icon"><span class="menu-label" data-key="ball">Ball</span></div>
-        <div class="menu-item" onclick="openScreen('coin-screen')"><img src="mon.png" class="menu-icon"><span class="menu-label" data-key="coin">Coin</span></div>
-        <div class="menu-item" onclick="openScreen('slots-screen')"><img src="slot.png" class="menu-icon"><span class="menu-label" data-key="slots">Slots</span></div>
-        <div class="menu-item" onclick="openScreen('rand-screen')"><img src="ran.png" class="menu-icon"><span class="menu-label" data-key="rand">Rand</span></div>
+        <div class="menu-item" onclick="openScreen('hp-screen')"><div class="menu-icon emoji-icon">❤️</div><span class="menu-label" data-key="hp">HP</span></div>
+        <div class="menu-item" onclick="openScreen('score-screen')"><div class="menu-icon emoji-icon">🏆</div><span class="menu-label" data-key="score">Счет</span></div>
+        <div class="menu-item" onclick="openScreen('name-screen')"><div class="menu-icon emoji-icon">📜</div><span class="menu-label" data-key="names">Имена</span></div>
+        
+        <div class="menu-item" onclick="openScreen('notes-screen')"><div class="menu-icon emoji-icon">✏️</div><span class="menu-label" data-key="notes">Заметки</span></div>
 
-        <div class="menu-item" onclick="openScreen('hp-screen')"><img src="hp.png" class="menu-icon"><span class="menu-label" data-key="hp">HP</span></div>
-        <div class="menu-item" onclick="openScreen('score-screen')"><img src="score.png" class="menu-icon"><span class="menu-label" data-key="score">Счет</span></div>
-        <div class="menu-item" onclick="openScreen('name-screen')"><img src="name.png" class="menu-icon"><span class="menu-label" data-key="names">Имена</span></div>
-        <div class="menu-item" onclick="openScreen('wheel-screen')"><img src="wheel.png" class="menu-icon"><span class="menu-label" data-key="wheel">Колесо</span></div>
-        <div class="menu-item" onclick="openScreen('rps-screen')"><img src="rps.png" class="menu-icon"><span class="menu-label" data-key="rps">К-Н-Б</span></div>
+        <div class="menu-item dnd-hide" onclick="openScreen('trump-screen')"><img src="kar.png" class="menu-icon"><span class="menu-label" data-key="trump">Козырь</span></div>
+        <div class="menu-item dnd-hide" onclick="openScreen('ball-screen')"><img src="sh.png" class="menu-icon"><span class="menu-label" data-key="ball">Ball</span></div>
+        <div class="menu-item dnd-hide" onclick="openScreen('coin-screen')"><img src="mon.png" class="menu-icon"><span class="menu-label" data-key="coin">Coin</span></div>
+        <div class="menu-item dnd-hide" onclick="openScreen('slots-screen')"><img src="slot.png" class="menu-icon"><span class="menu-label" data-key="slots">Slots</span></div>
+        <div class="menu-item dnd-hide" onclick="openScreen('rand-screen')"><img src="ran.png" class="menu-icon"><span class="menu-label" data-key="rand">Rand</span></div>
+        <div class="menu-item dnd-hide" onclick="openScreen('wheel-screen')"><div class="menu-icon emoji-icon">🎡</div><span class="menu-label" data-key="wheel">Колесо</span></div>
+        <div class="menu-item dnd-hide" onclick="openScreen('rps-screen')"><div class="menu-icon emoji-icon">✂️</div><span class="menu-label" data-key="rps">К-Н-Б</span></div>
       </div>
     </div>
 
@@ -54,6 +56,14 @@
     <div id="d10-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d10-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
     <div id="d12-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d12-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
     <div id="d20-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d20-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
+
+    <div id="notes-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="notes-container">
+            <textarea id="notes-area" class="glass-textarea" placeholder="..."></textarea>
+        </div>
+        <button class="glass-btn small" style="margin-top: 10px;" onclick="resetNotes()" data-key="reset">СБРОС</button>
+    </div>
 
     <div id="trump-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
@@ -73,23 +83,15 @@
 
     <div id="hp-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-        <div class="mode-switch">
-            <button class="mode-btn active" onclick="setPlayers('hp', 1)">1P</button>
-            <button class="mode-btn" onclick="setPlayers('hp', 2)">2P</button>
-        </div>
-        <div id="hp-container" class="counter-container">
-            </div>
+        <div class="mode-switch"><button class="mode-btn active" onclick="setPlayers('hp', 1)">1P</button><button class="mode-btn" onclick="setPlayers('hp', 2)">2P</button></div>
+        <div id="hp-container" class="counter-container"></div>
         <button class="glass-btn reset-tool-btn" onclick="resetCounter('hp')" data-key="reset">СБРОС</button>
     </div>
 
     <div id="score-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-        <div class="mode-switch">
-            <button class="mode-btn active" onclick="setPlayers('score', 1)">1P</button>
-            <button class="mode-btn" onclick="setPlayers('score', 2)">2P</button>
-        </div>
-        <div id="score-container" class="counter-container">
-            </div>
+        <div class="mode-switch"><button class="mode-btn active" onclick="setPlayers('score', 1)">1P</button><button class="mode-btn" onclick="setPlayers('score', 2)">2P</button></div>
+        <div id="score-container" class="counter-container"></div>
         <button class="glass-btn reset-tool-btn" onclick="resetCounter('score')" data-key="reset">СБРОС</button>
     </div>
 
@@ -119,15 +121,15 @@
     <div id="rps-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
         <div class="rps-arena">
-            <div id="rps-top" class="rps-side inverted">
-                <span class="rps-icon">🤖</span>
-            </div>
-            <div id="rps-bottom" class="rps-side">
-                <span class="rps-icon">👤</span>
-            </div>
+            <div id="rps-top" class="rps-side inverted"><span class="rps-icon">🤖</span></div>
+            <div id="rps-bottom" class="rps-side"><span class="rps-icon">👤</span></div>
             <button class="glass-btn round-start" onclick="playRPS()">GO</button>
         </div>
     </div>
+
+    <footer>
+        <span data-key="dev">Developer:</span> <a href="https://t.me/desoope" target="_blank">DesOope</a>
+    </footer>
 
   </div>
 
