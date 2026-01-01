@@ -18,9 +18,7 @@
         <div id="status-name-area" class="status-area left"></div>
       </div>
 
-      <div class="header-col center">
-        <button class="dnd-toggle-btn" id="dnd-btn" onclick="toggleDNDMode()">DND MODE</button>
-      </div>
+      <button class="dnd-toggle-btn" id="dnd-btn" onclick="toggleDNDMode()">DND MODE</button>
 
       <div class="header-col right">
         <div class="ios-toggle lang-switch">
@@ -62,13 +60,7 @@
     <div id="d12-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d12-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
     <div id="d20-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d20-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
 
-    <div id="notes-screen" class="screen">
-        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-        <div class="notes-container">
-            <textarea id="notes-area" class="glass-textarea" placeholder="..."></textarea>
-        </div>
-        <button class="glass-btn small" style="margin-top: 10px;" onclick="resetNotes()" data-key="reset">СБРОС</button>
-    </div>
+    <div id="notes-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="notes-container"><textarea id="notes-area" class="glass-textarea" placeholder="..."></textarea></div><button class="glass-btn small" style="margin-top: 10px;" onclick="resetNotes()" data-key="reset">СБРОС</button></div>
 
     <div id="trump-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
@@ -103,24 +95,14 @@
     <div id="name-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
         <div class="name-display" id="generated-name">...</div>
-        <div class="name-controls">
-            <button class="glass-btn" onclick="generateName()" data-key="generate">ГЕНЕРАЦИЯ</button>
-            <button class="glass-btn small" onclick="resetName()" data-key="reset">СБРОС</button>
-        </div>
+        <div class="name-controls"><button class="glass-btn" onclick="generateName()" data-key="generate">ГЕНЕРАЦИЯ</button><button class="glass-btn small" onclick="resetName()" data-key="reset">СБРОС</button></div>
     </div>
 
     <div id="wheel-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-        <div class="wheel-wrapper">
-            <canvas id="wheel-canvas" width="300" height="300"></canvas>
-            <div class="wheel-pointer">▼</div>
-        </div>
+        <div class="wheel-wrapper"><canvas id="wheel-canvas" width="300" height="300"></canvas><div class="wheel-pointer">▼</div></div>
         <button class="glass-btn" onclick="spinWheel()" data-key="spin_btn">КРУТИТЬ</button>
-        <div class="wheel-inputs">
-            <input type="text" id="wheel-add-input" class="glass-input" placeholder="+">
-            <button class="icon-btn" onclick="addWheelSegment()">+</button>
-            <button class="icon-btn" onclick="resetWheel()">↻</button>
-        </div>
+        <div class="wheel-inputs"><input type="text" id="wheel-add-input" class="glass-input" placeholder="+"><button class="icon-btn" onclick="addWheelSegment()">+</button><button class="icon-btn" onclick="resetWheel()">↻</button></div>
     </div>
 
     <div id="rps-screen" class="screen">
@@ -132,10 +114,7 @@
         </div>
     </div>
 
-    <footer>
-        <span data-key="dev">Developer:</span> <a href="https://t.me/desoope" target="_blank">DesOope</a>
-    </footer>
-
+    <footer><span data-key="dev">Developer:</span> <a href="https://t.me/desoope" target="_blank">DesOope</a></footer>
   </div>
 
   <script type="module" src="app.js"></script>
