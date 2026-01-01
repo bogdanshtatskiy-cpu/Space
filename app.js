@@ -1,7 +1,31 @@
 import { DiceEngine } from './dice-engine.js';
-import { predictions } from './predictions.js';
 
-// --- Конфигурация ---
+// --- ДАННЫЕ (Переводы и Предсказания) ---
+const predictions = {
+    ru: [
+        "Бесспорно", "Предрешено", "Никаких сомнений", "Определенно да",
+        "Можешь быть уверен", "Мне кажется — да", "Вероятнее всего", 
+        "Хорошие перспективы", "Знаки говорят — да", "Да", 
+        "Пока не ясно, попробуй снова", "Спроси позже", "Лучше не рассказывать", 
+        "Сейчас нельзя предсказать", "Сконцентрируйся и спроси опять", 
+        "Даже не думай", "Мой ответ — нет", "По моим данным — нет", 
+        "Перспективы не очень", "Весьма сомнительно", "Звезды говорят нет",
+        "Абсолютно точно", "Не надейся", "Удача на твоей стороне",
+        "Слушай свое сердце", "Рискни", "Забудь об этом", "Время покажет"
+    ],
+    uk: [
+        "Безперечно", "Це вирішено", "Жодних сумнівів", "Безумовно так",
+        "Можеш бути впевнений", "Мені здається — так", "Найімовірніше",
+        "Хороші перспективи", "Знаки кажуть — так", "Так",
+        "Поки не ясно, спробуй знову", "Спитай пізніше", "Краще не розповідати",
+        "Зараз не можна передбачити", "Сконцентруйся і спитай знову",
+        "Навіть не думай", "Мій відповідь — ні", "За моїми даними — ні",
+        "Перспективи не дуже", "Дуже сумнівно", "Зірки кажуть ні",
+        "Абсолютно точно", "Не сподівайся", "Удача на твоєму боці",
+        "Слухай своє серце", "Ризикни", "Забудь про це", "Час покаже"
+    ]
+};
+
 const translations = {
     ru: {
         ball: "Шар Судьбы", d4: "Кубик D4", d6: "Кубик D6", d8: "Кубик D8", 
@@ -39,26 +63,18 @@ let state = {
 let coinTotalRotation = 0;
 const engines = {}; 
 
-// --- ГЛОБАЛЬНЫЕ ФУНКЦИИ (Чтобы работали onclick в HTML) ---
-// Мы привязываем их к window, иначе HTML их не увидит из модуля
-
+// --- ФУНКЦИИ (Глобальные для HTML) ---
 window.openScreen = (id) => {
     const menu = document.getElementById('menu-screen');
     menu.classList.remove('active');
-    
     setTimeout(() => {
         menu.style.display = 'none';
         const target = document.getElementById(id);
         target.style.display = 'flex';
-        
-        // Небольшой хак для принудительной перерисовки перед анимацией
-        void target.offsetWidth; 
-        
         target.classList.add('active');
         
         if(id.startsWith('d') && id.includes('-screen')) {
-            // Даем браузеру время отрисовать контейнер перед загрузкой 3D
-            setTimeout(() => initDice3D(id), 50);
+            initDice3D(id);
         }
     }, 200);
 };
@@ -70,12 +86,8 @@ window.goBack = () => {
         setTimeout(() => {
             activeScreen.style.display = 'none';
             const menu = document.getElementById('menu-screen');
-            menu.style.display = 'flex'; // Сначала включаем
-            
-            // Ждем кадр, потом добавляем класс анимации
-            requestAnimationFrame(() => {
-                menu.classList.add('active');
-            });
+            menu.style.display = 'flex';
+            requestAnimationFrame(() => menu.classList.add('active'));
         }, 300);
     }
 };
@@ -98,7 +110,6 @@ window.flipCoin = () => {
     const wrapper = document.querySelector('.coin-wrapper');
     const outcome = Math.random() > 0.5 ? 0 : 180;
     coinTotalRotation += (1800 + outcome); 
-    
     wrapper.classList.remove('coin-toss');
     void wrapper.offsetWidth; 
     wrapper.classList.add('coin-toss');
@@ -116,12 +127,11 @@ window.spinSlots = () => {
         let count = 0;
         const maxCount = 10 + i * 5;
         const interval = setInterval(() => {
-            const sym = syms[Math.floor(Math.random()*syms.length)];
-            el.textContent = sym;
+            el.textContent = syms[Math.floor(Math.random()*syms.length)];
             count++;
             if(count > maxCount) {
                 clearInterval(interval);
-                results.push(sym);
+                results.push(el.textContent);
                 if(results.length === 3) checkWin(results, msg);
             }
         }, 60);
@@ -139,8 +149,7 @@ window.generateRandom = () => {
     }, 50);
 };
 
-// --- ВНУТРЕННИЕ ФУНКЦИИ ---
-
+// --- Вспомогательные ---
 function checkWin(res, msgEl) {
     if(res[0] === res[1] && res[1] === res[2]) {
         msgEl.textContent = translations[state.lang].win;
@@ -155,15 +164,9 @@ function checkWin(res, msgEl) {
 function initDice3D(screenId) {
     const diceType = screenId.replace('-screen', ''); 
     if (engines[diceType]) return; 
-    
     const containerId = `${diceType}-scene`;
-    const container = document.getElementById(containerId);
-    
-    // Проверка, существует ли контейнер
-    if (container) {
+    if (document.getElementById(containerId)) {
         engines[diceType] = new DiceEngine(containerId, diceType);
-    } else {
-        console.error("Контейнер не найден:", containerId);
     }
 }
 
@@ -175,7 +178,6 @@ function setupNavigation() {
             applyLang();
         };
     });
-
     const themeBtn = document.getElementById('theme-toggle');
     themeBtn.onclick = () => {
         state.theme = state.theme === 'dark' ? 'light' : 'dark';
@@ -191,16 +193,16 @@ function applyTheme() {
 }
 
 function applyLang() {
-    document.querySelectorAll('.lang-btn').forEach(b => 
-        b.classList.toggle('active', b.dataset.lang === state.lang));
-    
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === state.lang));
     document.querySelectorAll('[data-key]').forEach(el => {
         const key = el.dataset.key;
-        if(translations[state.lang][key]) el.textContent = translations[state.lang][key];
+        if(translations[state.lang][key]) {
+            // Если это input placeholder или что-то подобное, нужно другое свойство, но у нас textContent
+            el.textContent = translations[state.lang][key];
+        }
     });
 }
 
-// Запуск при загрузке
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     applyLang();
