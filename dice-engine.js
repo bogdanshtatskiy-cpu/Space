@@ -1,15 +1,14 @@
-// Добавляем импорт загрузчика HDRI текстур
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-import { RGBELoader } from "https://unpkg.com/three@0.160.0/examples/jsm/loaders/RGBELoader.js";
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 export class DiceEngine {
     constructor(containerId, diceType) {
         this.container = document.getElementById(containerId);
         this.type = diceType; 
-        // Цвет чуть насыщеннее, чтобы лучше играл со светом
-        this.color = 0x6688aa; 
+        this.color = 0x8899aa; 
         
-        this.size = (diceType === 'd6') ? 6.5 : (diceType === 'd10' ? 6.5 : (diceType === 'd12' ? 7 : 8));
+        // Размеры
+        this.size = (diceType === 'd6') ? 7 : (diceType === 'd10' ? 6.5 : (diceType === 'd12' ? 7 : 8));
         
         this.textMeshes = {};
         this.resultValues = [];
@@ -21,38 +20,22 @@ export class DiceEngine {
 
     init() {
         this.scene = new THREE.Scene();
-        
         this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 1, 1000);
         this.camera.position.z = 35;
 
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        // Включаем физически корректное освещение и тональную компрессию для реализма
         this.renderer.physicallyCorrectLights = true;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.2;
         this.container.appendChild(this.renderer.domElement);
 
-        // --- ЗАГРУЗКА HDRI ОКРУЖЕНИЯ ---
-        // Это ключевой момент для реализма. Кубик будет отражать эту текстуру.
-        // Используем публичный пример текстуры от three.js
+        // --- ГЕНЕРАЦИЯ СТУДИЙНОГО ОКРУЖЕНИЯ (RoomEnvironment) ---
+        // Это создает красивые блики на стекле без загрузки файлов
         const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-        pmremGenerator.compileEquirectangularShader();
+        this.scene.environment = pmremGenerator.fromScene(new RoomEnvironment()).texture;
 
-        new RGBELoader()
-            .setPath('https://threejs.org/examples/textures/equirectangular/')
-            .load('royal_esplanade_1k.hdr', (texture) => {
-                const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-                // scene.background = envMap; // Если раскомментировать, будет виден фон
-                this.scene.environment = envMap; // Кубик отражает этот фон
-                texture.dispose();
-                pmremGenerator.dispose();
-
-                // Создаем кубик только после загрузки окружения, чтобы материал сразу его подхватил
-                this.setupLights();
-                this.createDice();
-            });
+        this.createDice();
 
         this.container.addEventListener('click', () => this.roll());
         this.container.addEventListener('touchstart', (e) => { e.preventDefault(); this.roll(); }, {passive: false});
@@ -65,43 +48,38 @@ export class DiceEngine {
         });
     }
 
-    setupLights() {
-        // Освещение теперь вспомогательное, основную работу делает HDRI
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); // Слабее
-        this.scene.add(ambientLight);
-        
-        // Направленный свет для четких бликов и теней
-        const mainLight = new THREE.DirectionalLight(0xffffff, 3);
-        mainLight.position.set(5, 10, 7);
-        this.scene.add(mainLight);
-
-        // Нижний свет для объема
-        const bottomLight = new THREE.PointLight(0x0a84ff, 1);
-        bottomLight.position.set(0, -10, 0);
-        this.scene.add(bottomLight);
-    }
-
     createD10Geometry(radius) {
-        // (Код геометрии D10 без изменений)
+        // Пентагональный трапецоэдр (правильный D10)
         const vertices = [];
         const indices = [];
         const h = radius * 1.3; 
         const r = radius * 1.0; 
         const k = radius * 0.2; 
-        vertices.push(0, h, 0); vertices.push(0, -h, 0);
+
+        vertices.push(0, h, 0); // 0: Top
+        vertices.push(0, -h, 0); // 1: Bottom
+
         for (let i = 0; i < 5; i++) {
             const angle = (i * 72) * (Math.PI / 180);
             const angleOffset = ((i * 72) + 36) * (Math.PI / 180);
-            vertices.push(r * Math.cos(angle), k, r * Math.sin(angle));
-            vertices.push(r * Math.cos(angleOffset), -k, r * Math.sin(angleOffset));
+            vertices.push(r * Math.cos(angle), k, r * Math.sin(angle)); // Upper
+            vertices.push(r * Math.cos(angleOffset), -k, r * Math.sin(angleOffset)); // Lower
         }
-        const upper = [2, 4, 6, 8, 10]; const lower = [3, 5, 7, 9, 11];
+
+        const upper = [2, 4, 6, 8, 10];
+        const lower = [3, 5, 7, 9, 11];
+
         for (let i = 0; i < 5; i++) {
-            const u = upper[i]; const nextU = upper[(i + 1) % 5];
-            const l = lower[i]; const nextL = lower[(i + 1) % 5];
-            indices.push(0, u, l); indices.push(0, l, nextU);
-            indices.push(1, l, nextU); indices.push(1, nextU, lower[(i+1)%5]);
+            const u = upper[i];
+            const nextU = upper[(i + 1) % 5];
+            const l = lower[i];
+            
+            indices.push(0, u, l);
+            indices.push(0, l, nextU);
+            indices.push(1, l, nextU);
+            indices.push(1, nextU, lower[(i+1)%5]);
         }
+
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         geometry.setIndex(indices);
@@ -123,37 +101,28 @@ export class DiceEngine {
             case 'd20': default: geometry = new THREE.IcosahedronGeometry(this.size, 0); break;
         }
 
-        // --- УЛУЧШЕННЫЙ МАТЕРИАЛ ---
-        // Имитация полированной смолы (Resin)
+        // --- МАТЕРИАЛ: ПОЛИРОВАННАЯ СМОЛА ---
         const material = new THREE.MeshPhysicalMaterial({
             color: this.color,
-            metalness: 0.0,       // Не металл
-            roughness: 0.15,      // Гладкая поверхность для четких отражений
-            transmission: 0.95,   // Высокая прозрачность
-            ior: 1.5,             // Коэффициент преломления (как у стекла/смолы)
-            thickness: 2.5,       // Толщина для глубины цвета
-            
-            // Clearcoat - эффект лака поверх материала
-            clearcoat: 1.0,
-            clearcoatRoughness: 0.05,
-            
-            envMapIntensity: 1.5, // Усиливаем отражения окружения
-            
-            transparent: true,
-            opacity: 1.0,
+            metalness: 0.0,
+            roughness: 0.15,      // Гладкое для бликов
+            transmission: 0.95,   // Прозрачность
+            thickness: 2.5,       // Объем стекла
+            clearcoat: 1.0,       // Лак
+            clearcoatRoughness: 0.1,
             side: THREE.DoubleSide
         });
 
         const mesh = new THREE.Mesh(geometry, material);
         this.diceGroup.add(mesh);
 
-        // Линии делаем тоньше и прозрачнее, чтобы не отвлекали
+        // Линии (скрываем внутренние швы для D10)
         const threshold = (this.type === 'd10') ? 30 : 1;
         const edges = new THREE.EdgesGeometry(geometry, threshold);
-        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 }));
+        const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 }));
         this.diceGroup.add(line);
 
-        // --- РАССТАНОВКА ЦИФР (Без изменений) ---
+        // --- ЦИФРЫ ---
         if (this.type === 'd6') {
              const data = [
                 {pos: [1, 0, 0], rot: [0, Math.PI/2, 0], num: 1}, {pos: [-1, 0, 0], rot: [0, -Math.PI/2, 0], num: 6},
@@ -173,7 +142,7 @@ export class DiceEngine {
                 const center = new THREE.Vector3();
                 uniqueIndices.forEach(idx => { center.add(new THREE.Vector3().fromBufferAttribute(posAttr, idx)); });
                 center.divideScalar(uniqueIndices.size);
-                let num = face; 
+                let num = face; // 0-9
                 this.addText(num, center.multiplyScalar(1.02), (mesh) => {
                     mesh.lookAt(center.multiplyScalar(2));
                     if (face >= 5) mesh.rotation.z = Math.PI;
@@ -198,7 +167,6 @@ export class DiceEngine {
 
     addText(num, pos, orientCallback) {
         let displayNum = num.toString();
-        if (this.type === 'd10' && num === 10) displayNum = "0";
         const txt = this.createTextLabel(displayNum);
         txt.position.copy(pos);
         orientCallback(txt);
@@ -222,35 +190,42 @@ export class DiceEngine {
         }
         const tex = new THREE.CanvasTexture(canvas);
         tex.minFilter = THREE.LinearFilter;
-        // Текст тоже должен реагировать на свет, поэтому MeshPhysicalMaterial, но простой
+        // Текст использует MeshPhysicalMaterial для правильного освещения
         const mat = new THREE.MeshPhysicalMaterial({ 
             map: tex, transparent: true, side: THREE.FrontSide,
-            roughness: 0.8, metalness: 0
+            roughness: 0.8, metalness: 0, clearcoat: 0.5
         });
         const planeSize = (this.type === 'd12') ? this.size * 0.8 : this.size * 0.7;
         const geo = new THREE.PlaneGeometry(planeSize, planeSize);
         return new THREE.Mesh(geo, mat);
     }
 
-    // --- АНИМАЦИЯ БРОСКА (Без изменений) ---
+    // --- ИДЕАЛЬНАЯ АНИМАЦИЯ ---
     roll() {
         if (this.isRolling) return;
         this.isRolling = true;
+
         const resultVal = this.resultValues[Math.floor(Math.random() * this.resultValues.length)];
         const targetMesh = this.textMeshes[resultVal];
+        
+        // Инвертируем кватернион цифры, чтобы она смотрела на нас
         const targetQ = targetMesh.quaternion.clone().invert();
+        
         const duration = 2000; const startTime = performance.now();
         let rotSpeed = { x: 0.15 + Math.random()*0.1, y: 0.15 + Math.random()*0.1 };
 
         const animateRoll = (time) => {
             const elapsed = time - startTime;
             const progress = Math.min(elapsed / duration, 1);
+
             if (progress < 1) {
                 if (progress < 0.6) {
+                    // Фаза 1: Свободное вращение
                     this.diceGroup.rotation.x += rotSpeed.x;
                     this.diceGroup.rotation.y += rotSpeed.y;
                     this.midQ = this.diceGroup.quaternion.clone();
                 } else {
+                    // Фаза 2: Плавная доводка
                     const p2 = (progress - 0.6) * 2.5; 
                     const ease = 1 - Math.pow(1 - p2, 3);
                     this.diceGroup.quaternion.slerpQuaternions(this.midQ, targetQ, ease);
@@ -266,7 +241,7 @@ export class DiceEngine {
 
     animate() {
         requestAnimationFrame(() => this.animate());
-        if (this.diceGroup && !this.isRolling) { // Проверка, что diceGroup уже создан
+        if (this.diceGroup && !this.isRolling) {
             this.diceGroup.rotation.y += 0.001;
         }
         this.renderer.render(this.scene, this.camera);
