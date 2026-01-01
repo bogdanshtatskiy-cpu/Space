@@ -13,7 +13,6 @@
       <div class="controls">
         <button class="icon-btn" id="theme-toggle"><span id="theme-icon">🌙</span></button>
       </div>
-      
       <div class="ios-toggle">
         <button class="lang-btn" data-lang="uk">UK</button>
         <button class="lang-btn" data-lang="ru">RU</button>
@@ -29,6 +28,7 @@
         <div class="menu-item" onclick="openScreen('d12-screen')"><div class="icon-bg">⚽</div><span class="menu-label" data-key="d12">D12</span></div>
         <div class="menu-item" onclick="openScreen('d20-screen')"><div class="icon-bg">🐉</div><span class="menu-label" data-key="d20">D20</span></div>
         
+        <div class="menu-item" onclick="openScreen('trump-screen')"><div class="icon-bg">🃏</div><span class="menu-label" data-key="trump">Козырь</span></div>
         <div class="menu-item" onclick="openScreen('ball-screen')"><div class="icon-bg">🎱</div><span class="menu-label" data-key="ball">Ball</span></div>
         <div class="menu-item" onclick="openScreen('coin-screen')"><div class="icon-bg">🪙</div><span class="menu-label" data-key="coin">Coin</span></div>
         <div class="menu-item" onclick="openScreen('slots-screen')"><div class="icon-bg">🎰</div><span class="menu-label" data-key="slots">Slots</span></div>
@@ -42,6 +42,17 @@
     <div id="d10-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d10-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
     <div id="d12-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d12-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
     <div id="d20-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d20-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
+
+    <div id="trump-screen" class="screen">
+        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+        <div class="trump-table">
+            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+            <div class="playing-card" onclick="flipTrumpCard(this)"><div class="card-inner"><div class="card-face card-back-side"></div><div class="card-face card-front-side"></div></div></div>
+        </div>
+        <button class="glass-btn" style="margin-top: 30px" onclick="resetTrumpCards()" data-key="reset">СБРОС</button>
+    </div>
 
     <div id="ball-screen" class="screen">
       <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
