@@ -1,16 +1,32 @@
 :root {
+  /* Темная тема (по умолчанию) */
+  --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  --text-primary: #ffffff;
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
-  --text-primary: #ffffff;
   --accent: #0a84ff;
-  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --btn-bg: rgba(0,0,0,0.3);
+  --btn-active: rgba(255,255,255,0.2);
+  --hint-color: rgba(255, 255, 255, 0.6);
+}
+
+body.light-theme {
+  /* Светлая тема */
+  --bg-gradient: linear-gradient(135deg, #e0eafc, #cfdef3, #b2cbe6);
+  --text-primary: #333333;
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --accent: #0056b3;
+  --btn-bg: rgba(0,0,0,0.05);
+  --btn-active: rgba(0,0,0,0.1);
+  --hint-color: rgba(0, 0, 0, 0.5);
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-stack);
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-gradient);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
   color: var(--text-primary);
@@ -18,6 +34,7 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: color 0.3s, background 0.3s;
 }
 
 @keyframes gradientBG {
@@ -34,117 +51,151 @@ body {
   max-width: 600px;
   margin: 0 auto;
   position: relative;
-  padding-bottom: 20px;
 }
 
-/* Header & Menu */
+/* Header */
 header {
   padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 20;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+}
+
+.icon-btn, .lang-btn {
+  background: var(--btn-bg);
+  border: none;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  backdrop-filter: blur(5px);
+}
+
+.icon-btn.active, .lang-btn.active {
+  background: var(--btn-active);
+  font-weight: bold;
+}
+
+/* Screens */
+.screen {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.screen.active {
+  display: flex;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Menu Grid */
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding-bottom: 40px;
+}
+
+.menu-item {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item:active { transform: scale(0.96); }
+.icon-bg { font-size: 36px; margin-bottom: 10px; }
+.menu-label { font-size: 14px; font-weight: 500; text-align: center; }
+
+/* 3D Canvas Container */
+.canvas-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 30px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.hint-text {
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  text-align: center;
+  color: var(--hint-color);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.back-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--accent);
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 10px;
+  align-self: flex-start;
   backdrop-filter: blur(10px);
 }
-.app-title { margin: 0; font-weight: 700; letter-spacing: 0.5px; }
-.lang-switch { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 4px; display: flex; }
-.lang-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 6px 12px; cursor: pointer; border-radius: 16px; transition: 0.3s; font-weight: 600; }
-.lang-btn.active { background: rgba(255,255,255,0.2); color: white; }
 
-.screen { flex: 1; display: none; flex-direction: column; padding: 20px; overflow-y: auto; }
-.screen.active { display: flex; animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; }
-.menu-item { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
-.menu-item:active { transform: scale(0.96); }
-.icon-bg { font-size: 40px; margin-bottom: 10px; }
-.menu-label { font-size: 14px; font-weight: 500; }
-
-.back-btn { background: transparent; border: none; color: var(--accent); font-size: 17px; font-weight: 600; padding: 10px 0; cursor: pointer; align-self: flex-start; display: flex; align-items: center; margin-bottom: 10px; }
-.back-btn::before { content: "‹"; font-size: 24px; margin-right: 5px; margin-top: -3px; }
-
-.tool-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
-.hint-text { margin-top: 30px; opacity: 0.6; font-size: 14px; }
-
-/* --- Magic Ball --- */
-.magic-ball-outer { width: 280px; height: 280px; background: radial-gradient(circle at 30% 30%, #444, #000); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.8); cursor: pointer; }
-.magic-ball-inner { width: 180px; height: 180px; background: radial-gradient(circle, #111, #000); border-radius: 50%; border: 1px solid #222; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-.ball-text { color: #aaffaa; text-shadow: 0 0 10px #aaffaa; font-size: 16px; font-weight: bold; text-transform: uppercase; opacity: 1; transition: opacity 1s ease; }
-.ball-animate { animation: ballShake 0.6s ease-in-out; }
-@keyframes ballShake { 0% { transform: translate(0,0) rotate(0); } 25% { transform: translate(-5px, 0) rotate(-5deg); } 50% { transform: translate(5px, 0) rotate(5deg); } 75% { transform: translate(-5px, 0) rotate(-5deg); } 100% { transform: translate(0,0) rotate(0); } }
-
-/* --- D6 --- */
-.cube-container { width: 100px; height: 100px; position: relative; transform-style: preserve-3d; cursor: pointer; }
-.cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; transition: transform 1s cubic-bezier(0.1, 0.9, 0.2, 1); transform: rotateX(-30deg) rotateY(-45deg); }
-.face { position: absolute; width: 100px; height: 100px; background: rgba(255,255,255,0.95); border-radius: 12px; border: 1px solid #999; color: black; font-size: 40px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 15px rgba(0,0,0,0.1); }
-.front { transform: rotateY(0deg) translateZ(50px); }
-.back { transform: rotateY(180deg) translateZ(50px); }
-.right { transform: rotateY(90deg) translateZ(50px); }
-.left { transform: rotateY(-90deg) translateZ(50px); }
-.top { transform: rotateX(90deg) translateZ(50px); }
-.bottom { transform: rotateX(-90deg) translateZ(50px); }
-
-/* --- D20 WebGL area --- */
-.d20-area { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.d20-wrapper { width: 240px; height: 240px; position: relative; }
-.d20-canvas-wrap {
-  width: 240px;
-  height: 240px;
-  border-radius: 22px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
-  overflow: hidden;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-.d20-canvas-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
-
-.d20-result {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 88px;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 16px rgba(10,132,255,0.9), 0 0 6px rgba(255,255,255,0.8);
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity .2s, transform .2s;
-}
-.d20-wrapper.crit .d20-result { color: #00ff66; }
-.d20-wrapper.fail .d20-result { color: #ff3344; }
-
-/* --- Slots --- */
-.slot-machine { display: flex; gap: 10px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
-.reel-window { width: 70px; height: 90px; background: linear-gradient(to bottom, #111, #333, #111); border-radius: 10px; overflow: hidden; position: relative; border: 2px solid gold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
-.reel { font-size: 45px; display: flex; align-items: center; justify-content: center; height: 100%; filter: blur(0px); transition: filter 0.1s; }
-.reel.blur { filter: blur(4px); transform: scale(0.9); }
-.slot-message { height: 30px; margin-bottom: 15px; font-weight: bold; color: gold; text-shadow: 0 0 5px orange; }
-
-/* --- Coin --- */
-#coin { position: relative; width: 150px; height: 150px; cursor: pointer; transform-style: preserve-3d; transition: transform 3s ease-out; }
-.side-a, .side-b {
-  position: absolute; width: 100%; height: 100%;
+/* Specific Tools Styles (Coin, Slots, Ball) */
+/* (Скопированы из прошлого кода и адаптированы под переменные) */
+.magic-ball-outer {
+  width: 260px; height: 260px;
+  background: radial-gradient(circle at 30% 30%, #444, #000);
   border-radius: 50%;
-  backface-visibility: hidden; -webkit-backface-visibility: hidden;
   display: flex; align-items: center; justify-content: center;
-  font-size: 24px; font-weight: bold;
-  border: 4px solid #ffd700;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  margin: auto; cursor: pointer;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
-.side-a { background: radial-gradient(circle, #ffe066, #b38f00); color: #554400; transform: rotateY(0deg); }
-.side-b { background: radial-gradient(circle, #e0e0e0, #888); color: #333; transform: rotateY(180deg); border-color: silver; }
-.coin-text { transform: translateZ(2px); letter-spacing: 1px; }
+.magic-ball-inner {
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, #111, #000);
+  border-radius: 50%;
+  border: 1px solid #333;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 10px;
+}
+.ball-text { color: #aaffaa; text-shadow: 0 0 10px #aaffaa; font-weight: bold; opacity: 0; transition: 1s; }
+.ball-animate { animation: shake 0.5s; }
+@keyframes shake { 0%,100%{transform:translate(0)} 25%{transform:translate(-5px)} 75%{transform:translate(5px)} }
 
-/* Randomizer */
-.input-area { width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
-.glass-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px; border-radius: 12px; font-size: 20px; text-align: center; width: 120px; outline: none; margin-top: 10px; }
-.rand-result { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; }
+.slot-machine { display: flex; gap: 5px; justify-content: center; margin-top: 50px; }
+.reel-window { width: 60px; height: 80px; background: #222; border: 2px solid gold; border-radius: 8px; overflow: hidden; position: relative; }
+.reel { font-size: 40px; line-height: 80px; text-align: center; }
 
-.glass-btn-large { background: white; color: black; border: none; padding: 15px 50px; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.3); transition: transform 0.1s; }
-.glass-btn-large:active { transform: scale(0.95); }
+.coin-container { perspective: 1000px; width: 150px; height: 150px; margin: auto; cursor: pointer; }
+.coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 3s ease-out; }
+.coin-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; border: 4px solid gold; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; background: radial-gradient(circle, #ffd700, #b8860b); color: #423102; }
+.coin-back { transform: rotateY(180deg); background: radial-gradient(circle, #c0c0c0, #808080); border-color: silver; color: #222; }
 
-footer { text-align: center; font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 10px; }
-footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+/* Input for Randomizer */
+.input-group { display: flex; flex-direction: column; align-items: center; margin-top: 50px; gap: 20px; }
+.glass-input { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 10px; color: var(--text-primary); border-radius: 10px; text-align: center; font-size: 20px; width: 100px; }
+.big-number { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+.glass-btn { background: var(--text-primary); color: var(--bg-gradient); border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; }
