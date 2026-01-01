@@ -15,7 +15,9 @@
       </div>
       
       <div id="status-bar" class="status-bar">
-        </div>
+        <div class="status-row" id="status-stats"></div>
+        <div class="status-row" id="status-name"></div>
+      </div>
 
       <div class="ios-toggle">
         <button class="lang-btn" data-lang="uk">UK</button>
@@ -38,7 +40,6 @@
         <div class="menu-item" onclick="openScreen('slots-screen')"><img src="slot.png" class="menu-icon"><span class="menu-label" data-key="slots">Slots</span></div>
         <div class="menu-item" onclick="openScreen('rand-screen')"><img src="ran.png" class="menu-icon"><span class="menu-label" data-key="rand">Rand</span></div>
 
-        <div class="menu-item" onclick="openScreen('timer-screen')"><img src="time.png" class="menu-icon"><span class="menu-label" data-key="timer">Таймер</span></div>
         <div class="menu-item" onclick="openScreen('hp-screen')"><img src="hp.png" class="menu-icon"><span class="menu-label" data-key="hp">HP</span></div>
         <div class="menu-item" onclick="openScreen('score-screen')"><img src="score.png" class="menu-icon"><span class="menu-label" data-key="score">Счет</span></div>
         <div class="menu-item" onclick="openScreen('name-screen')"><img src="name.png" class="menu-icon"><span class="menu-label" data-key="names">Имена</span></div>
@@ -69,18 +70,6 @@
     <div id="coin-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="coin-wrapper"><div class="coin" onclick="flipCoin()"><div class="coin-face side-a" data-key="heads">ОРЕЛ</div><div class="coin-face coin-back side-b" data-key="tails">РЕШКА</div></div></div><p class="hint-text" data-key="tap">Нажми</p></div>
     <div id="slots-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="slot-machine"><div class="reel-window"><div class="reel" id="reel-1">🍒</div></div><div class="reel-window"><div class="reel" id="reel-2">🍒</div></div><div class="reel-window"><div class="reel" id="reel-3">🍒</div></div></div><div id="slot-msg" style="text-align:center; height:30px; font-weight:bold; margin-top:10px;"></div><button class="glass-btn" style="margin-top:20px; width:100%" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button></div>
     <div id="rand-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="input-group"><label data-key="rand_limit_label">Max:</label><input type="number" id="rand-max" class="glass-input" value="100"><div id="rand-display" class="big-number">0</div><button class="glass-btn" onclick="generateRandom()" data-key="generate">СТАРТ</button></div></div>
-
-    <div id="timer-screen" class="screen">
-        <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-        <div class="canvas-wrapper" id="timer-scene"></div>
-        <div class="input-group">
-            <input type="number" id="timer-input" class="glass-input" value="60" style="width:80px">
-            <div class="timer-controls">
-                <button class="glass-btn small" onclick="startTimer()" data-key="generate">СТАРТ</button>
-                <button class="glass-btn small" onclick="resetTimer()" data-key="reset">СБРОС</button>
-            </div>
-        </div>
-    </div>
 
     <div id="hp-screen" class="screen">
         <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
