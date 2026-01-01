@@ -13,7 +13,7 @@
     --coin-text: #4a2c00;
     --win-green: rgba(40, 167, 69, 0.6);
     --lose-red: rgba(220, 53, 69, 0.6);
-    --dnd-color: #ff3b30; /* Красный для активного DND */
+    --dnd-color: #ff3b30;
 }
 
 body.light-theme {
@@ -54,13 +54,59 @@ button, a, input, textarea, .menu-item, .playing-card {
     touch-action: manipulation;
 }
 
+/* --- HEADER GRID LAYOUT --- */
 header {
-    padding: 20px; display: flex; justify-content: space-between;
-    align-items: flex-start; z-index: 100; flex-shrink: 0;
-    position: relative;
+    padding: 20px;
+    display: grid;
+    /* Три колонки: 1fr (Лево) - auto (Центр) - 1fr (Право) */
+    grid-template-columns: 1fr auto 1fr;
+    align-items: flex-start; /* Выравнивание по верху */
+    z-index: 100; flex-shrink: 0; position: relative;
+    height: 90px; /* Фиксированная высота, чтобы не прыгало */
 }
 
-/* DND TOGGLE BUTTON */
+.header-col {
+    display: flex; flex-direction: column; gap: 8px;
+}
+
+.header-col.left { align-items: flex-start; }
+.header-col.center { align-items: center; justify-content: flex-start; padding-top: 5px;}
+.header-col.right { align-items: flex-end; }
+
+/* Status info boxes */
+.status-area {
+    display: flex; flex-direction: column; gap: 5px;
+    font-size: 11px; font-weight: 600; opacity: 0.9;
+}
+.status-area.left { align-items: flex-start; }
+.status-area.right { align-items: flex-end; }
+
+.status-item { 
+    background: var(--btn-bg); padding: 4px 8px; 
+    border-radius: 12px; backdrop-filter: blur(5px); 
+    white-space: nowrap; max-width: 100px; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* TOGGLES (IOS STYLE) */
+.ios-toggle {
+    display: flex; background: rgba(0, 0, 0, 0.25); padding: 3px;
+    border-radius: 20px; position: relative; backdrop-filter: blur(10px);
+}
+body.light-theme .ios-toggle { background: rgba(0, 0, 0, 0.1); }
+
+/* Theme & Lang Buttons */
+.theme-btn, .lang-btn {
+    border: none; background: transparent; color: rgba(255, 255, 255, 0.6);
+    padding: 6px 12px; border-radius: 18px; cursor: pointer;
+    font-size: 14px; font-weight: 600; transition: all 0.3s; z-index: 2;
+}
+body.light-theme .theme-btn, body.light-theme .lang-btn { color: rgba(0, 0, 0, 0.5); }
+
+.theme-btn.active, .lang-btn.active {
+    background: #ffffff; color: #000000; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* DND BUTTON */
 .dnd-toggle-btn {
     background: var(--btn-bg); border: 1px solid var(--glass-border);
     color: var(--text-primary); padding: 8px 16px; border-radius: 20px;
@@ -73,55 +119,16 @@ header {
     box-shadow: 0 0 15px rgba(255, 59, 48, 0.5);
 }
 
-.icon-btn {
-    background: var(--glass-bg); border: 1px solid var(--glass-border);
-    color: var(--text-primary); width: 40px; height: 40px;
-    border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: 0.2s; backdrop-filter: blur(5px); font-size: 18px;
-}
-.icon-btn:active { transform: scale(0.9); }
-
-/* STATUS BAR (Ниже заголовка) */
-.status-bar {
-    position: absolute; top: 70px; left: 0; width: 100%; 
-    display: flex; flex-direction: column; 
-    align-items: center; gap: 5px;
-    pointer-events: none; font-size: 12px; font-weight: 600;
-    z-index: 50; opacity: 0.9;
-}
-.status-row { display: flex; gap: 10px; }
-.status-item { 
-    background: var(--btn-bg); padding: 4px 10px; 
-    border-radius: 12px; backdrop-filter: blur(5px); 
-    white-space: nowrap;
-}
-
-.ios-toggle {
-    display: flex; background: rgba(0, 0, 0, 0.25); padding: 3px;
-    border-radius: 20px; position: relative; backdrop-filter: blur(10px);
-}
-body.light-theme .ios-toggle { background: rgba(0, 0, 0, 0.1); }
-
-.lang-btn {
-    border: none; background: transparent; color: rgba(255, 255, 255, 0.6);
-    padding: 6px 14px; border-radius: 18px; cursor: pointer;
-    font-size: 13px; font-weight: 600; transition: all 0.3s;
-    z-index: 2;
-}
-body.light-theme .lang-btn { color: rgba(0, 0, 0, 0.5); }
-.lang-btn.active { background: #ffffff; color: #000000; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-
+/* --- SCREENS --- */
 .screen {
     flex: 1; display: none; flex-direction: column;
-    padding: 20px; padding-top: 80px; /* Отступ для статус бара */
+    padding: 20px; padding-top: 20px;
     overflow-y: auto; overflow-x: hidden;
 }
 .screen.active { display: flex; animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
 .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 40px; }
-
-/* СКРЫТИЕ ПЛИТОК В DND */
 .hidden-tile { display: none !important; }
 
 .menu-item {
@@ -132,16 +139,9 @@ body.light-theme .lang-btn { color: rgba(0, 0, 0, 0.5); }
     transition: transform 0.2s; box-shadow: 0 4px 30px rgba(0,0,0,0.1); text-align: center;
 }
 .menu-item:active { transform: scale(0.96); }
-
 .menu-icon { width: 85px; height: 85px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); transition: transform 0.2s; }
 .menu-item:hover .menu-icon { transform: scale(1.1); }
-
-/* EMOJI ICON REPLACEMENT */
-.emoji-icon {
-    font-size: 65px; display: flex; align-items: center; justify-content: center;
-    text-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
+.emoji-icon { font-size: 65px; display: flex; align-items: center; justify-content: center; text-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 .menu-label { font-size: 12px; font-weight: 500; opacity: 0.8; }
 
 .back-btn {
@@ -163,13 +163,10 @@ body.light-theme .lang-btn { color: rgba(0, 0, 0, 0.5); }
 }
 
 /* FOOTER */
-footer {
-    text-align: center; padding: 15px; font-size: 12px;
-    color: var(--hint-color); width: 100%; box-sizing: border-box;
-}
+footer { text-align: center; padding: 15px; font-size: 12px; color: var(--hint-color); width: 100%; box-sizing: border-box; }
 footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
 
-/* ... (Old Tools Styles - MagicBall, Coin, Slots, Cards - No Changes) ... */
+/* TOOLS (Rest unchanged) */
 .magic-ball-outer { width: 260px; height: 260px; background: radial-gradient(circle at 30% 30%, #444, #000); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: auto; cursor: pointer; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.2s; }
 .magic-ball-inner { width: 140px; height: 140px; background: radial-gradient(circle, #111, #000); border-radius: 50%; border: 1px solid #333; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; }
 .ball-text { color: #aaffaa; text-shadow: 0 0 10px #aaffaa; font-weight: bold; opacity: 0; transition: 1s; }
@@ -192,11 +189,9 @@ footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
 .card-front-side { background: #e0e0e0; transform: rotateY(180deg); text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 .suit-red { color: #d32f2f; }
 .suit-black { color: #212121; }
-
 .mode-switch { display: flex; justify-content: center; margin-bottom: 20px; background: rgba(0,0,0,0.2); border-radius: 20px; padding: 4px; width: fit-content; margin-left: auto; margin-right: auto; }
 .mode-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 8px 20px; border-radius: 16px; cursor: pointer; transition: 0.3s; }
 .mode-btn.active { background: rgba(255,255,255,0.2); color: white; }
-
 .counter-container { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
 .counter-box { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border); position: relative; transition: 0.3s; }
 .counter-val-input { font-size: 80px; font-weight: 200; background: transparent; border: none; color: var(--text-primary); width: 100%; text-align: center; outline: none; -moz-appearance: textfield; }
@@ -206,21 +201,17 @@ footer a { color: var(--accent); text-decoration: none; font-weight: bold; }
 .counter-btn:active { background: rgba(255,255,255,0.3); }
 .inverted-player { transform: rotate(180deg); }
 .reset-tool-btn { margin-top: 20px; width: 100%; }
-
 .name-display { font-size: 28px; font-weight: bold; text-align: center; margin: auto; padding: 20px; min-height: 100px; display: flex; align-items: center; justify-content: center; background: var(--glass-bg); border-radius: 20px; border: 1px solid var(--glass-border); width: 100%; box-sizing: border-box; }
 .name-controls { display: flex; flex-direction: column; gap: 10px; align-items: center; padding-bottom: 20px; width: 100%; }
-
 .wheel-wrapper { position: relative; width: 300px; height: 300px; margin: auto; }
 .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 30px; color: var(--accent); text-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; }
 .wheel-inputs { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
-
 .rps-arena { flex: 1; display: flex; flex-direction: column; position: relative; }
 .rps-side { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 80px; transition: background 0.3s; border-radius: 20px; margin: 5px; background: var(--glass-bg); border: 1px solid var(--glass-border); }
 .rps-side.inverted { transform: rotate(180deg); }
 .round-start { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: 50%; padding: 0; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
 .win { background: var(--win-green) !important; }
 .lose { background: var(--lose-red) !important; }
-
 .input-group { display: flex; flex-direction: column; align-items: center; margin: auto; gap: 20px; }
 .glass-input { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 10px; color: var(--text-primary); border-radius: 10px; text-align: center; font-size: 20px; width: 100px; }
 .big-number { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; justify-content: center; }
