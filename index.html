@@ -1,183 +1,320 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MultiTool 3D</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Real 3D D20</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
-    :root {
-      --text-primary: #ffffff;
-      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
     body {
       margin: 0;
       overflow: hidden;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      font-family: var(--font-stack);
-      color: white;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      font-family: sans-serif;
+      touch-action: none; /* Убираем зум по двойному тапу */
+    }
+
+    #container {
+      width: 100vw;
       height: 100vh;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* Навигация */
-    .app-header {
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: absolute;
-      top: 0;
-      width: 100%;
-      box-sizing: border-box;
-      z-index: 10;
-    }
-    
+    /* Кнопка Назад */
     .back-btn {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       color: white;
-      padding: 8px 16px;
       border-radius: 20px;
       cursor: pointer;
-      backdrop-filter: blur(10px);
-    }
-
-    /* Контейнер для 3D */
-    #canvas-container {
-      width: 100%;
-      height: 100%;
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-    }
-
-    /* Результат поверх кубика */
-    .result-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 80px;
-      font-weight: 900;
-      color: white;
-      text-shadow: 0 0 30px rgba(10, 132, 255, 0.8);
-      z-index: 5;
-      pointer-events: none; /* Чтобы клики проходили сквозь цифру */
-      opacity: 0;
-      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .result-overlay.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    
-    .result-overlay.hide {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.5);
+      backdrop-filter: blur(5px);
+      z-index: 10;
+      text-decoration: none;
+      font-size: 14px;
     }
 
     .hint {
       position: absolute;
-      bottom: 50px;
+      bottom: 10%;
       width: 100%;
       text-align: center;
-      opacity: 0.6;
-      z-index: 5;
+      color: rgba(255, 255, 255, 0.5);
       pointer-events: none;
-      font-size: 14px;
+      font-size: 16px;
+      animation: pulse 2s infinite;
     }
 
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="app-header">
-    <button class="back-btn" onclick="location.reload()">MultiTool</button>
-    <span>D20 3D</span>
-  </div>
-
-  <div id="canvas-container"></div>
-  
-  <div id="result-num" class="result-overlay hide">20</div>
-  
+  <a href="#" class="back-btn" onclick="location.reload()">MultiTool</a>
   <div class="hint">Коснитесь экрана, чтобы бросить</div>
+  
+  <div id="container"></div>
 
   <script>
-    // --- НАСТРОЙКИ THREE.JS ---
-    let scene, camera, renderer, d20mesh, wireframe;
+    // --- НАСТРОЙКИ ---
+    const DICE_COLOR = 0x0a84ff; // Синий цвет кубика
+    const TEXT_COLOR = 'white';  // Цвет цифр
+    const SIZE = 12;             // Размер кубика (был больше, теперь уменьшен)
+
+    let scene, camera, renderer;
+    let diceGroup; // Группа, содержащая кубик и цифры
     let isRolling = false;
-    let spinSpeed = { x: 0.005, y: 0.005 }; // Скорость медленного вращения
+    
+    // Массив для хранения векторов нормалей каждой грани (куда смотрит грань)
+    // и соответствующих им значений (цифр)
+    const faceNormals = [];
+
+    init();
+    animate();
 
     function init() {
-      const container = document.getElementById('canvas-container');
+      const container = document.getElementById('container');
 
       // 1. Сцена
       scene = new THREE.Scene();
-      // Легкий туман для глубины
-      scene.fog = new THREE.FogExp2(0x1a1a2e, 0.02);
+      
+      // 2. Камера (настроена так, чтобы кубик был виден полностью)
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+      camera.position.z = 50; // Отодвинули камеру, чтобы кубик влез
 
-      // 2. Камера
-      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.z = 6;
-
-      // 3. Рендерер (Вывод графики)
+      // 3. Рендер
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(renderer.domElement);
 
-      // 4. Свет (чтобы было красиво)
-      const ambientLight = new THREE.AmbientLight(0x404040, 2); // Мягкий свет
+      // 4. Свет
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
       scene.add(ambientLight);
+      
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(10, 20, 10);
+      scene.add(dirLight);
+      
+      const bottomLight = new THREE.PointLight(0x0a84ff, 0.5);
+      bottomLight.position.set(0, -20, 10);
+      scene.add(bottomLight);
 
-      const spotLight = new THREE.SpotLight(0x0a84ff, 2); // Синий прожектор сверху
-      spotLight.position.set(5, 10, 5);
-      spotLight.angle = Math.PI / 4;
-      spotLight.penumbra = 0.5;
-      scene.add(spotLight);
+      // 5. Создание D20
+      createD20();
 
-      const pointLight = new THREE.PointLight(0xff00ff, 1); // Розовая подсветка снизу
-      pointLight.position.set(-5, -5, 5);
-      scene.add(pointLight);
+      // События
+      window.addEventListener('resize', onWindowResize, false);
+      container.addEventListener('click', rollDice);
+      container.addEventListener('touchstart', rollDice, {passive: false});
+    }
 
-      // 5. Создаем D20 (Икосаэдр)
-      const geometry = new THREE.IcosahedronGeometry(1.8, 0); // Радиус 1.8, детализация 0
+    function createD20() {
+      diceGroup = new THREE.Group();
+      scene.add(diceGroup);
 
-      // Материал "Кристалл"
-      const material = new THREE.MeshPhysicalMaterial({
-        color: 0x222222,
-        metalness: 0.1,
+      // Геометрия Икосаэдра (20 граней)
+      const geometry = new THREE.IcosahedronGeometry(SIZE, 0);
+      
+      // Материал самого кубика
+      const material = new THREE.MeshStandardMaterial({
+        color: DICE_COLOR,
         roughness: 0.1,
-        transmission: 0.6, // Прозрачность стекла
-        opacity: 1,
-        transparent: true,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.1,
+        metalness: 0.1,
+        flatShading: true // Важно: грани должны быть плоскими
       });
 
-      d20mesh = new THREE.Mesh(geometry, material);
-      scene.add(d20mesh);
+      const mesh = new THREE.Mesh(geometry, material);
+      diceGroup.add(mesh);
 
-      // Добавляем красивый каркас (Wireframe), чтобы видеть грани
-      const wireGeo = new THREE.WireframeGeometry(geometry);
-      const wireMat = new THREE.LineBasicMaterial({ color: 0x0a84ff, linewidth: 2 });
-      wireframe = new THREE.LineSegments(wireGeo, wireMat);
-      d20mesh.add(wireframe);
+      // Добавляем wireframe (сетку) для красоты
+      const wireframe = new THREE.LineSegments(
+        new THREE.WireframeGeometry(geometry),
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 })
+      );
+      diceGroup.add(wireframe);
 
-      // Обработчики событий
-      window.addEventListener('resize', onWindowResize, false);
-      document.body.addEventListener('click', rollDice, false);
+      // --- ДОБАВЛЕНИЕ ЦИФР НА ГРАНИ ---
+      // В Three.js IcosahedronGeometry(radius, 0) создает грани в определенном порядке.
+      // Нам нужно найти центр каждой грани и прикрепить туда текст.
+      
+      const posAttribute = geometry.attributes.position;
+      
+      // Icosahedron с детализацией 0 имеет 20 граней (60 вершин / 3)
+      // Мы пройдемся по каждому треугольнику
+      
+      let faceIndex = 0;
+      
+      // Вектор "Вверх" (Z) для ориентации цифр
+      const vectorZ = new THREE.Vector3(0, 0, 1);
 
-      // Запуск анимации
-      animate();
+      for (let i = 0; i < posAttribute.count; i += 3) {
+        faceIndex++;
+        
+        // 1. Получаем координаты 3 вершин грани
+        const v1 = new THREE.Vector3().fromBufferAttribute(posAttribute, i);
+        const v2 = new THREE.Vector3().fromBufferAttribute(posAttribute, i + 1);
+        const v3 = new THREE.Vector3().fromBufferAttribute(posAttribute, i + 2);
+
+        // 2. Находим центр грани (среднее арифметическое)
+        const center = new THREE.Vector3()
+          .addVectors(v1, v2)
+          .add(v3)
+          .divideScalar(3);
+
+        // 3. Находим нормаль грани (вектор, перпендикулярный поверхности)
+        // Он нужен, чтобы повернуть цифру так, чтобы она "лежала" на грани
+        const normal = center.clone().normalize();
+        
+        // Сохраняем нормаль и индекс грани для логики броска
+        // Примечание: тут цифры будут идти от 1 до 20 по порядку генерации геометрии.
+        // Для реального D20 порядок другой (сумма противоположных = 21), но для визуала это не важно.
+        faceNormals.push({ normal: normal.clone(), value: faceIndex });
+
+        // 4. Создаем текстуру с цифрой
+        const textMesh = createTextLabel(faceIndex.toString());
+        
+        // 5. Позиционируем цифру
+        // Чуть выдвигаем текст наружу (на 1.05), чтобы он не проваливался в кубик
+        textMesh.position.copy(center.multiplyScalar(1.02)); 
+        
+        // 6. Поворачиваем цифру так, чтобы она смотрела наружу от центра
+        textMesh.lookAt(center.multiplyScalar(2)); 
+        
+        diceGroup.add(textMesh);
+      }
+    }
+
+    // Функция создания текстуры с текстом
+    function createTextLabel(text) {
+      const canvas = document.createElement('canvas');
+      const size = 128; // Размер текстуры (чем больше, тем четче)
+      canvas.width = size;
+      canvas.height = size;
+      
+      const ctx = canvas.getContext('2d');
+      
+      // Рисуем текст
+      ctx.fillStyle = 'rgba(0,0,0,0)'; // Прозрачный фон
+      ctx.fillRect(0, 0, size, size);
+      
+      ctx.fillStyle = TEXT_COLOR;
+      ctx.font = 'bold 70px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Поправка на то, что некоторые цифры визуально не по центру
+      let yOffset = 0;
+      if (text === '6' || text === '9') yOffset = 5;
+      
+      ctx.fillText(text, size / 2, size / 2 + yOffset);
+      
+      // Подчеркивание для 6 и 9, чтобы отличать
+      if (text === '6' || text === '9') {
+         ctx.font = 'bold 20px Arial';
+         ctx.fillText('.', size / 2, size - 20);
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      
+      // Создаем плоскость с этой текстурой
+      const planeGeo = new THREE.PlaneGeometry(5, 5); // Размер цифры на кубике
+      const planeMat = new THREE.MeshBasicMaterial({ 
+        map: texture, 
+        transparent: true, 
+        opacity: 0.9,
+        side: THREE.DoubleSide
+      });
+      
+      const mesh = new THREE.Mesh(planeGeo, planeMat);
+      return mesh;
+    }
+
+    // --- ЛОГИКА БРОСКА ---
+    function rollDice(e) {
+      if (e) e.preventDefault(); // Чтобы на мобильном не скроллило
+      if (isRolling) return;
+      isRolling = true;
+
+      // 1. Выбираем случайный результат (1-20)
+      const resultIndex = Math.floor(Math.random() * 20); // индекс в массиве faceNormals
+      const targetFace = faceNormals[resultIndex];
+      
+      console.log(`Target: ${targetFace.value}`);
+
+      // 2. Рассчитываем конечное вращение
+      // Нам нужно повернуть diceGroup так, чтобы нормаль целевой грани смотрела в камеру (ось Z+)
+      
+      // Начальная ориентация (сбросим текущее вращение группы, но сохраним визуально через startQuaternion, 
+      // это сложно, поэтому пойдем простым путем: вращаем саму геометрию или используем lookAt трюк).
+      
+      // Простой метод с Кватернионами:
+      // Вектор "В Камеру" в локальных координатах
+      const targetVector = new THREE.Vector3(0, 0, 1);
+      
+      // Кватернион, который поворачивает нормаль грани к вектору камеры
+      const targetQuaternion = new THREE.Quaternion();
+      targetQuaternion.setFromUnitVectors(targetFace.normal, targetVector);
+
+      // Поскольку мы крутили кубик, его текущее положение произвольное.
+      // Мы сделаем хитрый ход:
+      // Сначала "бешено" вращаем кубик случайно (анимация броска).
+      // А в конце плавно доводим его до targetQuaternion.
+
+      const startRot = diceGroup.quaternion.clone();
+      
+      // Анимация
+      let progress = 0;
+      const duration = 2000; // длительность мс
+      const startTime = performance.now();
+      
+      // Случайные оси вращения для анимации
+      const spinAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+      const totalSpin = Math.PI * (4 + Math.random() * 2); // Сколько оборотов сделает
+
+      function animateRoll(time) {
+        const elapsed = time - startTime;
+        progress = elapsed / duration;
+
+        if (progress < 1) {
+          // Easing function (easeOutCubic) - быстро начинает, медленно заканчивает
+          const ease = 1 - Math.pow(1 - progress, 3);
+          
+          if (progress < 0.7) {
+            // ФАЗА 1: Быстрое вращение
+            // Просто крутим группу
+            diceGroup.rotation.x += 0.2;
+            diceGroup.rotation.y += 0.2;
+          } else {
+            // ФАЗА 2: Доводка до результата (последние 30% времени)
+            // Мы интерполируем (slerp) текущее вращение к целевому
+            
+            // Чтобы slerp работал правильно, нам нужно знать текущее состояние
+            // Это сложная математика. Упростим:
+            // Просто в момент 0.7 вычислим, где мы, и начнем slerp к targetQuaternion
+            
+            diceGroup.quaternion.slerp(targetQuaternion, 0.15);
+          }
+
+          requestAnimationFrame(animateRoll);
+        } else {
+          // Финиш: жестко ставим нужную ориентацию
+          diceGroup.quaternion.copy(targetQuaternion);
+          isRolling = false;
+        }
+      }
+      
+      requestAnimationFrame(animateRoll);
     }
 
     function onWindowResize() {
@@ -186,83 +323,17 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // --- ЛОГИКА АНИМАЦИИ ---
     function animate() {
       requestAnimationFrame(animate);
-
-      // Постоянное вращение
-      d20mesh.rotation.x += spinSpeed.x;
-      d20mesh.rotation.y += spinSpeed.y;
-
+      
+      // Легкое покачивание в покое
+      if (!isRolling) {
+        diceGroup.rotation.x += 0.002;
+        diceGroup.rotation.y += 0.003;
+      }
+      
       renderer.render(scene, camera);
     }
-
-    // --- ЛОГИКА БРОСКА ---
-    function rollDice() {
-      if (isRolling) return;
-      isRolling = true;
-
-      const resultEl = document.getElementById('result-num');
-      
-      // 1. Скрываем прошлый результат
-      resultEl.classList.remove('show');
-      resultEl.classList.add('hide');
-
-      // 2. Ускоряем вращение (эффект броска)
-      // Используем простую интерполяцию для разгона и торможения
-      let duration = 0;
-      const maxDuration = 100; // кадров анимации (~1.5 сек)
-      
-      // Случайное направление вращения
-      const targetSpeedX = (Math.random() - 0.5) * 0.8;
-      const targetSpeedY = (Math.random() - 0.5) * 0.8;
-
-      const rollInterval = setInterval(() => {
-        duration++;
-        
-        // В первой половине времени - быстро крутим
-        if (duration < 50) {
-           spinSpeed.x = targetSpeedX;
-           spinSpeed.y = targetSpeedY;
-        } 
-        // Во второй половине - замедляем
-        else {
-           spinSpeed.x *= 0.92; // Торможение
-           spinSpeed.y *= 0.92;
-        }
-
-        // Финиш
-        if (duration >= maxDuration) {
-          clearInterval(rollInterval);
-          
-          // Возвращаем к медленному парению
-          spinSpeed.x = 0.005; 
-          spinSpeed.y = 0.005;
-          
-          showResult();
-          isRolling = false;
-        }
-      }, 16); // ~60fps
-    }
-
-    function showResult() {
-      const resultEl = document.getElementById('result-num');
-      const num = Math.floor(Math.random() * 20) + 1;
-      
-      resultEl.innerText = num;
-      
-      // Цвет в зависимости от удачи
-      if (num === 20) resultEl.style.color = "#00ff00"; // Зеленый
-      else if (num === 1) resultEl.style.color = "#ff3333"; // Красный
-      else resultEl.style.color = "white";
-
-      resultEl.classList.remove('hide');
-      resultEl.classList.add('show');
-    }
-
-    // Запуск
-    init();
-
   </script>
 </body>
 </html>
