@@ -1,7 +1,11 @@
 import { DiceEngine } from './dice-engine.js';
-import { predictions } from './predictions.js';
 
 // --- ДАННЫЕ ---
+const predictions = {
+    ru: ["Бесспорно","Предрешено","Никаких сомнений","Определенно да","Можешь быть уверен","Мне кажется — да","Вероятнее всего","Хорошие перспективы","Знаки говорят — да","Да","Пока не ясно","Спроси позже","Лучше не рассказывать","Сконцентрируйся","Даже не думай","Мой ответ — нет","По моим данным — нет","Перспективы не очень","Весьма сомнительно","Звезды говорят нет","Абсолютно точно","Не надейся","Удача на твоей стороне","Слушай сердце","Рискни","Забудь","Время покажет"],
+    uk: ["Безперечно","Це вирішено","Жодних сумнівів","Безумовно так","Можеш бути впевнений","Мені здається — так","Найімовірніше","Хороші перспективи","Знаки кажуть — так","Так","Поки не ясно","Спитай пізніше","Краще не розповідати","Сконцентруйся","Навіть не думай","Мій відповідь — ні","За моїми даними — ні","Перспективи не дуже","Дуже сумнівно","Зірки кажуть ні","Абсолютно точно","Не сподівайся","Удача з тобою","Слухай серце","Ризикни","Забудь","Час покаже"]
+};
+
 const translations = {
     ru: { ball:"Шар Судьбы", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоты", coin:"Монетка", rand:"Рандом", trump:"Козырь", back:"Назад", tap:"Нажми, чтобы бросить", heads:"ОРЕЛ", tails:"РЕШКА", win:"ПОБЕДА!", lose_phrases:["Эх, мимо...", "Попробуй еще!", "Не сегодня", "Упс...", "Пусто", "Почти..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", reset:"СБРОС", rand_limit_label:"Максимум:", settings:"Настройки" },
     uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", trump:"Козир", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТИ", generate:"СТАРТ", reset:"СКИДАННЯ", rand_limit_label:"Максимум:", settings:"Налаштування" }
@@ -16,6 +20,9 @@ const engines = {};
 let isFlippingCoin = false;
 let currentCoinRotation = 0;
 
+// Массив для карт (4 уникальные масти)
+let currentDeck = ['♠️', '♥️', '♦️', '♣️'];
+
 // ГЛОБАЛЬНЫЕ ФУНКЦИИ
 window.openScreen = (id) => {
     const menu = document.getElementById('menu-screen');
@@ -27,6 +34,12 @@ window.openScreen = (id) => {
         void target.offsetWidth; 
         target.classList.add('active');
         if(id.startsWith('d') && id.includes('-screen')) setTimeout(() => initDice3D(id), 50);
+        
+        // Перемешиваем карты при входе в экран карт, если они еще не были тронуты
+        if (id === 'trump-screen') {
+             // Можно раскомментировать, если хотите, чтобы при каждом входе мешалось
+             // shuffleDeck(); 
+        }
     }, 200);
 };
 
@@ -88,15 +101,30 @@ window.flipCoin = () => {
     requestAnimationFrame(animate);
 };
 
-window.flipTrumpCard = (card) => {
+// --- ФУНКЦИИ ДЛЯ КАРТ (КОЗЫРЬ) ---
+
+// Функция перемешивания (Fisher-Yates)
+function shuffleDeck() {
+    currentDeck = ['♠️', '♥️', '♦️', '♣️'];
+    for (let i = currentDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [currentDeck[i], currentDeck[j]] = [currentDeck[j], currentDeck[i]];
+    }
+}
+
+window.flipTrumpCard = (card, index) => {
     if (card.classList.contains('flipped')) return;
-    const suits = ['♠️', '♥️', '♦️', '♣️'];
-    const randomSuit = suits[Math.floor(Math.random() * suits.length)];
+    
+    // Берем масть из заранее перемешанного массива по индексу карты (0-3)
+    const assignedSuit = currentDeck[index];
+    
     const frontFace = card.querySelector('.card-front-side');
-    frontFace.textContent = randomSuit;
+    frontFace.textContent = assignedSuit;
     frontFace.classList.remove('suit-red', 'suit-black');
-    if (randomSuit === '♥️' || randomSuit === '♦️') frontFace.classList.add('suit-red');
+    
+    if (assignedSuit === '♥️' || assignedSuit === '♦️') frontFace.classList.add('suit-red');
     else frontFace.classList.add('suit-black');
+    
     card.classList.add('flipped');
 };
 
@@ -106,6 +134,11 @@ window.resetTrumpCards = () => {
         card.classList.remove('flipped');
         setTimeout(() => { card.querySelector('.card-front-side').textContent = ''; }, 300);
     });
+    
+    // Перемешиваем колоду, пока карты перевернуты
+    setTimeout(() => {
+        shuffleDeck();
+    }, 300);
 };
 
 window.spinSlots = () => {
@@ -197,4 +230,5 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     applyLang();
     setupNavigation();
+    shuffleDeck(); // Инициализация колоды при запуске
 });
