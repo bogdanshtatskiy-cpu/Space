@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MultiTool DnD</title>
   <link rel="stylesheet" href="style.css">
+  
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
 
@@ -55,36 +64,12 @@
       </div>
     </div>
 
-    <div id="d4-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="canvas-wrapper" id="d4-scene"></div>
-      <p class="hint-text" data-key="tap">Нажми</p>
-    </div>
-    <div id="d6-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="canvas-wrapper" id="d6-scene"></div>
-      <p class="hint-text" data-key="tap">Нажми</p>
-    </div>
-    <div id="d8-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="canvas-wrapper" id="d8-scene"></div>
-      <p class="hint-text" data-key="tap">Нажми</p>
-    </div>
-    <div id="d10-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="canvas-wrapper" id="d10-scene"></div>
-      <p class="hint-text" data-key="tap">Нажми</p>
-    </div>
-    <div id="d12-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="canvas-wrapper" id="d12-scene"></div>
-      <p class="hint-text" data-key="tap">Нажми</p>
-    </div>
-    <div id="d20-screen" class="screen">
-      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
-      <div class="canvas-wrapper" id="d20-scene"></div>
-      <p class="hint-text" data-key="tap">Нажми</p>
-    </div>
+    <div id="d4-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d4-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
+    <div id="d6-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d6-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
+    <div id="d8-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d8-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
+    <div id="d10-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d10-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
+    <div id="d12-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d12-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
+    <div id="d20-screen" class="screen"><button class="back-btn" onclick="goBack()" data-key="back">Назад</button><div class="canvas-wrapper" id="d20-scene"></div><p class="hint-text" data-key="tap">Нажми</p></div>
 
     <div id="ball-screen" class="screen">
       <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
