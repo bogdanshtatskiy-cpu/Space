@@ -3,256 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Frosted 3D D20</title>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      /* Немного осветлил фон, чтобы стекло лучше смотрелось */
-      background: radial-gradient(circle at center, #2a2a4e, #0f0c29);
-      font-family: sans-serif;
-      touch-action: none;
-    }
-
-    #container {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .back-btn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      border-radius: 20px;
-      cursor: pointer;
-      backdrop-filter: blur(10px); /* Матовое стекло на кнопке для соответствия */
-      z-index: 10;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .hint {
-      position: absolute;
-      bottom: 10%;
-      width: 100%;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.6);
-      pointer-events: none;
-      font-size: 16px;
-      letter-spacing: 0.5px;
-    }
-  </style>
+  <title>MultiTool DnD</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <a href="#" class="back-btn" onclick="location.reload()">MultiTool</a>
-  <div class="hint">Коснитесь экрана, чтобы бросить</div>
-  
-  <div id="container"></div>
+  <div class="app-container">
+    <header>
+      <div class="controls">
+        <button class="icon-btn" id="theme-toggle"><span id="theme-icon">🌙</span></button>
+      </div>
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="uk">UK</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
+      </div>
+    </header>
 
-  <script>
-    // --- НАСТРОЙКИ ---
-    const DICE_COLOR = 0x3a94ff; // Немного ярче синий для стекла
-    const TEXT_COLOR = 'white';
-    const SIZE = 9;              // УМЕНЬШИЛ РАЗМЕР (было 12)
+    <div id="menu-screen" class="screen active">
+      <div class="menu-grid">
+        <div class="menu-item" onclick="openScreen('d4-screen')">
+          <div class="icon-bg">⚠️</div><span class="menu-label" data-key="d4">D4</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d6-screen')">
+          <div class="icon-bg">🎲</div><span class="menu-label" data-key="d6">D6</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d8-screen')">
+          <div class="icon-bg">💎</div><span class="menu-label" data-key="d8">D8</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d10-screen')">
+          <div class="icon-bg">💠</div><span class="menu-label" data-key="d10">D10</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d12-screen')">
+          <div class="icon-bg">⚽</div><span class="menu-label" data-key="d12">D12</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('d20-screen')">
+          <div class="icon-bg">🐉</div><span class="menu-label" data-key="d20">D20</span>
+        </div>
+        
+        <div class="menu-item" onclick="openScreen('ball-screen')">
+          <div class="icon-bg">🎱</div><span class="menu-label" data-key="ball">Ball</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('coin-screen')">
+          <div class="icon-bg">🪙</div><span class="menu-label" data-key="coin">Coin</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('slots-screen')">
+          <div class="icon-bg">🎰</div><span class="menu-label" data-key="slots">Slots</span>
+        </div>
+        <div class="menu-item" onclick="openScreen('rand-screen')">
+          <div class="icon-bg">🔢</div><span class="menu-label" data-key="rand">Rand</span>
+        </div>
+      </div>
+    </div>
 
-    let scene, camera, renderer;
-    let diceGroup;
-    let isRolling = false;
-    const faceNormals = [];
+    <div id="d4-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="canvas-wrapper" id="d4-scene"></div>
+      <p class="hint-text" data-key="tap">Нажми</p>
+    </div>
+    <div id="d6-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="canvas-wrapper" id="d6-scene"></div>
+      <p class="hint-text" data-key="tap">Нажми</p>
+    </div>
+    <div id="d8-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="canvas-wrapper" id="d8-scene"></div>
+      <p class="hint-text" data-key="tap">Нажми</p>
+    </div>
+    <div id="d10-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="canvas-wrapper" id="d10-scene"></div>
+      <p class="hint-text" data-key="tap">Нажми</p>
+    </div>
+    <div id="d12-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="canvas-wrapper" id="d12-scene"></div>
+      <p class="hint-text" data-key="tap">Нажми</p>
+    </div>
+    <div id="d20-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="canvas-wrapper" id="d20-scene"></div>
+      <p class="hint-text" data-key="tap">Нажми</p>
+    </div>
 
-    init();
-    animate();
+    <div id="ball-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="magic-ball-outer" onclick="askBall()">
+        <div class="magic-ball-inner"><span id="ball-text" class="ball-text">8</span></div>
+      </div>
+    </div>
 
-    function init() {
-      const container = document.getElementById('container');
+    <div id="coin-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="coin-container" onclick="flipCoin()">
+        <div class="coin">
+          <div class="coin-face side-a" data-key="heads">ОРЕЛ</div>
+          <div class="coin-face coin-back side-b" data-key="tails">РЕШКА</div>
+        </div>
+      </div>
+    </div>
 
-      scene = new THREE.Scene();
-      
-      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-      camera.position.z = 50;
+    <div id="slots-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="slot-machine">
+        <div class="reel-window"><div class="reel" id="reel-1">🍒</div></div>
+        <div class="reel-window"><div class="reel" id="reel-2">🍒</div></div>
+        <div class="reel-window"><div class="reel" id="reel-3">🍒</div></div>
+      </div>
+      <button class="glass-btn" style="margin-top:20px; width:100%" onclick="spinSlots()" data-key="spin_btn">КРУТИТЬ</button>
+    </div>
 
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      // Включаем физически корректное освещение для стекла
-      renderer.physicallyCorrectLights = true;
-      renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      container.appendChild(renderer.domElement);
+    <div id="rand-screen" class="screen">
+      <button class="back-btn" onclick="goBack()" data-key="back">Назад</button>
+      <div class="input-group">
+        <label data-key="rand_limit_label">Max:</label>
+        <input type="number" id="rand-max" class="glass-input" value="100">
+        <div id="rand-display" class="big-number">0</div>
+        <button class="glass-btn" onclick="generateRandom()" data-key="generate">START</button>
+      </div>
+    </div>
 
-      // --- ОСВЕЩЕНИЕ ДЛЯ СТЕКЛА ---
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-      scene.add(ambientLight);
-      
-      // Основной свет сверху-сбоку
-      const mainLight = new THREE.DirectionalLight(0xffffff, 2);
-      mainLight.position.set(10, 20, 15);
-      scene.add(mainLight);
-      
-      // Контровой свет сзади (чтобы просвечивало)
-      const backLight = new THREE.SpotLight(0x00ffff, 3);
-      backLight.position.set(0, 10, -20);
-      backLight.lookAt(0,0,0);
-      scene.add(backLight);
-      
-      // Нижний заполняющий
-      const bottomLight = new THREE.PointLight(0x0a84ff, 1);
-      bottomLight.position.set(0, -20, 10);
-      scene.add(bottomLight);
+  </div>
 
-      createD20();
-
-      window.addEventListener('resize', onWindowResize, false);
-      container.addEventListener('click', rollDice);
-      container.addEventListener('touchstart', rollDice, {passive: false});
-    }
-
-    function createD20() {
-      diceGroup = new THREE.Group();
-      scene.add(diceGroup);
-
-      const geometry = new THREE.IcosahedronGeometry(SIZE, 0);
-      
-      // --- НОВЫЙ МАТЕРИАЛ: МАТОВОЕ СТЕКЛО (Frosted Glass) ---
-      const material = new THREE.MeshPhysicalMaterial({
-        color: DICE_COLOR,
-        metalness: 0.0,       // Стекло не металл
-        roughness: 0.35,      // Шероховатость (0 - глянец, 1 - шершавый). 0.35 - матовое.
-        transmission: 0.98,   // Пропускание света (почти полное)
-        ior: 1.5,             // Коэффициент преломления (как у стекла)
-        thickness: 2.0,       // Толщина для реалистичного поглощения света
-        transparent: true,    // Включаем прозрачность
-        opacity: 0.9,         // Общая непрозрачность
-        flatShading: true,    // Оставляем грани четкими, как у кристалла
-        side: THREE.DoubleSide // Рендерим обе стороны, чтобы видеть сквозь него
-      });
-
-      const mesh = new THREE.Mesh(geometry, material);
-      diceGroup.add(mesh);
-
-      // Wireframe делаем еле заметным
-      const wireframe = new THREE.LineSegments(
-        new THREE.WireframeGeometry(geometry),
-        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 })
-      );
-      diceGroup.add(wireframe);
-
-      // --- ЦИФРЫ ---
-      const posAttribute = geometry.attributes.position;
-      let faceIndex = 0;
-      for (let i = 0; i < posAttribute.count; i += 3) {
-        faceIndex++;
-        const v1 = new THREE.Vector3().fromBufferAttribute(posAttribute, i);
-        const v2 = new THREE.Vector3().fromBufferAttribute(posAttribute, i + 1);
-        const v3 = new THREE.Vector3().fromBufferAttribute(posAttribute, i + 2);
-        const center = new THREE.Vector3().addVectors(v1, v2).add(v3).divideScalar(3);
-        const normal = center.clone().normalize();
-        faceNormals.push({ normal: normal.clone(), value: faceIndex });
-
-        const textMesh = createTextLabel(faceIndex.toString());
-        // Чуть ближе к поверхности, чем раньше
-        textMesh.position.copy(center.multiplyScalar(1.01)); 
-        textMesh.lookAt(center.multiplyScalar(2)); 
-        diceGroup.add(textMesh);
-      }
-    }
-
-    function createTextLabel(text) {
-      const canvas = document.createElement('canvas');
-      const size = 128;
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(0,0,0,0)';
-      ctx.fillRect(0, 0, size, size);
-      ctx.fillStyle = TEXT_COLOR;
-      ctx.font = 'bold 70px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      let yOffset = 0;
-      if (text === '6' || text === '9') yOffset = 5;
-      ctx.fillText(text, size / 2, size / 2 + yOffset);
-      if (text === '6' || text === '9') {
-         ctx.font = 'bold 20px Arial';
-         ctx.fillText('.', size / 2, size - 20);
-      }
-      const texture = new THREE.CanvasTexture(canvas);
-      
-      const planeGeo = new THREE.PlaneGeometry(SIZE/2.2, SIZE/2.2); 
-      const planeMat = new THREE.MeshBasicMaterial({ 
-        map: texture, 
-        transparent: true, 
-        opacity: 0.95,
-        // Важно: FrontSide, чтобы цифры с обратной стороны не просвечивали зеркально через стекло
-        side: THREE.FrontSide 
-      });
-      
-      const mesh = new THREE.Mesh(planeGeo, planeMat);
-      return mesh;
-    }
-
-    // --- ЛОГИКА БРОСКА (та же самая) ---
-    function rollDice(e) {
-      if (e) e.preventDefault();
-      if (isRolling) return;
-      isRolling = true;
-
-      const resultIndex = Math.floor(Math.random() * 20);
-      const targetFace = faceNormals[resultIndex];
-      
-      const targetVector = new THREE.Vector3(0, 0, 1);
-      const targetQuaternion = new THREE.Quaternion();
-      targetQuaternion.setFromUnitVectors(targetFace.normal, targetVector);
-
-      let progress = 0;
-      const duration = 2000;
-      const startTime = performance.now();
-      
-      function animateRoll(time) {
-        const elapsed = time - startTime;
-        progress = elapsed / duration;
-        if (progress < 1) {
-          if (progress < 0.7) {
-            diceGroup.rotation.x += 0.2;
-            diceGroup.rotation.y += 0.2;
-          } else {
-            diceGroup.quaternion.slerp(targetQuaternion, 0.15);
-          }
-          requestAnimationFrame(animateRoll);
-        } else {
-          diceGroup.quaternion.copy(targetQuaternion);
-          isRolling = false;
-        }
-      }
-      requestAnimationFrame(animateRoll);
-    }
-
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    function animate() {
-      requestAnimationFrame(animate);
-      if (!isRolling) {
-        diceGroup.rotation.x += 0.002;
-        diceGroup.rotation.y += 0.003;
-      }
-      renderer.render(scene, camera);
-    }
-  </script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
