@@ -1,201 +1,222 @@
 :root {
-  /* Темная тема (по умолчанию) */
-  --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  --text-primary: #ffffff;
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --accent: #0a84ff;
-  --btn-bg: rgba(0,0,0,0.3);
-  --btn-active: rgba(255,255,255,0.2);
-  --hint-color: rgba(255, 255, 255, 0.6);
+    --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    --text-primary: #ffffff;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --accent: #0a84ff;
+    --btn-bg: rgba(0,0,0,0.3);
+    --btn-active: rgba(255,255,255,0.2);
+    --hint-color: rgba(255, 255, 255, 0.6);
 }
 
 body.light-theme {
-  /* Светлая тема */
-  --bg-gradient: linear-gradient(135deg, #e0eafc, #cfdef3, #b2cbe6);
-  --text-primary: #333333;
-  --glass-bg: rgba(255, 255, 255, 0.4);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --accent: #0056b3;
-  --btn-bg: rgba(0,0,0,0.05);
-  --btn-active: rgba(0,0,0,0.1);
-  --hint-color: rgba(0, 0, 0, 0.5);
+    --bg-gradient: linear-gradient(135deg, #e0eafc, #cfdef3, #b2cbe6);
+    --text-primary: #333333;
+    --glass-bg: rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --accent: #0056b3;
+    --btn-bg: rgba(0,0,0,0.05);
+    --btn-active: rgba(0,0,0,0.1);
+    --hint-color: rgba(0, 0, 0, 0.5);
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg-gradient);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
-  color: var(--text-primary);
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: color 0.3s, background 0.3s;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-gradient);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .app-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    height: 100%; /* Важно для скролла */
 }
 
 /* Header */
 header {
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 20;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    flex-shrink: 0; /* Чтобы хедер не сжимался */
 }
 
-.controls {
-  display: flex;
-  gap: 10px;
+.controls, .lang-switch {
+    display: flex;
+    gap: 10px;
 }
 
 .icon-btn, .lang-btn {
-  background: var(--btn-bg);
-  border: none;
-  color: var(--text-primary);
-  padding: 8px 12px;
-  border-radius: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-  backdrop-filter: blur(5px);
+    background: var(--btn-bg);
+    border: none;
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    backdrop-filter: blur(5px);
 }
 
 .icon-btn.active, .lang-btn.active {
-  background: var(--btn-active);
-  font-weight: bold;
+    background: var(--btn-active);
+    font-weight: bold;
 }
 
 /* Screens */
 .screen {
-  flex: 1;
-  display: none;
-  flex-direction: column;
-  padding: 20px;
-  overflow-y: auto;
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    overflow-y: auto; /* Скролл только внутри контента */
+    overflow-x: hidden;
 }
 
 .screen.active {
-  display: flex;
-  animation: fadeIn 0.4s ease-out;
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Menu Grid */
 .menu-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  padding-bottom: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding-bottom: 40px;
 }
 
 .menu-item {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  aspect-ratio: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Центрирование текста */
 }
 
 .menu-item:active { transform: scale(0.96); }
 .icon-bg { font-size: 36px; margin-bottom: 10px; }
-.menu-label { font-size: 14px; font-weight: 500; text-align: center; }
+.menu-label { font-size: 14px; font-weight: 500; }
 
-/* 3D Canvas Container */
+/* 3D Canvas */
 .canvas-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  border-radius: 30px;
-  overflow: hidden;
-  background: transparent;
+    flex: 1;
+    width: 100%;
+    position: relative;
+    border-radius: 30px;
+    overflow: hidden;
 }
 
 .hint-text {
-  position: absolute;
-  bottom: 30px;
-  width: 100%;
-  text-align: center;
-  color: var(--hint-color);
-  pointer-events: none;
-  font-size: 14px;
+    text-align: center;
+    color: var(--hint-color);
+    padding: 15px;
+    font-size: 14px;
+    pointer-events: none;
 }
 
 .back-btn {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  color: var(--accent);
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-bottom: 10px;
-  align-self: flex-start;
-  backdrop-filter: blur(10px);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--accent);
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 10px;
+    align-self: flex-start;
+    backdrop-filter: blur(10px);
 }
 
-/* Specific Tools Styles (Coin, Slots, Ball) */
-/* (Скопированы из прошлого кода и адаптированы под переменные) */
+/* Tools Styles */
 .magic-ball-outer {
-  width: 260px; height: 260px;
-  background: radial-gradient(circle at 30% 30%, #444, #000);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin: auto; cursor: pointer;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    width: 260px; height: 260px;
+    background: radial-gradient(circle at 30% 30%, #444, #000);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: auto; cursor: pointer;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
 }
 .magic-ball-inner {
-  width: 140px; height: 140px;
-  background: radial-gradient(circle, #111, #000);
-  border-radius: 50%;
-  border: 1px solid #333;
-  display: flex; align-items: center; justify-content: center;
-  text-align: center; padding: 10px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, #111, #000);
+    border-radius: 50%;
+    border: 1px solid #333;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 10px;
 }
 .ball-text { color: #aaffaa; text-shadow: 0 0 10px #aaffaa; font-weight: bold; opacity: 0; transition: 1s; }
 .ball-animate { animation: shake 0.5s; }
 @keyframes shake { 0%,100%{transform:translate(0)} 25%{transform:translate(-5px)} 75%{transform:translate(5px)} }
 
-.slot-machine { display: flex; gap: 5px; justify-content: center; margin-top: 50px; }
+.slot-machine { display: flex; gap: 5px; justify-content: center; margin-top: auto; margin-bottom: auto; }
 .reel-window { width: 60px; height: 80px; background: #222; border: 2px solid gold; border-radius: 8px; overflow: hidden; position: relative; }
 .reel { font-size: 40px; line-height: 80px; text-align: center; }
 
-.coin-container { perspective: 1000px; width: 150px; height: 150px; margin: auto; cursor: pointer; }
-.coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 3s ease-out; }
-.coin-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; border: 4px solid gold; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; background: radial-gradient(circle, #ffd700, #b8860b); color: #423102; }
+/* Coin */
+.coin-wrapper {
+    width: 150px; height: 150px; margin: auto; perspective: 1000px;
+}
+.coin {
+    width: 100%; height: 100%; position: relative;
+    transform-style: preserve-3d;
+    transition: transform 2.5s cubic-bezier(0.1, 0.9, 0.2, 1); /* Плавная остановка */
+}
+/* Анимация подбрасывания (масштаб) */
+.coin-toss { animation: toss-scale 1s ease-in-out; }
+@keyframes toss-scale {
+    0% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.5) translateY(-50px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+.coin-face {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden; border-radius: 50%;
+    border: 4px solid gold; display: flex; align-items: center;
+    justify-content: center; font-weight: bold; font-size: 20px;
+    background: radial-gradient(circle, #ffd700, #b8860b); color: #423102;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
 .coin-back { transform: rotateY(180deg); background: radial-gradient(circle, #c0c0c0, #808080); border-color: silver; color: #222; }
 
-/* Input for Randomizer */
-.input-group { display: flex; flex-direction: column; align-items: center; margin-top: 50px; gap: 20px; }
+/* Randomizer */
+.input-group { display: flex; flex-direction: column; align-items: center; margin: auto; gap: 20px; }
 .glass-input { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 10px; color: var(--text-primary); border-radius: 10px; text-align: center; font-size: 20px; width: 100px; }
 .big-number { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; justify-content: center; }
-.glass-btn { background: var(--text-primary); color: var(--bg-gradient); border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+.glass-btn { background: var(--text-primary); color: var(--bg-gradient); border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.glass-btn:active { transform: scale(0.95); }
