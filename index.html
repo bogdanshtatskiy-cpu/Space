@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Real 3D D20</title>
+  <title>Frosted 3D D20</title>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -11,9 +11,10 @@
     body {
       margin: 0;
       overflow: hidden;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      /* Немного осветлил фон, чтобы стекло лучше смотрелось */
+      background: radial-gradient(circle at center, #2a2a4e, #0f0c29);
       font-family: sans-serif;
-      touch-action: none; /* Убираем зум по двойному тапу */
+      touch-action: none;
     }
 
     #container {
@@ -24,7 +25,6 @@
       align-items: center;
     }
 
-    /* Кнопка Назад */
     .back-btn {
       position: absolute;
       top: 20px;
@@ -35,10 +35,11 @@
       color: white;
       border-radius: 20px;
       cursor: pointer;
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(10px); /* Матовое стекло на кнопке для соответствия */
       z-index: 10;
       text-decoration: none;
       font-size: 14px;
+      font-weight: 500;
     }
 
     .hint {
@@ -46,15 +47,10 @@
       bottom: 10%;
       width: 100%;
       text-align: center;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.6);
       pointer-events: none;
       font-size: 16px;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
@@ -67,16 +63,13 @@
 
   <script>
     // --- НАСТРОЙКИ ---
-    const DICE_COLOR = 0x0a84ff; // Синий цвет кубика
-    const TEXT_COLOR = 'white';  // Цвет цифр
-    const SIZE = 12;             // Размер кубика (был больше, теперь уменьшен)
+    const DICE_COLOR = 0x3a94ff; // Немного ярче синий для стекла
+    const TEXT_COLOR = 'white';
+    const SIZE = 9;              // УМЕНЬШИЛ РАЗМЕР (было 12)
 
     let scene, camera, renderer;
-    let diceGroup; // Группа, содержащая кубик и цифры
+    let diceGroup;
     let isRolling = false;
-    
-    // Массив для хранения векторов нормалей каждой грани (куда смотрит грань)
-    // и соответствующих им значений (цифр)
     const faceNormals = [];
 
     init();
@@ -85,35 +78,42 @@
     function init() {
       const container = document.getElementById('container');
 
-      // 1. Сцена
       scene = new THREE.Scene();
       
-      // 2. Камера (настроена так, чтобы кубик был виден полностью)
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-      camera.position.z = 50; // Отодвинули камеру, чтобы кубик влез
+      camera.position.z = 50;
 
-      // 3. Рендер
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      // Включаем физически корректное освещение для стекла
+      renderer.physicallyCorrectLights = true;
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
       container.appendChild(renderer.domElement);
 
-      // 4. Свет
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      // --- ОСВЕЩЕНИЕ ДЛЯ СТЕКЛА ---
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
       scene.add(ambientLight);
       
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      dirLight.position.set(10, 20, 10);
-      scene.add(dirLight);
+      // Основной свет сверху-сбоку
+      const mainLight = new THREE.DirectionalLight(0xffffff, 2);
+      mainLight.position.set(10, 20, 15);
+      scene.add(mainLight);
       
-      const bottomLight = new THREE.PointLight(0x0a84ff, 0.5);
+      // Контровой свет сзади (чтобы просвечивало)
+      const backLight = new THREE.SpotLight(0x00ffff, 3);
+      backLight.position.set(0, 10, -20);
+      backLight.lookAt(0,0,0);
+      scene.add(backLight);
+      
+      // Нижний заполняющий
+      const bottomLight = new THREE.PointLight(0x0a84ff, 1);
       bottomLight.position.set(0, -20, 10);
       scene.add(bottomLight);
 
-      // 5. Создание D20
       createD20();
 
-      // События
       window.addEventListener('resize', onWindowResize, false);
       container.addEventListener('click', rollDice);
       container.addEventListener('touchstart', rollDice, {passive: false});
@@ -123,197 +123,119 @@
       diceGroup = new THREE.Group();
       scene.add(diceGroup);
 
-      // Геометрия Икосаэдра (20 граней)
       const geometry = new THREE.IcosahedronGeometry(SIZE, 0);
       
-      // Материал самого кубика
-      const material = new THREE.MeshStandardMaterial({
+      // --- НОВЫЙ МАТЕРИАЛ: МАТОВОЕ СТЕКЛО (Frosted Glass) ---
+      const material = new THREE.MeshPhysicalMaterial({
         color: DICE_COLOR,
-        roughness: 0.1,
-        metalness: 0.1,
-        flatShading: true // Важно: грани должны быть плоскими
+        metalness: 0.0,       // Стекло не металл
+        roughness: 0.35,      // Шероховатость (0 - глянец, 1 - шершавый). 0.35 - матовое.
+        transmission: 0.98,   // Пропускание света (почти полное)
+        ior: 1.5,             // Коэффициент преломления (как у стекла)
+        thickness: 2.0,       // Толщина для реалистичного поглощения света
+        transparent: true,    // Включаем прозрачность
+        opacity: 0.9,         // Общая непрозрачность
+        flatShading: true,    // Оставляем грани четкими, как у кристалла
+        side: THREE.DoubleSide // Рендерим обе стороны, чтобы видеть сквозь него
       });
 
       const mesh = new THREE.Mesh(geometry, material);
       diceGroup.add(mesh);
 
-      // Добавляем wireframe (сетку) для красоты
+      // Wireframe делаем еле заметным
       const wireframe = new THREE.LineSegments(
         new THREE.WireframeGeometry(geometry),
-        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 })
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 })
       );
       diceGroup.add(wireframe);
 
-      // --- ДОБАВЛЕНИЕ ЦИФР НА ГРАНИ ---
-      // В Three.js IcosahedronGeometry(radius, 0) создает грани в определенном порядке.
-      // Нам нужно найти центр каждой грани и прикрепить туда текст.
-      
+      // --- ЦИФРЫ ---
       const posAttribute = geometry.attributes.position;
-      
-      // Icosahedron с детализацией 0 имеет 20 граней (60 вершин / 3)
-      // Мы пройдемся по каждому треугольнику
-      
       let faceIndex = 0;
-      
-      // Вектор "Вверх" (Z) для ориентации цифр
-      const vectorZ = new THREE.Vector3(0, 0, 1);
-
       for (let i = 0; i < posAttribute.count; i += 3) {
         faceIndex++;
-        
-        // 1. Получаем координаты 3 вершин грани
         const v1 = new THREE.Vector3().fromBufferAttribute(posAttribute, i);
         const v2 = new THREE.Vector3().fromBufferAttribute(posAttribute, i + 1);
         const v3 = new THREE.Vector3().fromBufferAttribute(posAttribute, i + 2);
-
-        // 2. Находим центр грани (среднее арифметическое)
-        const center = new THREE.Vector3()
-          .addVectors(v1, v2)
-          .add(v3)
-          .divideScalar(3);
-
-        // 3. Находим нормаль грани (вектор, перпендикулярный поверхности)
-        // Он нужен, чтобы повернуть цифру так, чтобы она "лежала" на грани
+        const center = new THREE.Vector3().addVectors(v1, v2).add(v3).divideScalar(3);
         const normal = center.clone().normalize();
-        
-        // Сохраняем нормаль и индекс грани для логики броска
-        // Примечание: тут цифры будут идти от 1 до 20 по порядку генерации геометрии.
-        // Для реального D20 порядок другой (сумма противоположных = 21), но для визуала это не важно.
         faceNormals.push({ normal: normal.clone(), value: faceIndex });
 
-        // 4. Создаем текстуру с цифрой
         const textMesh = createTextLabel(faceIndex.toString());
-        
-        // 5. Позиционируем цифру
-        // Чуть выдвигаем текст наружу (на 1.05), чтобы он не проваливался в кубик
-        textMesh.position.copy(center.multiplyScalar(1.02)); 
-        
-        // 6. Поворачиваем цифру так, чтобы она смотрела наружу от центра
+        // Чуть ближе к поверхности, чем раньше
+        textMesh.position.copy(center.multiplyScalar(1.01)); 
         textMesh.lookAt(center.multiplyScalar(2)); 
-        
         diceGroup.add(textMesh);
       }
     }
 
-    // Функция создания текстуры с текстом
     function createTextLabel(text) {
       const canvas = document.createElement('canvas');
-      const size = 128; // Размер текстуры (чем больше, тем четче)
+      const size = 128;
       canvas.width = size;
       canvas.height = size;
-      
       const ctx = canvas.getContext('2d');
-      
-      // Рисуем текст
-      ctx.fillStyle = 'rgba(0,0,0,0)'; // Прозрачный фон
+      ctx.fillStyle = 'rgba(0,0,0,0)';
       ctx.fillRect(0, 0, size, size);
-      
       ctx.fillStyle = TEXT_COLOR;
       ctx.font = 'bold 70px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      
-      // Поправка на то, что некоторые цифры визуально не по центру
       let yOffset = 0;
       if (text === '6' || text === '9') yOffset = 5;
-      
       ctx.fillText(text, size / 2, size / 2 + yOffset);
-      
-      // Подчеркивание для 6 и 9, чтобы отличать
       if (text === '6' || text === '9') {
          ctx.font = 'bold 20px Arial';
          ctx.fillText('.', size / 2, size - 20);
       }
-
       const texture = new THREE.CanvasTexture(canvas);
       
-      // Создаем плоскость с этой текстурой
-      const planeGeo = new THREE.PlaneGeometry(5, 5); // Размер цифры на кубике
+      const planeGeo = new THREE.PlaneGeometry(SIZE/2.2, SIZE/2.2); 
       const planeMat = new THREE.MeshBasicMaterial({ 
         map: texture, 
         transparent: true, 
-        opacity: 0.9,
-        side: THREE.DoubleSide
+        opacity: 0.95,
+        // Важно: FrontSide, чтобы цифры с обратной стороны не просвечивали зеркально через стекло
+        side: THREE.FrontSide 
       });
       
       const mesh = new THREE.Mesh(planeGeo, planeMat);
       return mesh;
     }
 
-    // --- ЛОГИКА БРОСКА ---
+    // --- ЛОГИКА БРОСКА (та же самая) ---
     function rollDice(e) {
-      if (e) e.preventDefault(); // Чтобы на мобильном не скроллило
+      if (e) e.preventDefault();
       if (isRolling) return;
       isRolling = true;
 
-      // 1. Выбираем случайный результат (1-20)
-      const resultIndex = Math.floor(Math.random() * 20); // индекс в массиве faceNormals
+      const resultIndex = Math.floor(Math.random() * 20);
       const targetFace = faceNormals[resultIndex];
       
-      console.log(`Target: ${targetFace.value}`);
-
-      // 2. Рассчитываем конечное вращение
-      // Нам нужно повернуть diceGroup так, чтобы нормаль целевой грани смотрела в камеру (ось Z+)
-      
-      // Начальная ориентация (сбросим текущее вращение группы, но сохраним визуально через startQuaternion, 
-      // это сложно, поэтому пойдем простым путем: вращаем саму геометрию или используем lookAt трюк).
-      
-      // Простой метод с Кватернионами:
-      // Вектор "В Камеру" в локальных координатах
       const targetVector = new THREE.Vector3(0, 0, 1);
-      
-      // Кватернион, который поворачивает нормаль грани к вектору камеры
       const targetQuaternion = new THREE.Quaternion();
       targetQuaternion.setFromUnitVectors(targetFace.normal, targetVector);
 
-      // Поскольку мы крутили кубик, его текущее положение произвольное.
-      // Мы сделаем хитрый ход:
-      // Сначала "бешено" вращаем кубик случайно (анимация броска).
-      // А в конце плавно доводим его до targetQuaternion.
-
-      const startRot = diceGroup.quaternion.clone();
-      
-      // Анимация
       let progress = 0;
-      const duration = 2000; // длительность мс
+      const duration = 2000;
       const startTime = performance.now();
       
-      // Случайные оси вращения для анимации
-      const spinAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
-      const totalSpin = Math.PI * (4 + Math.random() * 2); // Сколько оборотов сделает
-
       function animateRoll(time) {
         const elapsed = time - startTime;
         progress = elapsed / duration;
-
         if (progress < 1) {
-          // Easing function (easeOutCubic) - быстро начинает, медленно заканчивает
-          const ease = 1 - Math.pow(1 - progress, 3);
-          
           if (progress < 0.7) {
-            // ФАЗА 1: Быстрое вращение
-            // Просто крутим группу
             diceGroup.rotation.x += 0.2;
             diceGroup.rotation.y += 0.2;
           } else {
-            // ФАЗА 2: Доводка до результата (последние 30% времени)
-            // Мы интерполируем (slerp) текущее вращение к целевому
-            
-            // Чтобы slerp работал правильно, нам нужно знать текущее состояние
-            // Это сложная математика. Упростим:
-            // Просто в момент 0.7 вычислим, где мы, и начнем slerp к targetQuaternion
-            
             diceGroup.quaternion.slerp(targetQuaternion, 0.15);
           }
-
           requestAnimationFrame(animateRoll);
         } else {
-          // Финиш: жестко ставим нужную ориентацию
           diceGroup.quaternion.copy(targetQuaternion);
           isRolling = false;
         }
       }
-      
       requestAnimationFrame(animateRoll);
     }
 
@@ -325,13 +247,10 @@
 
     function animate() {
       requestAnimationFrame(animate);
-      
-      // Легкое покачивание в покое
       if (!isRolling) {
         diceGroup.rotation.x += 0.002;
         diceGroup.rotation.y += 0.003;
       }
-      
       renderer.render(scene, camera);
     }
   </script>
