@@ -1,19 +1,17 @@
 :root {
-    /* Основной фон */
     --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
     --text-primary: #ffffff;
-    /* Стеклянные элементы */
     --glass-bg: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
     --accent: #0a84ff;
     --btn-bg: rgba(0,0,0,0.3);
     --btn-active: rgba(255,255,255,0.2);
     --hint-color: rgba(255, 255, 255, 0.6);
-    /* Цвета золотой монеты */
+    /* Цвета монеты */
     --coin-gold-light: #fff3a0;
     --coin-gold-mid: #e6c13b;
     --coin-gold-dark: #b08d00;
-    --coin-shadow: #4a3b00;
+    --coin-text: #4a2c00; /* Темный цвет для текста */
 }
 
 body.light-theme {
@@ -47,16 +45,52 @@ body {
 
 header {
     padding: 20px; display: flex; justify-content: space-between;
-    align-items: center; z-index: 20; flex-shrink: 0;
+    align-items: center; 
+    z-index: 100; /* Подняли выше, чтобы точно нажималось */
+    flex-shrink: 0;
+    position: relative;
 }
 
-.controls, .lang-switch { display: flex; gap: 10px; }
-.icon-btn, .lang-btn {
-    background: var(--btn-bg); border: none; color: var(--text-primary);
-    padding: 8px 12px; border-radius: 16px; cursor: pointer;
-    transition: 0.3s; backdrop-filter: blur(5px);
+/* --- IOS STYLE SWITCHERS --- */
+.controls { display: flex; align-items: center; }
+
+.icon-btn {
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    color: var(--text-primary); width: 40px; height: 40px;
+    border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: 0.2s; backdrop-filter: blur(5px); font-size: 18px;
 }
-.icon-btn.active, .lang-btn.active { background: var(--btn-active); font-weight: bold; }
+.icon-btn:active { transform: scale(0.9); }
+
+/* Качелька переключения языка */
+.ios-toggle {
+    display: flex;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 3px;
+    border-radius: 20px;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+body.light-theme .ios-toggle { background: rgba(0, 0, 0, 0.1); }
+
+.lang-btn {
+    border: none; background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 6px 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    font-size: 13px; font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 2;
+}
+body.light-theme .lang-btn { color: rgba(0, 0, 0, 0.5); }
+
+/* Активная кнопка в качельке */
+.lang-btn.active {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
 
 .screen {
     flex: 1; display: none; flex-direction: column;
@@ -87,6 +121,7 @@ header {
     color: var(--accent); padding: 10px 20px; border-radius: 20px;
     cursor: pointer; font-weight: 600; margin-bottom: 10px;
     align-self: flex-start; backdrop-filter: blur(10px);
+    z-index: 50; /* Чтобы точно нажималась */
 }
 
 /* Tools */
@@ -109,73 +144,33 @@ header {
 .reel-window { width: 60px; height: 80px; background: #222; border: 2px solid gold; border-radius: 8px; overflow: hidden; position: relative; }
 .reel { font-size: 40px; line-height: 80px; text-align: center; }
 
-
-/* --- COIN (REALISTIC GOLD) --- */
-.coin-wrapper { 
-    width: 160px; height: 160px; margin: auto; 
-    perspective: 1000px; 
-}
-
-.coin { 
-    width: 100%; height: 100%; position: relative; 
-    transform-style: preserve-3d;
-    will-change: transform;
-}
+/* --- COIN (IMPROVED READABILITY) --- */
+.coin-wrapper { width: 160px; height: 160px; margin: auto; perspective: 1000px; }
+.coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; will-change: transform; }
 
 .coin-face {
-    position: absolute; width: 100%; height: 100%; 
-    backface-visibility: hidden; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
     
-    /* Шрифт для чеканки */
-    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-weight: bold; font-size: 24px; letter-spacing: 1px;
-    color: var(--coin-gold-light);
+    font-family: serif; font-weight: 900; font-size: 26px; letter-spacing: 1px;
     
-    /* Эффект выдавленного текста (чеканка) */
-    text-shadow: 
-        -1px -1px 1px var(--coin-shadow), 
-        1px 1px 1px #ffffff;
+    /* ТЕМНЫЙ ЦВЕТ ТЕКСТА ДЛЯ КОНТРАСТА */
+    color: var(--coin-text);
+    
+    /* Тень для эффекта вдавливания */
+    text-shadow: 0px 1px 0px rgba(255,255,255,0.4), 0px -1px 0px rgba(0,0,0,0.3);
 
-    /* Реалистичный золотой градиент с бликами */
-    background: radial-gradient(ellipse at center, 
-        var(--coin-gold-light) 0%, 
-        var(--coin-gold-mid) 40%, 
-        var(--coin-gold-dark) 85%, 
-        var(--coin-shadow) 100%);
-        
-    /* Эффект выпуклого бортика и толщины */
-    box-shadow: 
-        inset 0 0 0 4px var(--coin-gold-mid), /* Внешний край бортика */
-        inset 0 0 8px 6px var(--coin-shadow), /* Тень внутри бортика */
-        0 4px 6px rgba(0,0,0,0.4); /* Тень под монеткой */
-
-    /* Тонкая рамка для четкости */
-    border: 1px solid var(--coin-gold-dark);
+    background: radial-gradient(ellipse at center, var(--coin-gold-light) 0%, var(--coin-gold-mid) 40%, var(--coin-gold-dark) 100%);
+    box-shadow: inset 0 0 0 4px var(--coin-gold-mid), inset 0 0 10px 6px #b08d00, 0 5px 15px rgba(0,0,0,0.3);
+    border: 1px solid #8a6e00;
 }
 
-/* Добавляем текстуру "шлифованного металла" через псевдоэлемент */
 .coin-face::after {
-    content: '';
-    position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
-    border-radius: 50%;
-    background: repeating-conic-gradient(
-        from 0deg, 
-        rgba(255,255,255,0) 0deg 10deg, 
-        rgba(255,255,255,0.1) 10deg 20deg
-    );
-    pointer-events: none;
+    content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
+    border-radius: 50%; border: 2px dashed rgba(74, 44, 0, 0.3);
 }
 
-/* Обратная сторона (Решка) - делаем чуть другой оттенок для реализма */
-.coin-back { 
-    transform: rotateY(180deg); 
-    /* Немного смещаем градиент, чтобы блик был в другом месте */
-    background: radial-gradient(ellipse at 70% 30%, 
-        var(--coin-gold-light) 0%, 
-        var(--coin-gold-mid) 50%, 
-        var(--coin-shadow) 100%);
-}
+.coin-back { transform: rotateY(180deg); background: radial-gradient(ellipse at center, #e0e0e0 0%, #bdbdbd 40%, #757575 100%); color: #333; box-shadow: inset 0 0 0 4px #bdbdbd, inset 0 0 10px 6px #616161, 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #616161; }
 
 .input-group { display: flex; flex-direction: column; align-items: center; margin: auto; gap: 20px; }
 .glass-input { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 10px; color: var(--text-primary); border-radius: 10px; text-align: center; font-size: 20px; width: 100px; }
