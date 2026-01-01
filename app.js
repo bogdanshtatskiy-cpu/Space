@@ -1,7 +1,6 @@
 import { DiceEngine } from './dice-engine.js';
 import { predictions } from './predictions.js';
 
-// --- Тексты и Фразы ---
 const translations = {
     ru: {
         ball: "Шар Судьбы", d4: "Кубик D4", d6: "Кубик D6", d8: "Кубик D8", 
@@ -20,8 +19,7 @@ const translations = {
         d10: "Кубик D10", d12: "Кубик D12", d20: "Кубик D20",
         slots: "Слоти", coin: "Монетка", rand: "Рандом",
         back: "Назад", tap: "Натисни, щоб кинути",
-        heads: "ОРЕЛ", tails: "РЕШКА", 
-        win: "ВИГРАШ!", 
+        heads: "ОРЕЛ", tails: "РЕШКА", win: "ВИГРАШ!", lose: "СПРОБУЙ ЩЕ",
         lose_phrases: ["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."],
         spin_btn: "КРУТИТИ",
         generate: "СТАРТ",
@@ -45,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupNavigation() {
-    // Язык
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.onclick = () => {
             state.lang = btn.dataset.lang;
@@ -54,7 +51,6 @@ function setupNavigation() {
         };
     });
 
-    // Тема
     const themeBtn = document.getElementById('theme-toggle');
     themeBtn.onclick = () => {
         state.theme = state.theme === 'dark' ? 'light' : 'dark';
@@ -113,7 +109,6 @@ function initDice3D(screenId) {
     const diceType = screenId.replace('-screen', ''); 
     if (engines[diceType]) return; 
     const containerId = `${diceType}-scene`;
-    // Цвет теперь не передается, он зашит в классе для единообразия
     engines[diceType] = new DiceEngine(containerId, diceType);
 }
 
@@ -171,7 +166,6 @@ function setupTools() {
             msgEl.textContent = translations[state.lang].win;
             msgEl.style.color = '#0f0';
         } else {
-            // Случайная фраза проигрыша
             const phrases = translations[state.lang].lose_phrases;
             msgEl.textContent = phrases[Math.floor(Math.random() * phrases.length)];
             msgEl.style.color = 'inherit';
