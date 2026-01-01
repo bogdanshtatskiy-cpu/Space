@@ -10,20 +10,26 @@
 
   <div class="app-container">
     <header>
-      <button class="icon-btn" id="theme-toggle"><span id="theme-icon">🌙</span></button>
-      
-      <button class="dnd-toggle-btn" id="dnd-btn" onclick="toggleDNDMode()">DND MODE</button>
+      <div class="header-col left">
+        <div class="ios-toggle theme-switch">
+          <button class="theme-btn" data-theme="light">☀️</button>
+          <button class="theme-btn" data-theme="dark">🌙</button>
+        </div>
+        <div id="status-name-area" class="status-area left"></div>
+      </div>
 
-      <div class="ios-toggle">
-        <button class="lang-btn" data-lang="uk">UK</button>
-        <button class="lang-btn" data-lang="ru">RU</button>
+      <div class="header-col center">
+        <button class="dnd-toggle-btn" id="dnd-btn" onclick="toggleDNDMode()">DND MODE</button>
+      </div>
+
+      <div class="header-col right">
+        <div class="ios-toggle lang-switch">
+          <button class="lang-btn" data-lang="uk">UK</button>
+          <button class="lang-btn" data-lang="ru">RU</button>
+        </div>
+        <div id="status-stats-area" class="status-area right"></div>
       </div>
     </header>
-
-    <div id="status-bar" class="status-bar">
-      <div class="status-row" id="status-stats"></div>
-      <div class="status-row" id="status-name"></div>
-    </div>
 
     <div id="menu-screen" class="screen active">
       <div class="menu-grid">
@@ -37,7 +43,6 @@
         <div class="menu-item" onclick="openScreen('hp-screen')"><div class="menu-icon emoji-icon">❤️</div><span class="menu-label" data-key="hp">HP</span></div>
         <div class="menu-item" onclick="openScreen('score-screen')"><div class="menu-icon emoji-icon">🏆</div><span class="menu-label" data-key="score">Счет</span></div>
         <div class="menu-item" onclick="openScreen('name-screen')"><div class="menu-icon emoji-icon">📜</div><span class="menu-label" data-key="names">Имена</span></div>
-        
         <div class="menu-item" onclick="openScreen('notes-screen')"><div class="menu-icon emoji-icon">✏️</div><span class="menu-label" data-key="notes">Заметки</span></div>
 
         <div class="menu-item dnd-hide" onclick="openScreen('trump-screen')"><img src="kar.png" class="menu-icon"><span class="menu-label" data-key="trump">Козырь</span></div>
