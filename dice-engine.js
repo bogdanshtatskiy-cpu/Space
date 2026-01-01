@@ -9,9 +9,24 @@ export class DiceEngine {
         this.textMeshes = {};
         this.resultValues = [];
         this.isRolling = false;
+        this.isAnimating = true;
+        this.reqId = null;
         
         this.init();
         this.animate();
+    }
+
+    // NEW: Render loop control
+    stop() {
+        if (this.reqId) cancelAnimationFrame(this.reqId);
+        this.isAnimating = false;
+    }
+
+    start() {
+        if (!this.isAnimating) {
+            this.isAnimating = true;
+            this.animate();
+        }
     }
 
     init() {
@@ -84,9 +99,37 @@ export class DiceEngine {
     createTextLabel(txt) { const c=document.createElement('canvas'); c.width=512; c.height=512; const x=c.getContext('2d'); x.fillStyle='rgba(0,0,0,0)'; x.fillRect(0,0,512,512); x.fillStyle='white'; x.font='bold 250px Arial'; x.textAlign='center'; x.textBaseline='middle'; if(txt==='6'||txt==='9')txt+='.'; x.fillText(txt,256,256); const tex=new THREE.CanvasTexture(c); tex.minFilter=THREE.LinearFilter; return new THREE.Mesh(new THREE.PlaneGeometry(this.size*0.7,this.size*0.7), new THREE.MeshPhysicalMaterial({map:tex,transparent:true,side:THREE.FrontSide,roughness:0.8,metalness:0,clearcoat:0.5})); }
 
     roll() { 
-        if(this.isRolling)return; this.isRolling=true; const rv=this.resultValues[Math.floor(Math.random()*this.resultValues.length)]; const tm=this.textMeshes[rv]; const tq=tm.quaternion.clone().invert(); const dur=2000; const st=performance.now(); const rs={x:0.15+Math.random()*0.1,y:0.15+Math.random()*0.1};
-        const ani=(t)=>{ const el=t-st; const p=Math.min(el/dur,1); if(p<1){ if(p<0.6){this.diceGroup.rotation.x+=rs.x; this.diceGroup.rotation.y+=rs.y; this.midQ=this.diceGroup.quaternion.clone();} else {const p2=(p-0.6)*2.5; const e=1-Math.pow(1-p2,3); this.diceGroup.quaternion.slerpQuaternions(this.midQ,tq,e);} requestAnimationFrame(ani); } else {this.diceGroup.quaternion.copy(tq); this.isRolling=false;} }; requestAnimationFrame(ani);
+        if(this.isRolling)return; 
+        this.isRolling=true; 
+        const rv=this.resultValues[Math.floor(Math.random()*this.resultValues.length)]; 
+        const tm=this.textMeshes[rv]; 
+        const tq=tm.quaternion.clone().invert(); 
+        const dur=2000; const st=performance.now(); const rs={x:0.15+Math.random()*0.1,y:0.15+Math.random()*0.1};
+        
+        const ani=(t)=>{ 
+            const el=t-st; 
+            const p=Math.min(el/dur,1); 
+            if(p<1){ 
+                if(p<0.6){this.diceGroup.rotation.x+=rs.x; this.diceGroup.rotation.y+=rs.y; this.midQ=this.diceGroup.quaternion.clone();} 
+                else {const p2=(p-0.6)*2.5; const e=1-Math.pow(1-p2,3); this.diceGroup.quaternion.slerpQuaternions(this.midQ,tq,e);} 
+                requestAnimationFrame(ani); 
+            } else {
+                this.diceGroup.quaternion.copy(tq); 
+                this.isRolling=false;
+                
+                // TRIGGER CRITICAL MESSAGE
+                if (this.type === 'd20' && (rv === 1 || rv === 20)) {
+                    if (window.showCrit) window.showCrit(rv);
+                }
+            } 
+        }; 
+        requestAnimationFrame(ani);
     }
 
-    animate() { requestAnimationFrame(() => this.animate()); if (this.diceGroup && !this.isRolling) { this.diceGroup.rotation.y += 0.001; } this.renderer.render(this.scene, this.camera); }
+    animate() { 
+        if (!this.isAnimating) return;
+        this.reqId = requestAnimationFrame(() => this.animate()); 
+        if (this.diceGroup && !this.isRolling) { this.diceGroup.rotation.y += 0.001; } 
+        this.renderer.render(this.scene, this.camera); 
+    }
 }
