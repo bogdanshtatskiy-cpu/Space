@@ -1,34 +1,37 @@
 import { DiceEngine } from './dice-engine.js';
 import { predictions } from './predictions.js';
 
-// --- ДАННЫЕ ---
+// --- DATA ---
 const translations = {
-    ru: { ball:"Шар Судьбы", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоты", coin:"Монетка", rand:"Рандом", trump:"Козырь", back:"Назад", tap:"Нажми, чтобы бросить", heads:"ОРЕЛ", tails:"РЕШКА", win:"ПОБЕДА!", lose_phrases:["Эх, мимо...", "Попробуй еще!", "Не сегодня", "Упс...", "Пусто", "Почти..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", reset:"СБРОС", rand_limit_label:"Максимум:", settings:"Настройки",
-    hp:"HP", score:"Счет", names:"Имена", wheel:"Колесо", rps:"К-Н-Б" },
-    uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", trump:"Козир", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТИ", generate:"СТАРТ", reset:"СКИДАННЯ", rand_limit_label:"Максимум:", settings:"Налаштування",
-    hp:"HP", score:"Рахунок", names:"Імена", wheel:"Колесо", rps:"К-Н-Б" }
+    ru: { ball:"Шар Судьбы", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоты", coin:"Монетка", rand:"Рандом", trump:"Козырь", back:"Назад", tap:"Нажми, чтобы бросить", heads:"ОРЕЛ", tails:"РЕШКА", win:"ПОБЕДА!", lose_phrases:["Эх, мимо...", "Попробуй еще!", "Не сегодня", "Упс...", "Пусто", "Почти..."], spin_btn:"КРУТИТЬ", generate:"СТАРТ", reset:"СБРОС", rand_limit_label:"Максимум:", 
+    hp:"HP", score:"Счет", names:"Имена", wheel:"Колесо", rps:"К-Н-Б", notes:"Заметки",
+    confirm_clear:"Вы точно хотите удалить содержимое?", dev:"Разработчик:" },
+    uk: { ball:"Куля Долі", d4:"Кубик D4", d6:"Кубик D6", d8:"Кубик D8", d10:"Кубик D10", d12:"Кубик D12", d20:"Кубик D20", slots:"Слоти", coin:"Монетка", rand:"Рандом", trump:"Козир", back:"Назад", tap:"Натисни, щоб кинути", heads:"ОРЕЛ", tails:"РЕШКА", win:"ВИГРАШ!", lose_phrases:["Ех, мимо...", "Спробуй ще!", "Не сьогодні", "Упс...", "Порожньо", "Майже..."], spin_btn:"КРУТИТИ", generate:"СТАРТ", reset:"СКИДАННЯ", rand_limit_label:"Максимум:", 
+    hp:"HP", score:"Рахунок", names:"Імена", wheel:"Колесо", rps:"К-Н-Б", notes:"Нотатки",
+    confirm_clear:"Ви точно хочете видалити вміст?", dev:"Розробник:" }
 };
 
-// --- D&D СПИСКИ ---
+// --- D&D NAMES ---
 const nameAdjectives = {
-    ru: ["Внезапный", "Пьяный", "Святой", "Проклятый", "Трусливый", "Безумный", "Жадный", "Героический", "Лысый", "Бородатый", "Сонный", "Грязный", "Золотой", "Мертвый", "Дикий", "Древний", "Юный", "Злобный", "Добрый", "Хитрый", "Тупой", "Ловкий", "Невидимый", "Горящий", "Ледяной", "Мокрый", "Громкий", "Тихий", "Слепой", "Одноглазый", "Хромой", "Везучий", "Неудачливый", "Богатый", "Нищий", "Влюбленный", "Одинокий", "Жестокий", "Милый", "Страшный", "Вонючий", "Душистый", "Быстрый", "Медленный", "Кровавый", "Теневой", "Звездный", "Лунный", "Солнечный", "Забытый"],
-    uk: ["Раптовий", "П'яний", "Святий", "Проклятий", "Боягузливий", "Божевільний", "Жадібний", "Героїчний", "Лисий", "Бородатий", "Сонний", "Брудний", "Золотий", "Мертвий", "Дикий", "Стародавній", "Юний", "Злісний", "Добрий", "Хитрий", "Тупий", "Спритний", "Невидимий", "Палаючий", "Крижаний", "Мокрий", "Гучний", "Тихий", "Сліпий", "Одноокий", "Кульгавий", "Везучий", "Невдачливий", "Багатий", "Жебрак", "Закоханий", "Самотній", "Жорстокий", "Милий", "Страшний", "Смердючий", "Запашний", "Швидкий", "Повільний", "Кривавий", "Тіньовий", "Зоряний", "Місячний", "Сонячний", "Забутий"]
+    ru: ["Внезапный","Пьяный","Святой","Проклятый","Трусливый","Безумный","Жадный","Героический","Лысый","Бородатый","Сонный","Грязный","Золотой","Мертвый","Дикий","Древний","Юный","Злобный","Добрый","Хитрый","Тупой","Ловкий","Невидимый","Горящий","Ледяной","Мокрый","Громкий","Тихий","Слепой","Одноглазый","Хромой","Везучий","Неудачливый","Богатый","Нищий","Влюбленный","Одинокий","Жестокий","Милый","Страшный","Вонючий","Душистый","Быстрый","Медленный","Кровавый","Теневой","Звездный","Лунный","Солнечный","Забытый"],
+    uk: ["Раптовий","П'яний","Святий","Проклятий","Боягузливий","Божевільний","Жадібний","Героїчний","Лисий","Бородатий","Сонний","Брудний","Золотий","Мертвий","Дикий","Стародавній","Юний","Злісний","Добрий","Хитрий","Тупий","Спритний","Невидимий","Палаючий","Крижаний","Мокрий","Гучний","Тихий","Сліпий","Одноокий","Кульгавий","Везучий","Невдачливий","Багатий","Жебрак","Закоханий","Самотній","Жорстокий","Милий","Страшний","Смердючий","Запашний","Швидкий","Повільний","Кривавий","Тіньовий","Зоряний","Місячний","Сонячний","Забутий"]
 };
 const nameClasses = {
-    ru: ["Стражник", "Орк", "Эльф", "Темный Эльф", "Бард", "Паладин", "Маг", "Лучник", "Разбойник", "Некромант", "Воин", "Варвар", "Жрец", "Друид", "Монах", "Следопыт", "Чародей", "Колдун", "Изобретатель", "Гном", "Полурослик", "Драконорожденный", "Тифлинг", "Гоблин", "Вампир", "Оборотень"],
-    uk: ["Стражник", "Орк", "Ельф", "Темний Ельф", "Бард", "Паладин", "Маг", "Лучник", "Розбійник", "Некромант", "Воїн", "Варвар", "Жрець", "Друїд", "Монах", "Слідопит", "Чародій", "Чаклун", "Винахідник", "Гном", "Напіврослик", "Дракононароджений", "Тіфлінг", "Гоблін", "Вампір", "Перевертень"]
+    ru: ["Стражник","Орк","Эльф","Темный Эльф","Бард","Паладин","Маг","Лучник","Разбойник","Некромант","Воин","Варвар","Жрец","Друид","Монах","Следопыт","Чародей","Колдун","Изобретатель","Гном","Полурослик","Драконорожденный","Тифлинг","Гоблин","Вампир","Оборотень"],
+    uk: ["Стражник","Орк","Ельф","Темний Ельф","Бард","Паладин","Маг","Лучник","Розбійник","Некромант","Воїн","Варвар","Жрець","Друїд","Монах","Слідопит","Чародій","Чаклун","Винахідник","Гном","Напіврослик","Дракононароджений","Тіфлінг","Гоблін","Вампір","Перевертень"]
 };
 
 let state = {
     lang: localStorage.getItem('mt_lang') || 'uk',
     theme: localStorage.getItem('mt_theme') || 'dark',
+    dnd_mode: localStorage.getItem('mt_dnd') === 'true',
     hp_p1: parseInt(localStorage.getItem('mt_hp_p1')) || 20,
     hp_p2: parseInt(localStorage.getItem('mt_hp_p2')) || 20,
     score_p1: parseInt(localStorage.getItem('mt_score_p1')) || 0,
     score_p2: parseInt(localStorage.getItem('mt_score_p2')) || 0,
     saved_name: localStorage.getItem('mt_name') || null,
-    // КОЛЕСО ТЕПЕРЬ ПУСТОЕ ПО УМОЛЧАНИЮ
-    wheel_segments: JSON.parse(localStorage.getItem('mt_wheel')) || [] 
+    wheel_segments: JSON.parse(localStorage.getItem('mt_wheel')) || [],
+    notes: localStorage.getItem('mt_notes') || ""
 };
 
 const engines = {}; 
@@ -41,7 +44,49 @@ function vibrate(ms = 50) {
     if (navigator.vibrate) navigator.vibrate(ms);
 }
 
-// --- HEADER STATUS UPDATE (Имя на новой строке) ---
+// --- DND MODE ---
+window.toggleDNDMode = () => {
+    state.dnd_mode = !state.dnd_mode;
+    localStorage.setItem('mt_dnd', state.dnd_mode);
+    applyDNDMode();
+    vibrate();
+};
+
+function applyDNDMode() {
+    const btn = document.getElementById('dnd-btn');
+    const tiles = document.querySelectorAll('.dnd-hide');
+    
+    if (state.dnd_mode) {
+        btn.classList.add('active');
+        btn.textContent = 'DND ON';
+        tiles.forEach(t => t.classList.add('hidden-tile'));
+    } else {
+        btn.classList.remove('active');
+        btn.textContent = 'DND OFF';
+        tiles.forEach(t => t.classList.remove('hidden-tile'));
+    }
+}
+
+// --- NOTES ---
+function initNotes() {
+    const area = document.getElementById('notes-area');
+    area.value = state.notes;
+    area.addEventListener('input', (e) => {
+        state.notes = e.target.value;
+        localStorage.setItem('mt_notes', state.notes);
+    });
+}
+
+window.resetNotes = () => {
+    if (confirm(translations[state.lang].confirm_clear)) {
+        state.notes = "";
+        localStorage.setItem('mt_notes', "");
+        document.getElementById('notes-area').value = "";
+        vibrate();
+    }
+};
+
+// --- HEADER STATUS UPDATE ---
 function updateHeaderStatus() {
     const statsRow = document.getElementById('status-stats');
     const nameRow = document.getElementById('status-name');
@@ -49,15 +94,12 @@ function updateHeaderStatus() {
     statsRow.innerHTML = '';
     nameRow.innerHTML = '';
     
-    // Статы (HP/Score)
     if (state.hp_p1 !== 20 || state.hp_p2 !== 20) {
         statsRow.innerHTML += `<div class="status-item">❤️ ${state.hp_p1}</div>`;
     }
     if (state.score_p1 !== 0 || state.score_p2 !== 0) {
         statsRow.innerHTML += `<div class="status-item">🏆 ${state.score_p1}</div>`;
     }
-    
-    // Имя (отдельной строкой ниже)
     if (state.saved_name) {
         nameRow.innerHTML = `<div class="status-item">👤 ${state.saved_name}</div>`;
     }
@@ -79,6 +121,7 @@ window.openScreen = (id) => {
         if(id === 'score-screen') renderCounter('score', 1);
         if(id === 'wheel-screen') drawWheel();
         if(id === 'name-screen') document.getElementById('generated-name').textContent = state.saved_name || "...";
+        if(id === 'notes-screen') initNotes();
     }, 200);
 };
 
@@ -204,7 +247,6 @@ function renderCounter(type, players) {
     const createBox = (pIndex, inverted) => {
         const key = `${type}_p${pIndex}`;
         const val = state[key];
-        // Используем input вместо div для ручного ввода
         return `
         <div class="counter-box ${inverted ? 'inverted-player' : ''}">
             <input type="number" class="counter-val-input" id="${key}-val" value="${val}" onchange="manualCounterUpdate('${type}', ${pIndex}, this.value)">
@@ -280,7 +322,7 @@ window.addWheelSegment = () => {
     }
 };
 window.resetWheel = () => {
-    state.wheel_segments = []; // Empty start
+    state.wheel_segments = [];
     localStorage.setItem('mt_wheel', JSON.stringify(state.wheel_segments));
     drawWheel();
 };
@@ -291,7 +333,6 @@ function drawWheel() {
     
     ctx.clearRect(0,0,300,300);
     
-    // Если пусто
     if (segments.length === 0) {
         ctx.fillStyle = "rgba(255,255,255,0.1)";
         ctx.beginPath(); ctx.arc(150, 150, 140, 0, Math.PI*2); ctx.fill();
@@ -312,13 +353,10 @@ function drawWheel() {
         ctx.lineTo(0, 0);
         ctx.fillStyle = colors[i % colors.length];
         ctx.fill();
-        
         ctx.save();
         ctx.rotate(i * arc + arc / 2);
-        ctx.fillStyle = "white";
-        ctx.font = "bold 14px Arial";
-        ctx.textAlign = "right";
-        ctx.fillText(seg, 130, 5);
+        ctx.fillStyle = "white"; ctx.font = "bold 14px Arial";
+        ctx.textAlign = "right"; ctx.fillText(seg, 130, 5);
         ctx.restore();
     });
     ctx.rotate(-wheelAngle);
@@ -330,8 +368,7 @@ window.spinWheel = () => {
     vibrate();
     const duration = 3000;
     const start = performance.now();
-    const spin = Math.random() * 10 + 10; // Rotations
-    
+    const spin = Math.random() * 10 + 10;
     function animate(time) {
         const p = Math.min((time - start) / duration, 1);
         const ease = 1 - Math.pow(1 - p, 3);
@@ -342,13 +379,12 @@ window.spinWheel = () => {
     requestAnimationFrame(animate);
 };
 
-// --- RPS (Rock Paper Scissors) ---
+// --- RPS ---
 window.playRPS = () => {
     vibrate();
     const opts = ['🪨', '✂️', '📄']; 
     const topEl = document.getElementById('rps-top');
     const botEl = document.getElementById('rps-bottom');
-    
     let c = 0;
     const int = setInterval(() => {
         topEl.querySelector('span').textContent = opts[c % 3];
@@ -356,15 +392,12 @@ window.playRPS = () => {
         c++;
         if(c > 20) {
             clearInterval(int);
-            const r1 = Math.floor(Math.random()*3); // 0=R, 1=S, 2=P
+            const r1 = Math.floor(Math.random()*3);
             const r2 = Math.floor(Math.random()*3);
-            
             topEl.querySelector('span').textContent = opts[r1];
             botEl.querySelector('span').textContent = opts[r2];
-            
             topEl.className = 'rps-side inverted';
             botEl.className = 'rps-side';
-            
             if(r1 === r2) { /* Tie */ }
             else if((r2 === 0 && r1 === 1) || (r2 === 1 && r1 === 2) || (r2 === 2 && r1 === 0)) {
                 botEl.classList.add('win'); topEl.classList.add('lose'); vibrate([50,50,50]);
@@ -380,8 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const langBtns = document.querySelectorAll('.lang-btn');
     langBtns.forEach(btn => btn.onclick = () => { state.lang = btn.dataset.lang; localStorage.setItem('mt_lang', state.lang); applyLang(); });
     document.getElementById('theme-toggle').onclick = () => { state.theme = state.theme==='dark'?'light':'dark'; localStorage.setItem('mt_theme', state.theme); applyTheme(); };
-    
-    applyTheme(); applyLang(); updateHeaderStatus();
+    applyTheme(); applyLang(); updateHeaderStatus(); applyDNDMode();
 });
 
 function applyTheme() {
@@ -396,7 +428,6 @@ function applyLang() {
         if(translations[state.lang][key]) el.textContent = translations[state.lang][key];
     });
 }
-
 function initDice3D(screenId) {
     const diceType = screenId.replace('-screen', ''); 
     if (engines[diceType]) return; 
