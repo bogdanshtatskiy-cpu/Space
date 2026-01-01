@@ -48,17 +48,16 @@ body {
     max-width: 600px;
     margin: 0 auto;
     position: relative;
-    height: 100%; /* Важно для скролла */
+    height: 100%;
 }
 
-/* Header */
 header {
     padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 20;
-    flex-shrink: 0; /* Чтобы хедер не сжимался */
+    flex-shrink: 0;
 }
 
 .controls, .lang-switch {
@@ -82,13 +81,12 @@ header {
     font-weight: bold;
 }
 
-/* Screens */
 .screen {
     flex: 1;
     display: none;
     flex-direction: column;
     padding: 20px;
-    overflow-y: auto; /* Скролл только внутри контента */
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -102,7 +100,6 @@ header {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Menu Grid */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -124,14 +121,13 @@ header {
     cursor: pointer;
     transition: transform 0.2s;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    text-align: center; /* Центрирование текста */
+    text-align: center;
 }
 
 .menu-item:active { transform: scale(0.96); }
 .icon-bg { font-size: 36px; margin-bottom: 10px; }
 .menu-label { font-size: 14px; font-weight: 500; }
 
-/* 3D Canvas */
 .canvas-wrapper {
     flex: 1;
     width: 100%;
@@ -188,22 +184,14 @@ header {
 .reel { font-size: 40px; line-height: 80px; text-align: center; }
 
 /* Coin */
-.coin-wrapper {
-    width: 150px; height: 150px; margin: auto; perspective: 1000px;
-}
-.coin {
-    width: 100%; height: 100%; position: relative;
-    transform-style: preserve-3d;
-    transition: transform 2.5s cubic-bezier(0.1, 0.9, 0.2, 1); /* Плавная остановка */
-}
-/* Анимация подбрасывания (масштаб) */
+.coin-wrapper { width: 150px; height: 150px; margin: auto; perspective: 1000px; }
+.coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 2.5s cubic-bezier(0.1, 0.9, 0.2, 1); }
 .coin-toss { animation: toss-scale 1s ease-in-out; }
 @keyframes toss-scale {
     0% { transform: scale(1) translateY(0); }
     50% { transform: scale(1.5) translateY(-50px); }
     100% { transform: scale(1) translateY(0); }
 }
-
 .coin-face {
     position: absolute; width: 100%; height: 100%;
     backface-visibility: hidden; border-radius: 50%;
@@ -218,5 +206,12 @@ header {
 .input-group { display: flex; flex-direction: column; align-items: center; margin: auto; gap: 20px; }
 .glass-input { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 10px; color: var(--text-primary); border-radius: 10px; text-align: center; font-size: 20px; width: 100px; }
 .big-number { font-size: 80px; font-weight: 200; min-height: 100px; display: flex; align-items: center; justify-content: center; }
-.glass-btn { background: var(--text-primary); color: var(--bg-gradient); border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.glass-btn { 
+    background: var(--text-primary); 
+    color: var(--bg-gradient); /* Цвет текста кнопки инвертирован для контраста */
+    /* Фикс для темного текста на белой кнопке в темной теме */
+    color: #333; 
+    border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.1s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+}
+body.light-theme .glass-btn { color: #fff; background: var(--accent); }
 .glass-btn:active { transform: scale(0.95); }
