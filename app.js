@@ -14,7 +14,7 @@ const translations = {
 // --- D&D NAMES ---
 const nameAdjectives = {
     ru: ["Внезапный","Пьяный","Святой","Проклятый","Трусливый","Безумный","Жадный","Героический","Лысый","Бородатый","Сонный","Грязный","Золотой","Мертвый","Дикий","Древний","Юный","Злобный","Добрый","Хитрый","Тупой","Ловкий","Невидимый","Горящий","Ледяной","Мокрый","Громкий","Тихий","Слепой","Одноглазый","Хромой","Везучий","Неудачливый","Богатый","Нищий","Влюбленный","Одинокий","Жестокий","Милый","Страшный","Вонючий","Душистый","Быстрый","Медленный","Кровавый","Теневой","Звездный","Лунный","Солнечный","Забытый"],
-    uk: ["Раптовий","П'яний","Святий","Проклятий","Боягузливий","Божевільний","Жадібний","Героїчний","Лисий","Бородатий","Сонний","Брудний","Золотий","Мертвий","Дикий","Стародавній","Юний","Злісний","Добрий","Хитрий","Тупий","Спритний","Невидимий","Палаючий","Крижаний","Мокрий","Гучний","Тихий","Сліпий","Одноокий","Кульгавий","Везучий","Невдачливий","Багатий","Жебрак","Закоханий","Самотній","Жорстокий","Милий","Страшний","Смердючий","Запашний","Швидкий","Повільний","Кривавий","Тіньовий","Зоряний","Місячний","Сонячний","Забутий"]
+    uk: ["Раптовий","П'яний","Святий","Проклятий","Боягузливий","Божевільний","Жадібний","Героїчний","Лисий","Бородатий","Сонний","Брудний","Золотий","Мертвий","Дикий","Стародавній","Юний","Злісний","Добрий","Хитрий","Тупий","Спритний","Невидимий","Палаючий","Крижаний","Мокрий","Гучний", "Тихий","Сліпий","Одноокий","Кульгавий","Везучий","Невдачливий","Багатий","Жебрак","Закоханий","Самотній","Жорстокий","Милий","Страшний","Смердючий","Запашний","Швидкий","Повільний","Кривавий","Тіньовий","Зоряний","Місячний","Сонячний","Забутий"]
 };
 const nameClasses = {
     ru: ["Стражник","Орк","Эльф","Темный Эльф","Бард","Паладин","Маг","Лучник","Разбойник","Некромант","Воин","Варвар","Жрец","Друид","Монах","Следопыт","Чародей","Колдун","Изобретатель","Гном","Полурослик","Драконорожденный","Тифлинг","Гоблин","Вампир","Оборотень"],
@@ -88,20 +88,23 @@ window.resetNotes = () => {
 
 // --- HEADER STATUS UPDATE ---
 function updateHeaderStatus() {
-    const statsRow = document.getElementById('status-stats');
-    const nameRow = document.getElementById('status-name');
+    const statsArea = document.getElementById('status-stats-area');
+    const nameArea = document.getElementById('status-name-area');
     
-    statsRow.innerHTML = '';
-    nameRow.innerHTML = '';
+    statsArea.innerHTML = '';
+    nameArea.innerHTML = '';
     
+    // Имя (Слева)
+    if (state.saved_name) {
+        nameArea.innerHTML = `<div class="status-item">👤 ${state.saved_name}</div>`;
+    }
+
+    // Статы (Справа)
     if (state.hp_p1 !== 20 || state.hp_p2 !== 20) {
-        statsRow.innerHTML += `<div class="status-item">❤️ ${state.hp_p1}</div>`;
+        statsArea.innerHTML += `<div class="status-item">❤️ ${state.hp_p1}</div>`;
     }
     if (state.score_p1 !== 0 || state.score_p2 !== 0) {
-        statsRow.innerHTML += `<div class="status-item">🏆 ${state.score_p1}</div>`;
-    }
-    if (state.saved_name) {
-        nameRow.innerHTML = `<div class="status-item">👤 ${state.saved_name}</div>`;
+        statsArea.innerHTML += `<div class="status-item">🏆 ${state.score_p1}</div>`;
     }
 }
 
@@ -410,17 +413,32 @@ window.playRPS = () => {
 
 // INIT
 document.addEventListener('DOMContentLoaded', () => {
-    const langBtns = document.querySelectorAll('.lang-btn');
-    langBtns.forEach(btn => btn.onclick = () => { state.lang = btn.dataset.lang; localStorage.setItem('mt_lang', state.lang); applyLang(); });
-    document.getElementById('theme-toggle').onclick = () => { state.theme = state.theme==='dark'?'light':'dark'; localStorage.setItem('mt_theme', state.theme); applyTheme(); };
+    // Языки
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.onclick = () => { state.lang = btn.dataset.lang; localStorage.setItem('mt_lang', state.lang); applyLang(); };
+    });
+    
+    // Темы (Новая логика для двух кнопок)
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.onclick = () => { 
+            state.theme = btn.dataset.theme; 
+            localStorage.setItem('mt_theme', state.theme); 
+            applyTheme(); 
+        };
+    });
+    
     applyTheme(); applyLang(); updateHeaderStatus(); applyDNDMode();
 });
 
 function applyTheme() {
     if (state.theme === 'light') document.body.classList.add('light-theme');
     else document.body.classList.remove('light-theme');
-    document.getElementById('theme-icon').textContent = state.theme === 'light' ? '☀️' : '🌙';
+    
+    // Обновляем активный класс на качельке тем
+    document.querySelectorAll('.theme-btn').forEach(b => 
+        b.classList.toggle('active', b.dataset.theme === state.theme));
 }
+
 function applyLang() {
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === state.lang));
     document.querySelectorAll('[data-key]').forEach(el => {
@@ -428,6 +446,7 @@ function applyLang() {
         if(translations[state.lang][key]) el.textContent = translations[state.lang][key];
     });
 }
+
 function initDice3D(screenId) {
     const diceType = screenId.replace('-screen', ''); 
     if (engines[diceType]) return; 
