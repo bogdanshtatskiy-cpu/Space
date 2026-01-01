@@ -1,4 +1,5 @@
 import { DiceEngine } from './dice-engine.js';
+import { predictions } from './predictions.js';
 
 // --- Конфигурация ---
 const translations = {
@@ -20,19 +21,14 @@ const translations = {
     }
 };
 
-const magicAnswers = {
-    ru: ["Да", "Нет", "Возможно", "Спроси позже", "Точно да", "Вряд ли"],
-    uk: ["Так", "Ні", "Можливо", "Спитай пізніше", "Точно так", "Навряд чи"]
-};
-
-// --- Состояние ---
 let state = {
     lang: localStorage.getItem('mt_lang') || 'uk',
-    theme: localStorage.getItem('mt_theme') || 'dark',
-    activeScreen: 'menu'
+    theme: localStorage.getItem('mt_theme') || 'dark'
 };
 
-// --- Инициализация ---
+// Для монетки (храним текущий угол, чтобы крутить дальше, а не с нуля)
+let coinTotalRotation = 0;
+
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     applyLang();
@@ -40,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTools();
 });
 
-// --- Навигация и Настройки ---
 function setupNavigation() {
     // Язык
     document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -59,37 +54,47 @@ function setupNavigation() {
         applyTheme();
     };
 
-    // Переходы
+    // Открытие экрана
     window.openScreen = (id) => {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('menu-screen').style.display = 'none';
-        
-        const target = document.getElementById(id);
-        target.style.display = 'flex';
-        // Небольшая задержка для анимации
-        setTimeout(() => target.classList.add('active'), 10);
-        
-        // Если это экран кубика, инициализируем 3D движок (если еще нет)
-        if(id.startsWith('d') && id.includes('-screen')) {
-            initDice3D(id);
-        }
+        const menu = document.getElementById('menu-screen');
+        menu.classList.remove('active');
+        // Ждем пока исчезнет
+        setTimeout(() => {
+            menu.style.display = 'none';
+            const target = document.getElementById(id);
+            target.style.display = 'flex';
+            setTimeout(() => target.classList.add('active'), 10);
+            
+            if(id.startsWith('d') && id.includes('-screen')) {
+                initDice3D(id);
+            }
+        }, 200);
     };
 
+    // Возврат назад (ИСПРАВЛЕНО: Теперь корректно переключает display)
     window.goBack = () => {
-        document.querySelectorAll('.screen').forEach(s => {
-            s.classList.remove('active');
-            setTimeout(() => s.style.display = 'none', 300);
-        });
-        const menu = document.getElementById('menu-screen');
-        menu.style.display = 'flex';
-        setTimeout(() => menu.classList.add('active'), 10);
+        // Находим активный экран
+        const activeScreen = document.querySelector('.screen.active');
+        if (activeScreen && activeScreen.id !== 'menu-screen') {
+            activeScreen.classList.remove('active');
+            
+            setTimeout(() => {
+                activeScreen.style.display = 'none';
+                
+                const menu = document.getElementById('menu-screen');
+                menu.style.display = 'flex'; // Явно включаем
+                // Форсируем перерисовку
+                requestAnimationFrame(() => {
+                    menu.classList.add('active');
+                });
+            }, 300); // Тайминг CSS анимации
+        }
     };
 }
 
 function applyTheme() {
     if (state.theme === 'light') document.body.classList.add('light-theme');
     else document.body.classList.remove('light-theme');
-    
     document.getElementById('theme-icon').textContent = state.theme === 'light' ? '☀️' : '🌙';
 }
 
@@ -103,65 +108,93 @@ function applyLang() {
     });
 }
 
-// --- 3D Кубики ---
-// Хранилище созданных движков, чтобы не создавать заново
+// 3D Engine Singleton
 const engines = {}; 
-
 function initDice3D(screenId) {
-    const diceType = screenId.replace('-screen', ''); // d4, d6...
-    if (engines[diceType]) return; // Уже создан
+    const diceType = screenId.replace('-screen', ''); 
+    if (engines[diceType]) return; 
 
-    // Находим контейнер
     const containerId = `${diceType}-scene`;
-    // Цвет кубика зависит от типа
-    const colors = { d4: 0xff3333, d6: 0x33ff33, d8: 0x3333ff, d10: 0xff33ff, d12: 0xffff33, d20: 0x0a84ff };
-    
-    // Создаем экземпляр движка
+    // Разные цвета для кубиков
+    const colors = { d4: 0xff4444, d6: 0x44ff44, d8: 0x4444ff, d10: 0xff44ff, d12: 0xffff44, d20: 0x0a84ff };
     engines[diceType] = new DiceEngine(containerId, diceType, colors[diceType]);
 }
 
-
-// --- Логика Мини-игр ---
 function setupTools() {
-    // Magic Ball
+    // Шар Судьбы (Использует новый файл)
     window.askBall = () => {
         const text = document.getElementById('ball-text');
         const ball = document.querySelector('.magic-ball-outer');
         text.style.opacity = 0;
         ball.classList.add('ball-animate');
         setTimeout(() => {
-            const opts = magicAnswers[state.lang];
+            const opts = predictions[state.lang];
             text.textContent = opts[Math.floor(Math.random() * opts.length)];
             text.style.opacity = 1;
             ball.classList.remove('ball-animate');
         }, 500);
     };
 
-    // Coin
+    // Монетка (ИСПРАВЛЕНО: Накопительное вращение)
     window.flipCoin = () => {
         const coin = document.querySelector('.coin');
-        const rot = 1800 + (Math.random() > 0.5 ? 0 : 180);
-        coin.style.transform = `rotateY(${rot}deg)`;
+        const wrapper = document.querySelector('.coin-wrapper'); // Для анимации прыжка
+        
+        // Добавляем к текущему углу минимум 5 оборотов (1800) + результат
+        const outcome = Math.random() > 0.5 ? 0 : 180;
+        coinTotalRotation += (1800 + outcome); 
+        
+        // Прыжок
+        wrapper.classList.remove('coin-toss');
+        void wrapper.offsetWidth; // Триггер рефлоу для перезапуска анимации
+        wrapper.classList.add('coin-toss');
+
+        coin.style.transform = `rotateY(${coinTotalRotation}deg)`;
     };
 
-    // Slots
+    // Слоты
     window.spinSlots = () => {
-        const syms = ["🍒","🍋","7️⃣","💎"];
-        [1,2,3].forEach(i => {
+        const syms = ["🍒","🍋","7️⃣","💎", "🔔", "🍇"];
+        const msg = document.getElementById('slot-msg');
+        msg.textContent = "";
+        
+        let results = [];
+        [1,2,3].forEach((i) => {
             const el = document.getElementById(`reel-${i}`);
             let count = 0;
+            const maxCount = 10 + i * 5;
             const interval = setInterval(() => {
-                el.textContent = syms[Math.floor(Math.random()*syms.length)];
+                const sym = syms[Math.floor(Math.random()*syms.length)];
+                el.textContent = sym;
                 count++;
-                if(count > 10 + i*5) clearInterval(interval);
-            }, 50);
+                if(count > maxCount) {
+                    clearInterval(interval);
+                    results.push(sym);
+                    if(results.length === 3) checkWin(results, msg);
+                }
+            }, 60);
         });
     };
+
+    function checkWin(res, msgEl) {
+        if(res[0] === res[1] && res[1] === res[2]) {
+            msgEl.textContent = translations[state.lang].win;
+            msgEl.style.color = '#0f0';
+        } else {
+            msgEl.textContent = translations[state.lang].lose;
+            msgEl.style.color = 'inherit';
+        }
+    }
     
-    // Randomizer
+    // Рандомайзер
     window.generateRandom = () => {
         const max = document.getElementById('rand-max').value;
-        document.getElementById('rand-display').textContent = Math.floor(Math.random() * max) + 1;
+        const display = document.getElementById('rand-display');
+        let count = 0;
+        const interval = setInterval(() => {
+            display.textContent = Math.floor(Math.random() * max) + 1;
+            count++;
+            if(count > 10) clearInterval(interval);
+        }, 50);
     }
 }
-
